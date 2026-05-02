@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+@theme {
+  /* Base ground — the layer behind every gradient */
+  --color-bg: #050508;
+  --color-fg: #f5f5f7;
+  --color-muted: #71717a;
+
+  /* Gravixar brand red square — preserved as the platform mark */
+  --color-mark: #ff1f2d;
+
+  /* Scene tokens. Each scene layout overrides these on its root. */
+  --color-scene-1: #ff6b6b;     /* primary accent */
+  --color-scene-2: #f5e6d3;     /* secondary */
+  --color-scene-glow: rgba(255, 107, 107, 0.35);
+
+  /* Typography — display fonts are loaded per-scene via next/font.
+     Body is Inter everywhere. */
+  --font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display-serif: var(--font-fraunces), "Fraunces", ui-serif, Georgia, serif;
+  --font-display-mono: var(--font-jetbrains), "JetBrains Mono", ui-monospace, "SF Mono", Consolas, monospace;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, "SF Mono", Consolas, monospace;
+}
+
+@layer base {
+  html {
+    background: #050508;
+    color: #f5f5f7;
+    color-scheme: dark;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    min-height: 100dvh;
+  }
+  ::selection {
+    background: var(--color-scene-1, #ff1f2d);
+    color: #050508;
+  }
+}
+
+@layer utilities {
+  /* Glass panel — the workhorse surface treatment */
+  .glass {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.06) inset,
+      0 30px 60px -20px rgba(0, 0, 0, 0.6);
+  }
+  .glass-strong {
+    background: rgba(20, 20, 28, 0.6);
+    backdrop-filter: blur(28px) saturate(160%);
+    -webkit-backdrop-filter: blur(28px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.08) inset,
+      0 40px 80px -24px rgba(0, 0, 0, 0.8);
+  }
+
+  /* Editorial dot grid */
+  .bg-dot-grid {
+    background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.07) 1px, transparent 0);
+    background-size: 28px 28px;
+  }
+
+  /* Lattice scene — navy → violet → cream wash */
+  .bg-lattice {
+    background:
+      radial-gradient(70% 60% at 100% 0%, rgba(255, 107, 107, 0.22) 0%, transparent 60%),
+      radial-gradient(60% 90% at 0% 100%, rgba(245, 230, 211, 0.10) 0%, transparent 60%),
+      linear-gradient(180deg, #0a1230 0%, #16143a 50%, #0a0a14 100%);
+  }
+
+  /* Studio Mix scene — near-black → indigo aurora */
+  .bg-studio-mix {
+    background:
+      radial-gradient(60% 60% at 80% 0%, rgba(0, 225, 255, 0.18) 0%, transparent 55%),
+      radial-gradient(50% 70% at 10% 100%, rgba(255, 45, 149, 0.18) 0%, transparent 60%),
+      linear-gradient(180deg, #070a14 0%, #0e0820 60%, #050508 100%);
+  }
+
+  /* Gallery landing — bigger, mixed palette */
+  .bg-gallery {
+    background:
+      radial-gradient(70% 60% at 100% 0%, rgba(255, 45, 149, 0.18) 0%, transparent 55%),
+      radial-gradient(50% 80% at 0% 50%, rgba(0, 225, 255, 0.14) 0%, transparent 55%),
+      radial-gradient(40% 50% at 100% 100%, rgba(255, 107, 107, 0.18) 0%, transparent 55%),
+      linear-gradient(180deg, #050508 0%, #0a0814 60%, #050508 100%);
+  }
+
+  /* Pulsing dot for live/coming indicators */
+  @keyframes scenePulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 currentColor; }
+    50% { opacity: 0.55; box-shadow: 0 0 0 6px transparent; }
+  }
+  .pulse-dot {
+    animation: scenePulse 2.2s ease-out infinite;
+  }
+
+  /* Window chrome — three traffic-light dots, top-left of a panel */
+  .window-dots::before {
+    content: "";
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ff5f57;
+    box-shadow:
+      18px 0 0 0 #febc2e,
+      36px 0 0 0 #28c840;
+    opacity: 0.85;
+  }
+
+  /* Scene-scoped accent utility — uses the CSS vars set on each scene root */
+  .text-scene { color: var(--color-scene-1); }
+  .bg-scene { background: var(--color-scene-1); }
+  .border-scene { border-color: var(--color-scene-1); }
+  .ring-scene { box-shadow: 0 0 0 1px var(--color-scene-1); }
+}

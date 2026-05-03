@@ -8,6 +8,7 @@ import { WindowDots } from "@/components/demo/WindowChrome";
 import { EchoRunner } from "@/components/scenes/studio-mix/EchoRunner";
 import { PulseRunner } from "@/components/scenes/studio-mix/PulseRunner";
 import { RiverRunner } from "@/components/scenes/studio-mix/RiverRunner";
+import { AtlasRunner } from "@/components/scenes/studio-mix/AtlasRunner";
 import { AgentRunFeed } from "@/components/scenes/studio-mix/AgentRunFeed";
 
 const AGENTS = [
@@ -113,6 +114,7 @@ export default function StudioMixConsole() {
           <EchoRunner />
           <PulseRunner />
           <RiverRunner />
+          <AtlasRunner />
         </div>
       </div>
 
@@ -122,7 +124,7 @@ export default function StudioMixConsole() {
       </div>
 
       <p className="mt-12 text-[10px] uppercase tracking-widest text-zinc-600">
-        ⚠ ATLAS still mocked · ECHO + RIVER come fully live the moment AI_GATEWAY_API_KEY is set · PULSE is SQL-only and works now
+        ⚠ ECHO + RIVER + ATLAS come fully live the moment AI_GATEWAY_API_KEY is set · PULSE is SQL-only and works now
       </p>
 
       <div className="mt-16 border-t border-white/5 pt-8">

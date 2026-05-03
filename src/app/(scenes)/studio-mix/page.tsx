@@ -7,6 +7,7 @@ import { GlassPanel } from "@/components/demo/GlassPanel";
 import { WindowDots } from "@/components/demo/WindowChrome";
 import { EchoRunner } from "@/components/scenes/studio-mix/EchoRunner";
 import { PulseRunner } from "@/components/scenes/studio-mix/PulseRunner";
+import { RiverRunner } from "@/components/scenes/studio-mix/RiverRunner";
 import { AgentRunFeed } from "@/components/scenes/studio-mix/AgentRunFeed";
 
 const AGENTS = [
@@ -111,6 +112,7 @@ export default function StudioMixConsole() {
         <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
           <EchoRunner />
           <PulseRunner />
+          <RiverRunner />
         </div>
       </div>
 
@@ -120,7 +122,7 @@ export default function StudioMixConsole() {
       </div>
 
       <p className="mt-12 text-[10px] uppercase tracking-widest text-zinc-600">
-        ⚠ RIVER / ATLAS run mocked until their endpoints land · ECHO is live the moment AI_GATEWAY_API_KEY is set
+        ⚠ ATLAS still mocked · ECHO + RIVER come fully live the moment AI_GATEWAY_API_KEY is set · PULSE is SQL-only and works now
       </p>
 
       <div className="mt-16 border-t border-white/5 pt-8">

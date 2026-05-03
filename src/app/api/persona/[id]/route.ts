@@ -1,12 +1,10 @@
 // Persona switch handler. POST a form here with persona id + redirect path.
-// Sets the persona cookie, redirects into the scene's landing page.
-//
-// When real auth lands (after Postgres is provisioned), this becomes
-// a NextAuth signIn() under the hood. Surface stays the same.
+// Calls NextAuth signIn() to start a real signed-in session, then
+// redirects into the persona's landing.
 
 import { NextResponse } from "next/server";
 import { findLatticePersona } from "@/lib/personas/lattice";
-import { setActivePersona } from "@/lib/demo/session";
+import { signIn } from "@/lib/auth";
 
 export const runtime = "nodejs";
 
@@ -38,7 +36,15 @@ async function handle(req: Request, params: Promise<{ id: string }>) {
     // body wasn't form-encoded; fine, use default landing
   }
 
-  await setActivePersona(id);
+  // signIn() with redirectTo handles the cookie + redirect for us.
+  // It throws a NEXT_REDIRECT under the hood; we let that propagate.
+  await signIn("credentials", {
+    personaId: id,
+    redirectTo,
+  });
+
+  // Unreachable — signIn throws a redirect — but the type system
+  // wants something here.
   return NextResponse.redirect(new URL(redirectTo, req.url), 303);
 }
 

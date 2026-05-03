@@ -1,0 +1,170 @@
+// Demo schema — minimal slice that powers Lattice + Studio Mix.
+// Patterns lifted from bs-hub but trimmed: no email verification, no
+// HIBP, no compliance retention tiers — this is a sandbox.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Connection URL lives in prisma.config.ts (Prisma 7 moved it out of
+// the schema). The runtime PrismaClient gets its connection via the
+// PrismaPg adapter in src/lib/db.ts.
+
+// ---- Users + roles ---------------------------------------------------
+
+enum UserRole {
+  CLIENT
+  PM
+  ADMIN
+  DESIGNER
+}
+
+model User {
+  id        String   @id @default(cuid())
+  // Stable id matching the persona slug in src/lib/personas/lattice.ts
+  // (e.g. "mira-voss"). Used by the persona-bypass credentials provider.
+  personaId String   @unique
+  name      String
+  email     String   @unique
+  role      UserRole
+  createdAt DateTime @default(now())
+
+  clientProfile    Client?          @relation("ClientUser")
+  projectsAsPm     Project[]        @relation("ProjectPm")
+  projectsAsClient Project[]        @relation("ProjectClient")
+  tasksAssigned    Task[]           @relation("TaskAssignee")
+  inquiryMessages  InquiryMessage[]
+  auditLogs        AuditLog[]
+}
+
+// CRM row — separate from the User account so a client can have a
+// "company" identity even before they log in.
+model Client {
+  id        String    @id @default(cuid())
+  userId    String    @unique
+  user      User      @relation("ClientUser", fields: [userId], references: [id], onDelete: Cascade)
+  company   String
+  industry  String?
+  projects  Project[]
+  inquiries Inquiry[]
+}
+
+// ---- Projects + delivery state machine -------------------------------
+
+enum ProjectStatus {
+  ACTIVE
+  IN_REVIEW
+  SHIPPED
+  ARCHIVED
+}
+
+model Project {
+  id           String        @id @default(cuid())
+  name         String
+  status       ProjectStatus @default(ACTIVE)
+  clientId     String
+  client       Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  pmId         String
+  pm           User          @relation("ProjectPm", fields: [pmId], references: [id])
+  clientUserId String
+  clientUser   User          @relation("ProjectClient", fields: [clientUserId], references: [id])
+  milestones   Milestone[]
+  tasks        Task[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Milestone {
+  id        String    @id @default(cuid())
+  name      String
+  projectId String
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  dueAt     DateTime?
+  tasks     Task[]
+}
+
+// 6-state review machine — same pattern as bs-hub.
+// DRAFT → SUBMITTED_FOR_INTERNAL → INTERNAL_APPROVED → SUBMITTED_FOR_CLIENT → CLIENT_APPROVED
+// (with a CLIENT_REVISION_REQUESTED branch back into the loop)
+enum TaskReviewState {
+  DRAFT
+  SUBMITTED_FOR_INTERNAL
+  INTERNAL_APPROVED
+  SUBMITTED_FOR_CLIENT
+  CLIENT_APPROVED
+  CLIENT_REVISION_REQUESTED
+}
+
+model Task {
+  id          String          @id @default(cuid())
+  title       String
+  reviewState TaskReviewState @default(DRAFT)
+  projectId   String
+  project     Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  milestoneId String?
+  milestone   Milestone?      @relation(fields: [milestoneId], references: [id])
+  assigneeId  String?
+  assignee    User?           @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  dueAt       DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+// ---- Pre-project funnel ----------------------------------------------
+
+enum InquiryStatus {
+  NEW
+  PM_ASSIGNED
+  AWAITING_CALL
+  CALL_DONE
+  ACTIVATED
+}
+
+model Inquiry {
+  id        String           @id @default(cuid())
+  clientId  String
+  client    Client           @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  status    InquiryStatus    @default(NEW)
+  summary   String
+  messages  InquiryMessage[]
+  createdAt DateTime         @default(now())
+}
+
+model InquiryMessage {
+  id        String   @id @default(cuid())
+  inquiryId String
+  inquiry   Inquiry  @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  body      String
+  createdAt DateTime @default(now())
+}
+
+// ---- Cross-cutting ---------------------------------------------------
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  table     String
+  recordId  String
+  action    String   // CREATE / UPDATE / DELETE
+  actorId   String?
+  actor     User?    @relation(fields: [actorId], references: [id])
+  before    Json?
+  after     Json?
+  note      String?
+  createdAt DateTime @default(now())
+}
+
+// Studio Mix — track each agent invocation.
+model AgentRun {
+  id     String   @id @default(cuid())
+  agent  String   // ECHO, PULSE, RIVER, ATLAS
+  input  Json?
+  output Json?
+  status String   // pending, success, error
+  ranAt  DateTime @default(now())
+}

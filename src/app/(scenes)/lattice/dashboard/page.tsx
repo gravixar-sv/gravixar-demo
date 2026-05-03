@@ -1,4 +1,4 @@
-// Mira's client dashboard — real data from Postgres.
+// Mira's client dashboard — real data + functional review buttons.
 
 import { redirect } from "next/navigation";
 import { findLatticePersona } from "@/lib/personas/lattice";
@@ -8,6 +8,7 @@ import {
   getPendingReviewTasks,
   projectStatusTone,
 } from "@/lib/queries/lattice";
+import { approveTaskAction, requestRevisionAction } from "@/lib/actions/lattice";
 import { GlassPanel } from "@/components/demo/GlassPanel";
 import { WindowDots } from "@/components/demo/WindowChrome";
 
@@ -25,7 +26,6 @@ export default async function LatticeDashboard() {
 
   return (
     <div className="mx-auto max-w-7xl px-6 pb-20 pt-12 md:px-10 lg:px-16">
-      {/* Greeting header */}
       <div className="grid gap-8 lg:grid-cols-12">
         <div className="lg:col-span-7">
           <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-[var(--color-scene-1)]">
@@ -35,13 +35,9 @@ export default async function LatticeDashboard() {
             Welcome back, {persona.name.split(" ")[0]}.
           </h1>
           <p className="mt-4 max-w-xl text-zinc-400">
-            {pendingReview.length > 0 ? (
-              <>
-                {pendingReview.length} deliverable{pendingReview.length === 1 ? "" : "s"} waiting on your review.
-              </>
-            ) : (
-              <>You&apos;re all caught up. Nothing waiting on your review.</>
-            )}
+            {pendingReview.length > 0
+              ? `${pendingReview.length} deliverable${pendingReview.length === 1 ? "" : "s"} waiting on your review.`
+              : "You're all caught up. Nothing waiting on your review."}
           </p>
         </div>
         <div className="lg:col-span-5 lg:pt-6">
@@ -65,7 +61,6 @@ export default async function LatticeDashboard() {
         </div>
       </div>
 
-      {/* Pending review */}
       {pendingReview.length > 0 ? (
         <div className="mt-12">
           <h2 className="font-mono text-[11px] uppercase tracking-widest text-[var(--color-scene-1)]">
@@ -73,26 +68,39 @@ export default async function LatticeDashboard() {
           </h2>
           <ul className="mt-4 divide-y divide-white/5 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md">
             {pendingReview.map((task) => (
-              <li key={task.id} className="flex items-center justify-between gap-4 px-5 py-4">
+              <li key={task.id} className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-sm text-zinc-100">{task.title}</p>
                   <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-zinc-500">
-                    updated {timeAgo(task.updatedAt)}
+                    {task.project.name} · updated {timeAgo(task.updatedAt)}
                   </p>
                 </div>
-                <button
-                  type="button"
-                  className="rounded-md border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/10 px-3 py-1.5 text-xs text-[var(--color-scene-1)] hover:bg-[var(--color-scene-1)]/20"
-                >
-                  review →
-                </button>
+                <div className="flex flex-shrink-0 gap-2">
+                  <form action={requestRevisionAction}>
+                    <input type="hidden" name="taskId" value={task.id} />
+                    <button
+                      type="submit"
+                      className="rounded-md border border-white/10 bg-transparent px-3 py-1.5 text-xs text-zinc-300 transition-colors hover:border-white/30"
+                    >
+                      request revision
+                    </button>
+                  </form>
+                  <form action={approveTaskAction}>
+                    <input type="hidden" name="taskId" value={task.id} />
+                    <button
+                      type="submit"
+                      className="rounded-md border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/15 px-3 py-1.5 text-xs text-[var(--color-scene-1)] transition-colors hover:bg-[var(--color-scene-1)]/25"
+                    >
+                      approve →
+                    </button>
+                  </form>
+                </div>
               </li>
             ))}
           </ul>
         </div>
       ) : null}
 
-      {/* Project cards */}
       <div className="mt-16">
         <h2 className="mb-6 font-display-serif text-2xl font-light tracking-tight">
           Your projects
@@ -118,15 +126,7 @@ export default async function LatticeDashboard() {
   );
 }
 
-function Stat({
-  k,
-  v,
-  accent = false,
-}: {
-  k: string;
-  v: string;
-  accent?: boolean;
-}) {
+function Stat({ k, v, accent = false }: { k: string; v: string; accent?: boolean }) {
   return (
     <div className="flex flex-col">
       <dt className="text-[10px] uppercase tracking-widest text-zinc-500">{k}</dt>

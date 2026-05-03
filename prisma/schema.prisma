@@ -39,6 +39,8 @@ model User {
   tasksAssigned    Task[]           @relation("TaskAssignee")
   inquiryMessages  InquiryMessage[]
   auditLogs        AuditLog[]
+  leaveRequests    LeaveRequest[]
+  dailyStatuses    DailyStatus[]
 }
 
 // CRM row — separate from the User account so a client can have a
@@ -167,4 +169,68 @@ model AgentRun {
   output Json?
   status String   // pending, success, error
   ranAt  DateTime @default(now())
+}
+
+// ---- People ops + finance (Nox's admin view) -------------------------
+
+enum LeaveType {
+  ANNUAL
+  SICK
+  PARENTAL
+  UNPAID
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model LeaveRequest {
+  id        String      @id @default(cuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      LeaveType
+  startDate DateTime    @db.Date
+  endDate   DateTime    @db.Date
+  reason    String?
+  status    LeaveStatus @default(PENDING)
+  createdAt DateTime    @default(now())
+}
+
+enum DailyStatusType {
+  OFFICE
+  WFH
+  FIELD
+  LEAVE
+}
+
+model DailyStatus {
+  id     String          @id @default(cuid())
+  userId String
+  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date   DateTime        @db.Date
+  status DailyStatusType
+
+  @@unique([userId, date])
+}
+
+enum ExpenseCategory {
+  SOFTWARE
+  SALARY
+  CONTRACTOR
+  OFFICE
+  TRAVEL
+  OTHER
+}
+
+model Expense {
+  id        String          @id @default(cuid())
+  amount    Decimal         @db.Decimal(10, 2)
+  currency  String          @default("USD")
+  category  ExpenseCategory
+  vendor    String
+  note      String?
+  paidAt    DateTime
+  createdAt DateTime        @default(now())
 }

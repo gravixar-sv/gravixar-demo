@@ -6,6 +6,8 @@ import Link from "next/link";
 import { GlassPanel } from "@/components/demo/GlassPanel";
 import { WindowDots } from "@/components/demo/WindowChrome";
 import { EchoRunner } from "@/components/scenes/studio-mix/EchoRunner";
+import { PulseRunner } from "@/components/scenes/studio-mix/PulseRunner";
+import { AgentRunFeed } from "@/components/scenes/studio-mix/AgentRunFeed";
 
 const AGENTS = [
   {
@@ -95,22 +97,30 @@ export default function StudioMixConsole() {
         </div>
       </div>
 
-      {/* Live ECHO runner */}
+      {/* Live runners */}
       <div className="mt-16">
         <h2 className="mb-2 text-xl uppercase tracking-widest text-zinc-300">
-          / try echo live
+          / try them live
         </h2>
         <p className="mb-6 max-w-2xl text-xs leading-relaxed text-zinc-500">
-          Pick a topic — or paste your own — and ECHO drafts a short post in
-          Qamar&apos;s voice. Tokens stream straight from Anthropic via Vercel
-          AI Gateway. Every run logs to the activity feed. Nothing
-          auto-publishes — drafts land in a review queue.
+          ECHO drafts content in Qamar&apos;s voice via streaming Anthropic
+          tokens. PULSE sweeps the demo&apos;s data for anomalies — same SQL
+          rules that fire nightly in production. Each run logs to the
+          activity feed below.
         </p>
-        <EchoRunner />
+        <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
+          <EchoRunner />
+          <PulseRunner />
+        </div>
+      </div>
+
+      {/* Activity feed */}
+      <div className="mt-12">
+        <AgentRunFeed />
       </div>
 
       <p className="mt-12 text-[10px] uppercase tracking-widest text-zinc-600">
-        ⚠ PULSE / RIVER / ATLAS run mocked until their endpoints land · ECHO is live the moment AI_GATEWAY_API_KEY is set
+        ⚠ RIVER / ATLAS run mocked until their endpoints land · ECHO is live the moment AI_GATEWAY_API_KEY is set
       </p>
 
       <div className="mt-16 border-t border-white/5 pt-8">

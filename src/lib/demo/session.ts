@@ -1,4 +1,4 @@
-// Demo session helpers. Sits on top of NextAuth — server components and
+// Demo session helpers. Sits on top of NextAuth, server components and
 // route handlers call getActivePersona() to get the signed-in persona's
 // id and role.
 

@@ -48,7 +48,7 @@ export async function wipeAndReseedDemo(prisma: PrismaClient): Promise<{
 
   const brandRefresh = await prisma.project.create({
     data: {
-      name: "Brand refresh — Q2",
+      name: "Brand refresh, Q2",
       status: "IN_REVIEW",
       clientId: vossCo.id,
       pmId: kai.id,
@@ -65,7 +65,7 @@ export async function wipeAndReseedDemo(prisma: PrismaClient): Promise<{
   await prisma.task.createMany({
     data: [
       {
-        title: "Logo direction — round 2",
+        title: "Logo direction, round 2",
         reviewState: "SUBMITTED_FOR_CLIENT",
         projectId: brandRefresh.id,
         milestoneId: milestoneIdentity.id,
@@ -90,7 +90,7 @@ export async function wipeAndReseedDemo(prisma: PrismaClient): Promise<{
 
   const reelSeries = await prisma.project.create({
     data: {
-      name: "Reel series — May launch",
+      name: "Reel series, May launch",
       status: "ACTIVE",
       clientId: vossCo.id,
       pmId: kai.id,
@@ -114,7 +114,7 @@ export async function wipeAndReseedDemo(prisma: PrismaClient): Promise<{
         assigneeId: sage.id,
       },
       {
-        title: "Animation pass — frames 1-6",
+        title: "Animation pass, frames 1-6",
         reviewState: "DRAFT",
         projectId: reelSeries.id,
         milestoneId: milestoneAnimation.id,
@@ -147,7 +147,7 @@ export async function wipeAndReseedDemo(prisma: PrismaClient): Promise<{
       clientId: vossCo.id,
       status: "PM_ASSIGNED",
       summary:
-        "Q3 product launch campaign — needs full creative + AI-assisted intake",
+        "Q3 product launch campaign, needs full creative + AI-assisted intake",
     },
   });
   await prisma.inquiryMessage.create({
@@ -225,7 +225,7 @@ export async function wipeAndReseedDemo(prisma: PrismaClient): Promise<{
         type: "ANNUAL",
         startDate: inDays(7),
         endDate: inDays(11),
-        reason: "Family trip — back the following Monday",
+        reason: "Family trip, back the following Monday",
         status: "PENDING",
       },
       {
@@ -254,7 +254,7 @@ export async function wipeAndReseedDemo(prisma: PrismaClient): Promise<{
     ],
   });
 
-  // Daily status — last 7 days for staff
+  // Daily status, last 7 days for staff
   const staff = [kai, nox, sage];
   const dayKey = (offset: number) => {
     const d = new Date(today);
@@ -295,10 +295,10 @@ export async function wipeAndReseedDemo(prisma: PrismaClient): Promise<{
       { amount: 4200.0, category: "SALARY", vendor: "Kai Render", note: "May payroll", paidAt: inDays(-2) },
       { amount: 4500.0, category: "SALARY", vendor: "Nox Bellini", note: "May payroll", paidAt: inDays(-2) },
       { amount: 3800.0, category: "SALARY", vendor: "Sage Holloway", note: "May payroll", paidAt: inDays(-2) },
-      { amount: 1200.0, category: "CONTRACTOR", vendor: "Aria K. (motion)", note: "Reel series — frames 7-12", paidAt: inDays(-9) },
+      { amount: 1200.0, category: "CONTRACTOR", vendor: "Aria K. (motion)", note: "Reel series, frames 7-12", paidAt: inDays(-9) },
       { amount: 2400.0, category: "OFFICE", vendor: "Studio rent", note: "May, prorated", paidAt: inDays(-12) },
       { amount: 180.0, category: "OFFICE", vendor: "Coffee + supplies", note: null, paidAt: inDays(-15) },
-      { amount: 640.0, category: "TRAVEL", vendor: "Client visit — flight", note: "Mira pitch trip", paidAt: inDays(-18) },
+      { amount: 640.0, category: "TRAVEL", vendor: "Client visit, flight", note: "Mira pitch trip", paidAt: inDays(-18) },
       { amount: 110.0, category: "OTHER", vendor: "Domain renewals", note: null, paidAt: inDays(-22) },
     ],
   });

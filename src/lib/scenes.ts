@@ -14,7 +14,7 @@ export type Scene = {
   paletteClass: string;
   /** Background gradient utility name (defined in globals.css). */
   bgUtility: string;
-  /** Display font label — informational, the actual font wires in the layout. */
+  /** Display font label, informational, the actual font wires in the layout. */
   displayFont: "fraunces" | "jetbrains" | "inter";
   /** Pretty palette swatches shown on the gallery card. */
   swatches: [string, string, string];
@@ -24,7 +24,7 @@ export const SCENES: Scene[] = [
   {
     slug: "lattice",
     name: "Lattice Studio",
-    tagline: "A creative studio's client portal — built by Gravixar.",
+    tagline: "A creative studio's client portal, built by Gravixar.",
     description:
       "Editorial-magazine portal for an agency. Client view, PM view, admin view, designer view. Real review state machine, real audit log, real chat.",
     bucket: "operations",
@@ -37,7 +37,7 @@ export const SCENES: Scene[] = [
   {
     slug: "studio-mix",
     name: "Studio Mix",
-    tagline: "Live AI agents — content, anomaly, classifier, review.",
+    tagline: "Live AI agents, content, anomaly, classifier, review.",
     description:
       "Operator-console sandbox. Four agents you can poke: ECHO drafts content, PULSE flags anomalies, RIVER classifies inbound, ATLAS reviews drafts.",
     bucket: "ai",
@@ -50,7 +50,7 @@ export const SCENES: Scene[] = [
   {
     slug: "northbeam",
     name: "Northbeam Goods",
-    tagline: "DTC brand admin — Amazon A+, motion review, brand system.",
+    tagline: "DTC brand admin, Amazon A+, motion review, brand system.",
     description:
       "Brand-system browser, Amazon A+ workflow with side-by-side compare, motion graphics review queue. Showcases the Brand & Visuals service.",
     bucket: "brand",
@@ -63,7 +63,7 @@ export const SCENES: Scene[] = [
   {
     slug: "verus",
     name: "Verus Partners",
-    tagline: "Professional services intake — AI brief from the start.",
+    tagline: "Professional services intake, AI brief from the start.",
     description:
       "Adaptive AI intake wizard, brand brief generation from a website URL, discovery-booking flow. Showcases AI Tooling end-to-end.",
     bucket: "ai",

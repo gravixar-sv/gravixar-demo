@@ -6,7 +6,7 @@ import { WindowDots } from "@/components/demo/WindowChrome";
 const SAMPLES = [
   {
     label: "real-looking inquiry",
-    text: "Hi — we're a 12-person agency in Toronto looking to replace our patchwork of Notion + Slack + email with a real client portal. Need delivery review flow, audit log, the works. Saw your bs-hub case study and wanted to know turnaround for something similar.",
+    text: "Hi, we're a 12-person agency in Toronto looking to replace our patchwork of Notion + Slack + email with a real client portal. Need delivery review flow, audit log, the works. Saw your bs-hub case study and wanted to know turnaround for something similar.",
   },
   {
     label: "spam: SEO outreach",
@@ -118,7 +118,7 @@ export function RiverRunner() {
           </span>
           {result?.mocked ? (
             <span className="text-[10px] text-zinc-600 font-sans">
-              mock — needs key
+              mock, needs key
             </span>
           ) : null}
         </div>

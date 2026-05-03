@@ -8,7 +8,7 @@ export const config: VercelConfig = {
   buildCommand: "pnpm build",
   installCommand: "pnpm install --frozen-lockfile",
   crons: [
-    // Weekly reset — Sunday 03:00 UTC. Wipes demo data, re-runs the seed.
+    // Weekly reset, Sunday 03:00 UTC. Wipes demo data, re-runs the seed.
     { path: "/api/cron/reset-demo", schedule: "0 3 * * 0" },
   ],
 };

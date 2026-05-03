@@ -12,14 +12,14 @@ export default function LatticePersonaPick() {
       <div className="grid gap-8 lg:grid-cols-12">
         <div className="lg:col-span-7">
           <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-[var(--color-scene-1)]">
-            scene 01 — operations infrastructure
+            scene 01, operations infrastructure
           </p>
           <h1 className="mt-5 font-display-serif text-5xl font-light leading-[0.95] tracking-tight md:text-7xl lg:text-[80px]">
             Lattice Studio
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-zinc-300">
             A creative studio runs its delivery, scope, and review on this
-            portal. Pick a role and step into it — every persona sees the
+            portal. Pick a role and step into it, every persona sees the
             same data, filtered to what they&apos;re allowed to touch.
           </p>
         </div>

@@ -1,4 +1,4 @@
-// Mira's client dashboard — real data + functional review buttons.
+// Mira's client dashboard, real data + functional review buttons.
 
 import { redirect } from "next/navigation";
 import { findLatticePersona } from "@/lib/personas/lattice";

@@ -7,7 +7,7 @@ import { getActivePersonaId } from "@/lib/demo/session";
 const SCENE = findScene("lattice")!;
 
 export const metadata: Metadata = {
-  title: `${SCENE.name} — Gravixar demo`,
+  title: `${SCENE.name}, Gravixar demo`,
 };
 
 export default async function LatticeSceneLayout({

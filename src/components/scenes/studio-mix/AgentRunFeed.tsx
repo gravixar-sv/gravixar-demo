@@ -1,4 +1,4 @@
-// Recent agent runs — server component. Pulls last 8 AgentRun rows
+// Recent agent runs, server component. Pulls last 8 AgentRun rows
 // across all agents and displays them as a feed. Re-renders on every
 // page load so it picks up any runs from ECHO/PULSE.
 
@@ -69,7 +69,7 @@ export async function AgentRunFeed() {
 function RunSummary({ output }: { output: unknown }) {
   if (!output || typeof output !== "object") return null;
   const obj = output as Record<string, unknown>;
-  // Compact summary line — show the most relevant key per agent
+  // Compact summary line, show the most relevant key per agent
   let summary = "";
   if (typeof obj.tokens === "number") summary = `${obj.tokens} tokens`;
   else if (typeof obj.findingsCount === "number") summary = `${obj.findingsCount} findings`;

@@ -1,4 +1,4 @@
-// Kai's PM inbox — real inquiries from the DB.
+// Kai's PM inbox, real inquiries from the DB.
 
 import { redirect } from "next/navigation";
 import { findLatticePersona } from "@/lib/personas/lattice";
@@ -28,7 +28,7 @@ export default async function LatticeInbox() {
             pm inbox
           </p>
           <h1 className="mt-4 font-display-serif text-4xl font-light leading-tight tracking-tight md:text-6xl">
-            Hi {persona.name.split(" ")[0]} — {inquiries.length} inquir{inquiries.length === 1 ? "y" : "ies"}.
+            Hi {persona.name.split(" ")[0]}, {inquiries.length} inquir{inquiries.length === 1 ? "y" : "ies"}.
           </h1>
           <p className="mt-4 max-w-xl text-zinc-400">
             {activeProjects.length} project{activeProjects.length === 1 ? "" : "s"} in flight,{" "}
@@ -59,7 +59,7 @@ export default async function LatticeInbox() {
           inquiries
         </h2>
         {inquiries.length === 0 ? (
-          <p className="mt-4 text-zinc-500">No inquiries — inbox zero.</p>
+          <p className="mt-4 text-zinc-500">No inquiries, inbox zero.</p>
         ) : (
           <ul className="mt-4 divide-y divide-white/5 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md">
             {inquiries.map((iq) => {

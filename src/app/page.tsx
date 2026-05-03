@@ -7,7 +7,7 @@ export default function GalleryLanding() {
 
   return (
     <main className="bg-gallery min-h-[calc(100dvh-40px)] pb-24">
-      {/* Hero — editorial header */}
+      {/* Hero, editorial header */}
       <section className="relative px-6 pb-20 pt-16 md:px-10 md:pt-24 lg:px-16 lg:pt-32">
         <div
           aria-hidden
@@ -18,7 +18,7 @@ export default function GalleryLanding() {
             {/* Eyebrow + title */}
             <div className="lg:col-span-8">
               <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-zinc-400">
-                gravixar — demo gallery
+                gravixar, demo gallery
               </p>
               <h1 className="mt-6 font-display-serif text-5xl font-light leading-[0.95] tracking-tight text-zinc-50 md:text-7xl lg:text-[88px]">
                 Pick a portal.
@@ -33,7 +33,7 @@ export default function GalleryLanding() {
               <p className="max-w-md text-lg leading-relaxed text-zinc-300 md:text-xl">
                 A working showroom of the kinds of systems Gravixar builds.
                 Each scene is its own client, its own visual identity,
-                its own running portal — with personas you log in as and
+                its own running portal, with personas you log in as and
                 AI that actually responds.
               </p>
               <p className="mt-4 max-w-md font-mono text-[11px] uppercase tracking-widest text-zinc-500">
@@ -87,7 +87,7 @@ export default function GalleryLanding() {
         <div className="mx-auto max-w-7xl border-t border-white/5 pt-8">
           <div className="flex flex-wrap items-baseline justify-between gap-4">
             <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">
-              gravixar — operations, ai tooling, brand & visuals
+              gravixar, operations, ai tooling, brand & visuals
             </p>
             <Link
               href="https://gravixar.com"

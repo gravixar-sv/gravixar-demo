@@ -54,7 +54,7 @@ export function PulseRunner() {
 
       <div className="px-5 pt-5">
         <p className="text-xs leading-relaxed text-zinc-400 font-sans">
-          Runs the same anomaly sweep that fires nightly in production. No AI —
+          Runs the same anomaly sweep that fires nightly in production. No AI -
           pure SQL over the audit log, leave requests, inquiries, and tasks.
         </p>
         <button

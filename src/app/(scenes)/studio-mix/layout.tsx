@@ -5,7 +5,7 @@ import { findScene } from "@/lib/scenes";
 const SCENE = findScene("studio-mix")!;
 
 export const metadata: Metadata = {
-  title: `${SCENE.name} — Gravixar demo`,
+  title: `${SCENE.name}, Gravixar demo`,
 };
 
 export default function StudioMixLayout({

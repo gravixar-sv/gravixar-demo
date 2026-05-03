@@ -43,7 +43,7 @@ async function handle(req: Request, params: Promise<{ id: string }>) {
     redirectTo,
   });
 
-  // Unreachable — signIn throws a redirect — but the type system
+  // Unreachable, signIn throws a redirect, but the type system
   // wants something here.
   return NextResponse.redirect(new URL(redirectTo, req.url), 303);
 }

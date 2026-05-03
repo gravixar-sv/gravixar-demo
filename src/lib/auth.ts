@@ -1,9 +1,9 @@
-// NextAuth v5 — persona-bypass credentials provider.
+// NextAuth v5, persona-bypass credentials provider.
 //
 // The demo doesn't have real signups. The persona-pick page POSTs to a
 // route handler that calls signIn("credentials", { personaId }). The
 // authorize() callback below looks up the matching User row and starts
-// a real signed-in session — JWT cookie, server components can read
+// a real signed-in session, JWT cookie, server components can read
 // auth() to get the active user.
 
 import NextAuth from "next-auth";
@@ -28,7 +28,7 @@ declare module "next-auth" {
   }
 }
 
-// JWT augmentation — Auth.js v5 hangs the JWT interface off
+// JWT augmentation, Auth.js v5 hangs the JWT interface off
 // `@auth/core/jwt`. We use a lightweight local interface and cast in
 // the callbacks to stay portable across Auth.js minor versions.
 type JwtClaims = {

@@ -22,10 +22,10 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Gravixar — demo gallery",
+  title: "Gravixar, demo gallery",
   description:
-    "demo.gravixar.com — design + capability showroom. Pick a scene to explore the kinds of systems Gravixar builds.",
-  // Demo subdomain — discouraged from indexing so keyword juice stays on gravixar.com
+    "demo.gravixar.com, design + capability showroom. Pick a scene to explore the kinds of systems Gravixar builds.",
+  // Demo subdomain, discouraged from indexing so keyword juice stays on gravixar.com
   robots: { index: false, follow: false },
 };
 

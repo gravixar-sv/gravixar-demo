@@ -1,4 +1,4 @@
-// Subtle window-chrome treatment — three traffic-light dots in the
+// Subtle window-chrome treatment, three traffic-light dots in the
 // top-left of a glass panel. Adds OS-app feel without being interactive.
 
 import { cn } from "@/lib/cn";

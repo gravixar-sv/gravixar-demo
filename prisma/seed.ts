@@ -1,7 +1,7 @@
-// Demo seed — calls the shared wipeAndReseedDemo() so the data stays
+// Demo seed, calls the shared wipeAndReseedDemo() so the data stays
 // in lockstep with the cron-based weekly reset.
 //
-// Run via `pnpm db:seed`. Idempotent — safe to run repeatedly.
+// Run via `pnpm db:seed`. Idempotent, safe to run repeatedly.
 
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";

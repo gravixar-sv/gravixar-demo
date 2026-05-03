@@ -1,24 +1,24 @@
-# DEMO-SCENES.md — gravixar-demo scene catalog
+# DEMO-SCENES.md, gravixar-demo scene catalog
 
 Each scene is a self-contained showcase: its own URL prefix, its own visual identity, its own personas, its own data model slice.
 
 ## Visual system (shared)
 
-- **Type pairings** — each scene picks a display + body pair. Display fonts vary; body is **Inter** everywhere for consistency.
-- **Layout grammar** — asymmetric editorial grids, generous whitespace, big typography moments
-- **Treatment** — glassmorphic panels (`backdrop-blur-xl`, gradient fills), subtle window-chrome dots on key panels
-- **Motion** — restrained: subtle hover scale, gradient drifts, content fade-in. Nothing distracting.
-- **Demo banner** — sitewide, top of viewport, never dismissable
+- **Type pairings**, each scene picks a display + body pair. Display fonts vary; body is **Inter** everywhere for consistency.
+- **Layout grammar**, asymmetric editorial grids, generous whitespace, big typography moments
+- **Treatment**, glassmorphic panels (`backdrop-blur-xl`, gradient fills), subtle window-chrome dots on key panels
+- **Motion**, restrained: subtle hover scale, gradient drifts, content fade-in. Nothing distracting.
+- **Demo banner**, sitewide, top of viewport, never dismissable
 
-## Scene 1 — `Lattice Studio` (live in MVP)
+## Scene 1, `Lattice Studio` (live in MVP)
 
 **URL prefix:** `/lattice`
-**Tagline:** "A creative studio's client portal — built by Gravixar."
+**Tagline:** "A creative studio's client portal, built by Gravixar."
 **Showcases:** Operations Infrastructure service.
 
 ### Visual
 
-- Display font: **Fraunces** (variable serif — editorial magazine feel)
+- Display font: **Fraunces** (variable serif, editorial magazine feel)
 - Palette:
   - Background gradient: deep navy → warm violet → soft cream wash
   - Primary accent: electric coral `#FF6B6B`
@@ -37,7 +37,7 @@ Each scene is a self-contained showcase: its own URL prefix, its own visual iden
 
 ### Data slice
 
-- `projects` (3 seeded — one in active flow, one awaiting review, one shipped)
+- `projects` (3 seeded, one in active flow, one awaiting review, one shipped)
 - `tasks` flowing through review state machine
 - `inquiries` (1 in PM_ASSIGNED state for the funnel demo)
 - `messages` (chat between Mira and Kai)
@@ -50,10 +50,10 @@ Each scene is a self-contained showcase: its own URL prefix, its own visual iden
 
 ---
 
-## Scene 2 — `Studio Mix` (live in MVP)
+## Scene 2, `Studio Mix` (live in MVP)
 
 **URL prefix:** `/studio-mix`
-**Tagline:** "Live AI agents — content, anomaly, classifier, review."
+**Tagline:** "Live AI agents, content, anomaly, classifier, review."
 **Showcases:** AI Tooling service end-to-end.
 
 ### Visual
@@ -66,7 +66,7 @@ Each scene is a self-contained showcase: its own URL prefix, its own visual iden
   - Surface: dark glass panels with cyan/magenta edge glows
 - Window-chrome: present on every agent's status card
 
-### "Personas" (agents — no human login)
+### "Personas" (agents, no human login)
 
 | Agent | Role | What it does live |
 |---|---|---|
@@ -86,23 +86,23 @@ Each scene is a self-contained showcase: its own URL prefix, its own visual iden
 
 ---
 
-## Scene 3 — `Northbeam Goods` (placeholder in MVP)
+## Scene 3, `Northbeam Goods` (placeholder in MVP)
 
 **URL prefix:** `/northbeam` (gallery shows it as "coming online")
-**Showcases:** Brand & Visuals service — DTC brand admin with Amazon A+ workflow, motion-graphics review, brand-system browser.
+**Showcases:** Brand & Visuals service, DTC brand admin with Amazon A+ workflow, motion-graphics review, brand-system browser.
 
 ---
 
-## Scene 4 — `Verus Partners` (placeholder in MVP)
+## Scene 4, `Verus Partners` (placeholder in MVP)
 
 **URL prefix:** `/verus` (gallery shows it as "coming online")
-**Showcases:** AI Tooling end-to-end for professional services — AI intake → brand brief → discovery booking flow with real auth.
+**Showcases:** AI Tooling end-to-end for professional services, AI intake → brand brief → discovery booking flow with real auth.
 
 ---
 
 ## Adding a new scene
 
-1. Add a row to `src/lib/scenes.ts` — slug, name, tagline, palette tokens, display font, gallery copy, status (`live` / `coming-online`)
+1. Add a row to `src/lib/scenes.ts`, slug, name, tagline, palette tokens, display font, gallery copy, status (`live` / `coming-online`)
 2. Create `src/app/(scenes)/{slug}/layout.tsx` and pages
 3. Create `src/components/scenes/{slug}/` for scene-specific components
 4. Extend `prisma/schema.prisma` if the scene has its own data slice

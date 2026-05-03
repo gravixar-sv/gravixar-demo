@@ -1,5 +1,5 @@
-// PULSE — anomaly detection over the audit log + operational data.
-// Runs purely on Postgres queries — no AI required. Sweeps for:
+// PULSE, anomaly detection over the audit log + operational data.
+// Runs purely on Postgres queries, no AI required. Sweeps for:
 // - Pending leave requests waiting on approval
 // - Inquiries stuck in PM_ASSIGNED with no PM reply yet
 // - Outstanding client reviews older than 2 days
@@ -44,7 +44,7 @@ export async function POST() {
       where: {
         status: "PM_ASSIGNED",
         messages: {
-          // No PM-authored message yet — for the demo, anything
+          // No PM-authored message yet, for the demo, anything
           // PM_ASSIGNED counts as needing first reply.
           none: { author: { role: "PM" } },
         },
@@ -92,7 +92,7 @@ export async function POST() {
     });
   }
 
-  // Spike detection — sudden burst of audit activity
+  // Spike detection, sudden burst of audit activity
   if (auditPrior24h > 0 && auditLast24h > auditPrior24h * 3) {
     findings.push({
       severity: "critical",

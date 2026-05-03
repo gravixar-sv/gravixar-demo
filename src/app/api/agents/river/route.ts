@@ -1,4 +1,4 @@
-// RIVER — suspicion classifier. Takes a sample text and classifies it
+// RIVER, suspicion classifier. Takes a sample text and classifies it
 // as legit / suspicious / spam, with a one-sentence reason.
 // Uses generateObject for structured output via AI Gateway.
 
@@ -21,16 +21,16 @@ const resultSchema = z.object({
 });
 
 const SYSTEM = `
-You are RIVER — a suspicion classifier for inbound text. You decide whether
+You are RIVER, a suspicion classifier for inbound text. You decide whether
 a piece of inbound content (inquiry form submission, contact note, sample
 message) is:
-- "legit" — sounds like a real prospect or genuine inquiry
-- "suspicious" — could be either, hedged, missing context, or ambiguous
-- "spam" — clear spam, scam, generic SEO bait, or automated submission
+- "legit", sounds like a real prospect or genuine inquiry
+- "suspicious", could be either, hedged, missing context, or ambiguous
+- "spam", clear spam, scam, generic SEO bait, or automated submission
 
 Be honest about uncertainty. confidence is your honest probability that the
 classification is correct. reason is one short sentence explaining the call.
-Do not be paranoid — most legit inquiries are short. Spam tends to mention
+Do not be paranoid, most legit inquiries are short. Spam tends to mention
 SEO services, link building, generic compliments, or contains URLs to
 unrelated topics.
 `;
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
   }
 
   if (!process.env.AI_GATEWAY_API_KEY && !process.env.ANTHROPIC_API_KEY) {
-    // Friendly fallback — keep UI honest about state
+    // Friendly fallback, keep UI honest about state
     return NextResponse.json({
       classification: "suspicious",
       confidence: 0.5,

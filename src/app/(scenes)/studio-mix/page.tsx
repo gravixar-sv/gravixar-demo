@@ -1,4 +1,4 @@
-// Studio Mix — operator console. Four agents you can poke. ECHO is the
+// Studio Mix, operator console. Four agents you can poke. ECHO is the
 // only one wired through real Anthropic via AI Gateway in MVP. PULSE,
 // RIVER, ATLAS are partly mocked at launch and progressively wired.
 
@@ -53,11 +53,11 @@ const AGENTS = [
 export default function StudioMixConsole() {
   return (
     <div className="mx-auto max-w-7xl px-6 pb-20 pt-12 md:px-10 lg:px-16">
-      {/* Operator header — mono-styled, terminal-flavored */}
+      {/* Operator header, mono-styled, terminal-flavored */}
       <div className="grid gap-8 lg:grid-cols-12">
         <div className="lg:col-span-8">
           <p className="text-[10px] uppercase tracking-[0.25em] text-[var(--color-scene-1)]">
-            scene 02 — ai tooling
+            scene 02, ai tooling
           </p>
           <h1 className="mt-5 font-display-mono text-3xl font-medium leading-tight tracking-tight text-zinc-50 md:text-5xl lg:text-[60px]">
             <span className="text-[var(--color-scene-1)]">$</span> studio-mix &mdash;
@@ -106,7 +106,7 @@ export default function StudioMixConsole() {
         </h2>
         <p className="mb-6 max-w-2xl text-xs leading-relaxed text-zinc-500">
           ECHO drafts content in Qamar&apos;s voice via streaming Anthropic
-          tokens. PULSE sweeps the demo&apos;s data for anomalies — same SQL
+          tokens. PULSE sweeps the demo&apos;s data for anomalies, same SQL
           rules that fire nightly in production. Each run logs to the
           activity feed below.
         </p>

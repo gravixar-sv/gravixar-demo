@@ -1,4 +1,4 @@
-# DEPLOY-CHECKLIST.md — gravixar-demo
+# DEPLOY-CHECKLIST.md, gravixar-demo
 
 Run-once steps to take this from "code pushed" to "demo.gravixar.com is live with real data."
 
@@ -23,7 +23,7 @@ In `https://vercel.com/gravixar-svs-projects/gravixar-demo` → Settings → Env
 | `GRAVIXAR_DEMO_MODE` | `true` | All environments |
 | `CRON_SECRET` | another random hex string (same `[guid]::NewGuid` trick) | Production + Preview |
 
-`AI_GATEWAY_API_KEY` and `RESEND_API_KEY` are NOT needed for Phase 2a — they come in Phase 3 when ECHO and lead-emails wire up.
+`AI_GATEWAY_API_KEY` and `RESEND_API_KEY` are NOT needed for Phase 2a, they come in Phase 3 when ECHO and lead-emails wire up.
 
 ## 3. Pull the new env vars locally
 
@@ -50,7 +50,7 @@ Expected output:
 The database is now in sync with your Prisma schema.
 ```
 
-This creates the tables. Skipping `prisma migrate` because demos don't need migration history — `db push` is the right tool.
+This creates the tables. Skipping `prisma migrate` because demos don't need migration history, `db push` is the right tool.
 
 ## 5. Seed the canonical data
 
@@ -108,7 +108,7 @@ Expected JSON response:
 {"ok":true,"elapsedMs":...,"ranAt":"...","note":"demo state reset to canonical seed"}
 ```
 
-If you see `{"error":"unauthorized"}` — the `CRON_SECRET` env var doesn't match what you sent. Set it correctly in Vercel and pull again with `vercel env pull`.
+If you see `{"error":"unauthorized"}`, the `CRON_SECRET` env var doesn't match what you sent. Set it correctly in Vercel and pull again with `vercel env pull`.
 
 ## 9. Domain attach (Phase 3)
 

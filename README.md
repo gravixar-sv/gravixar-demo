@@ -1,8 +1,8 @@
 # gravixar-demo
 
-`demo.gravixar.com` — design + capability showroom.
+`demo.gravixar.com`, design + capability showroom.
 
-A Gravixar-branded multi-scene demo site. Visitors pick a scene from the gallery and explore an interactive showcase of a kind of system Qamar can build. **Not a Broomstick clone** — completely separate brand, separate fictional personas, separate visual identity, separate database.
+A Gravixar-branded multi-scene demo site. Visitors pick a scene from the gallery and explore an interactive showcase of a kind of system Qamar can build. **Not a Broomstick clone**, completely separate brand, separate fictional personas, separate visual identity, separate database.
 
 ## Stack
 
@@ -22,14 +22,14 @@ pnpm install
 pnpm dev
 ```
 
-Open http://localhost:3400 — or http://demo.localhost:3400 for a labeled tab.
+Open http://localhost:3400, or http://demo.localhost:3400 for a labeled tab.
 
 ## Scenes
 
 See [DEMO-SCENES.md](DEMO-SCENES.md) for the full catalog. MVP launches with two scenes:
 
-- **Lattice Studio** — agency client portal. Login as Mira Voss (client), Kai Render (PM), Nox Bellini (admin), or Sage Holloway (designer).
-- **Studio Mix** — AI agents playground. No login — operator-style sandbox showing live SEO drafter, anomaly cron, suspicion classifier, content review queue.
+- **Lattice Studio**, agency client portal. Login as Mira Voss (client), Kai Render (PM), Nox Bellini (admin), or Sage Holloway (designer).
+- **Studio Mix**, AI agents playground. No login, operator-style sandbox showing live SEO drafter, anomaly cron, suspicion classifier, content review queue.
 
 Coming next: **Northbeam Goods** (DTC brand admin), **Verus Partners** (professional services intake).
 
@@ -37,7 +37,7 @@ Coming next: **Northbeam Goods** (DTC brand admin), **Verus Partners** (professi
 
 `GRAVIXAR_DEMO_MODE=true` is hard-on in this app. The infrastructure layer:
 
-- Sitewide banner ("Demo mode — sandbox, resets weekly")
+- Sitewide banner ("Demo mode, sandbox, resets weekly")
 - Persona-switcher login bypass (visitors click a card, no password needed)
 - Side-effect stubs (no real Resend, no Stripe, no Drive)
 - Weekly reset cron: `/api/cron/reset-demo` runs Sunday 03:00 UTC, wipes the DB and re-runs `prisma/seed.ts`

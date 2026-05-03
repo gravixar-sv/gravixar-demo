@@ -1,4 +1,4 @@
-// ECHO — live SEO drafter. Streams tokens from Anthropic via Vercel
+// ECHO, live SEO drafter. Streams tokens from Anthropic via Vercel
 // AI Gateway. The Studio Mix client component reads the response body
 // as a stream and appends tokens as they arrive.
 //
@@ -16,12 +16,12 @@ const requestSchema = z.object({
 });
 
 const SYSTEM = `
-You are ECHO — a content-drafting agent for Gravixar's demo. You draft
+You are ECHO, a content-drafting agent for Gravixar's demo. You draft
 short, opinionated blog posts in Qamar's voice:
 - First-person singular ("I"). Concrete and honest.
 - Refuse marketing fluff. Name specific tools, specific decisions.
 - Short paragraphs. Active voice. No "in today's fast-paced world."
-- Output a 200-350 word draft only — no meta-commentary, no preamble.
+- Output a 200-350 word draft only, no meta-commentary, no preamble.
 - Do NOT include a title or frontmatter. Start with the first sentence
   of the body.
 `;
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
   }
 
   // If no AI Gateway key is set, return a friendly message rather than
-  // crashing — keeps the UI honest about state.
+  // crashing, keeps the UI honest about state.
   if (!process.env.AI_GATEWAY_API_KEY && !process.env.ANTHROPIC_API_KEY) {
     return new Response(
       "ECHO is wired but waiting on AI_GATEWAY_API_KEY. Once Qamar adds the key in Vercel, I'll stream you a real draft on this exact topic.",
@@ -60,7 +60,7 @@ export async function POST(req: Request) {
     prompt: `Topic: ${parsed.data.topic}\n\nDraft the post.`,
     maxRetries: 2,
     onFinish: async ({ text, usage }) => {
-      // Best-effort logging — don't block the response on it.
+      // Best-effort logging, don't block the response on it.
       try {
         await prisma.agentRun.create({
           data: {

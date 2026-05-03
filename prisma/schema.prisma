@@ -1,6 +1,6 @@
-// Demo schema — minimal slice that powers Lattice + Studio Mix.
+// Demo schema, minimal slice that powers Lattice + Studio Mix.
 // Patterns lifted from bs-hub but trimmed: no email verification, no
-// HIBP, no compliance retention tiers — this is a sandbox.
+// HIBP, no compliance retention tiers, this is a sandbox.
 
 generator client {
   provider = "prisma-client-js"
@@ -43,7 +43,7 @@ model User {
   dailyStatuses    DailyStatus[]
 }
 
-// CRM row — separate from the User account so a client can have a
+// CRM row, separate from the User account so a client can have a
 // "company" identity even before they log in.
 model Client {
   id        String    @id @default(cuid())
@@ -89,7 +89,7 @@ model Milestone {
   tasks     Task[]
 }
 
-// 6-state review machine — same pattern as bs-hub.
+// 6-state review machine, same pattern as bs-hub.
 // DRAFT → SUBMITTED_FOR_INTERNAL → INTERNAL_APPROVED → SUBMITTED_FOR_CLIENT → CLIENT_APPROVED
 // (with a CLIENT_REVISION_REQUESTED branch back into the loop)
 enum TaskReviewState {
@@ -161,7 +161,7 @@ model AuditLog {
   createdAt DateTime @default(now())
 }
 
-// Studio Mix — track each agent invocation.
+// Studio Mix, track each agent invocation.
 model AgentRun {
   id     String   @id @default(cuid())
   agent  String   // ECHO, PULSE, RIVER, ATLAS

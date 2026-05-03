@@ -7,7 +7,7 @@ const SAMPLE_TOPICS = [
   "the case against auto-publish AI content",
   "what an honest project portal actually requires",
   "why 'agentic' is doing too much work as a word",
-  "AI in the loop, not the driver — three patterns",
+  "AI in the loop, not the driver, three patterns",
 ];
 
 export function EchoRunner() {
@@ -32,7 +32,7 @@ export function EchoRunner() {
 
       if (!res.ok || !res.body) {
         const errBody = await res.text().catch(() => "");
-        throw new Error(`http ${res.status}${errBody ? ` — ${errBody}` : ""}`);
+        throw new Error(`http ${res.status}${errBody ? `, ${errBody}` : ""}`);
       }
 
       const reader = res.body.getReader();

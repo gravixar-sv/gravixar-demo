@@ -1,5 +1,5 @@
 // Lattice Studio personas. These names are intentionally globally-placeable
-// (no obvious regional pin) and distinct from any real client — Gravixar's
+// (no obvious regional pin) and distinct from any real client, Gravixar's
 // demo never reuses Broomstick's Casey/Anri/Fahad names.
 
 export type LatticePersona = {
@@ -19,7 +19,7 @@ export const LATTICE_PERSONAS: LatticePersona[] = [
     id: "mira-voss",
     name: "Mira Voss",
     role: "client",
-    title: "Client — Active project",
+    title: "Client, Active project",
     blurb:
       "Logged in as the founder of a B2B brand mid-rebrand. Two deliverables waiting on her review.",
     initials: "MV",
@@ -39,7 +39,7 @@ export const LATTICE_PERSONAS: LatticePersona[] = [
     id: "nox-bellini",
     name: "Nox Bellini",
     role: "admin",
-    title: "Admin — Studio operations",
+    title: "Admin, Studio operations",
     blurb:
       "Logged in as the operations admin. Sees every project, the audit log, presence dashboard, and the daily security-watch digest.",
     initials: "NB",
@@ -49,7 +49,7 @@ export const LATTICE_PERSONAS: LatticePersona[] = [
     id: "sage-holloway",
     name: "Sage Holloway",
     role: "designer",
-    title: "Designer — Senior",
+    title: "Designer, Senior",
     blurb:
       "Logged in as a senior designer. Personal task list, one deliverable to upload, one revision to address.",
     initials: "SH",

@@ -14,7 +14,7 @@ const SAMPLE_DRAFTS = [
   },
   {
     label: "Qamar-style draft",
-    text: `I built bs-hub for one agency and rebuilt it three times before the state machine clicked. The first version had implicit status — admins typed "approved" in a free-text field. That broke twice in the first month. The second version had explicit states but no audit trail. That broke once when a deliverable disappeared. Third version has 12 hard-transitioned states and an audit row per mutation. It's been quiet since.`,
+    text: `I built bs-hub for one agency and rebuilt it three times before the state machine clicked. The first version had implicit status, admins typed "approved" in a free-text field. That broke twice in the first month. The second version had explicit states but no audit trail. That broke once when a deliverable disappeared. Third version has 12 hard-transitioned states and an audit row per mutation. It's been quiet since.`,
   },
 ];
 
@@ -123,7 +123,7 @@ export function AtlasRunner() {
             verdict
           </span>
           {result?.mocked ? (
-            <span className="text-[10px] text-zinc-600 font-sans">mock — needs key</span>
+            <span className="text-[10px] text-zinc-600 font-sans">mock, needs key</span>
           ) : null}
         </div>
 

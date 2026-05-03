@@ -1,4 +1,4 @@
-// Sage's designer task list — real data, with submit-for-client action
+// Sage's designer task list, real data, with submit-for-client action
 // on draft tasks.
 
 import { redirect } from "next/navigation";
@@ -34,7 +34,7 @@ export default async function LatticeTasks() {
         designer tasks
       </p>
       <h1 className="mt-4 font-display-serif text-4xl font-light tracking-tight md:text-5xl">
-        Hi {persona.name.split(" ")[0]} — {tasks.length} task{tasks.length === 1 ? "" : "s"} on your plate.
+        Hi {persona.name.split(" ")[0]}, {tasks.length} task{tasks.length === 1 ? "" : "s"} on your plate.
       </h1>
       <p className="mt-4 max-w-2xl text-zinc-400">
         {draftCount} in draft · {readyCount} ready to ship to client review.

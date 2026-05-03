@@ -1,4 +1,4 @@
-// Nox's admin console — multi-section view of studio operations.
+// Nox's admin console, multi-section view of studio operations.
 // Audit log, team status today, leave requests, finance snapshot.
 
 import { redirect } from "next/navigation";
@@ -69,7 +69,7 @@ export default async function LatticeAdmin() {
       </div>
 
       {/* Section: Team status today */}
-      <Section title="Team status — today" subtitle="who's where">
+      <Section title="Team status, today" subtitle="who's where">
         {team.length === 0 ? (
           <Empty>No check-ins yet.</Empty>
         ) : (
@@ -245,7 +245,7 @@ export default async function LatticeAdmin() {
                       {row.action}
                     </span>{" "}
                     <span className="text-zinc-100">{row.table}</span>
-                    {row.note ? <span className="text-zinc-400"> — {row.note}</span> : null}
+                    {row.note ? <span className="text-zinc-400">, {row.note}</span> : null}
                   </p>
                   <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-zinc-500">
                     {row.actor?.name ?? "system"} · {timeAgo(row.createdAt)}
@@ -257,12 +257,12 @@ export default async function LatticeAdmin() {
         )}
       </Section>
 
-      {/* Section: Internal controls (placeholder card — managed elsewhere) */}
+      {/* Section: Internal controls (placeholder card, managed elsewhere) */}
       <Section title="Internal controls" subtitle="permissions & policies">
         <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 text-sm text-zinc-400 backdrop-blur-md">
           <p>
             Role hierarchy, per-feature permission flags, and audit-restore allowlist are
-            managed via the platform CLI rather than the UI — the principle is &ldquo;safe
+            managed via the platform CLI rather than the UI, the principle is &ldquo;safe
             defaults, opt-in surface area.&rdquo;
           </p>
           <ul className="mt-4 grid gap-2 text-xs sm:grid-cols-2 lg:grid-cols-4">

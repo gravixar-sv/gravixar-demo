@@ -107,6 +107,77 @@ export default function GalleryLanding() {
         </div>
       </section>
 
+      {/* Modules surface, parallel to scenes */}
+      <section className="relative mt-16 px-6 md:px-10 lg:px-16">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-6 flex items-baseline justify-between">
+            <h2 className="text-2xl font-medium tracking-[-0.015em] md:text-3xl">
+              Modules, the building blocks
+            </h2>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+              12 patterns
+            </p>
+          </div>
+          <Link
+            href="/modules"
+            className="scene-card group relative block overflow-hidden rounded-2xl"
+          >
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 opacity-50 transition-opacity group-hover:opacity-70"
+              style={{
+                background:
+                  "radial-gradient(70% 80% at 100% 0%, #FF6B3528 0%, transparent 60%), radial-gradient(50% 80% at 0% 100%, #00E1FF1a 0%, transparent 55%)",
+              }}
+            />
+            <div className="relative px-7 pb-7 pt-7 md:px-9 md:py-9">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+                  03 / library
+                </span>
+                <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/90">
+                  <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 text-emerald-400" />
+                  3 interactive · 9 coming
+                </span>
+              </div>
+              <h3 className="mt-8 max-w-2xl text-3xl font-medium leading-tight tracking-[-0.015em] md:text-4xl">
+                Skip the scenes. Try one capability at a time.
+              </h3>
+              <p className="mt-3 max-w-xl text-sm leading-relaxed text-zinc-300 md:text-base">
+                Review state machine. Daily check-in. Audit log + restore. AI
+                intake wizard. HIPAA-aware AI guardrail. The 12 patterns
+                running in production across Broomstick Hub and Beeline,
+                each a 30-second sandbox you can poke at without signing in.
+              </p>
+              <div className="mt-8 flex items-center justify-between">
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    "auth",
+                    "audit",
+                    "ai",
+                    "finance",
+                    "ops",
+                  ].map((c) => (
+                    <span
+                      key={c}
+                      className="rounded-sm border border-white/10 bg-white/[0.04] px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-400"
+                    >
+                      {c}
+                    </span>
+                  ))}
+                </div>
+                <span className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-200 transition-colors group-hover:text-white">
+                  open library
+                  <span aria-hidden className="transition-transform group-hover:translate-x-1">
+                    →
+                  </span>
+                </span>
+              </div>
+            </div>
+          </Link>
+        </div>
+      </section>
+
       {/* Coming online */}
       <section className="relative mt-16 px-6 md:px-10 lg:px-16">
         <div className="mx-auto max-w-7xl">

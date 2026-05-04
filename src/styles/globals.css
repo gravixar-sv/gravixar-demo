@@ -14,12 +14,16 @@
   --color-scene-2: #f5e6d3;     /* secondary */
   --color-scene-glow: rgba(255, 107, 107, 0.35);
 
-  /* Typography, display fonts are loaded per-scene via next/font.
-     Body is Inter everywhere. */
-  --font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display-serif: var(--font-fraunces), "Fraunces", ui-serif, Georgia, serif;
-  --font-display-mono: var(--font-jetbrains), "JetBrains Mono", ui-monospace, "SF Mono", Consolas, monospace;
-  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, "SF Mono", Consolas, monospace;
+  /* Typography. Aligned with the marketing site (Geist Sans + Geist
+     Mono). The legacy `--font-display-serif` and `--font-display-mono`
+     names are kept to avoid changing every Tailwind class on every
+     page; they now both resolve to Geist faces, so the design reads
+     as agency-tech rather than editorial-magazine. */
+  --font-sans: var(--font-geist), "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-geist), "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-display-serif: var(--font-geist), "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-display-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Consolas, monospace;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, "SF Mono", Consolas, monospace;
 }
 
 @layer base {
@@ -41,54 +45,60 @@
 }
 
 @layer utilities {
-  /* Glass panel, the workhorse surface treatment */
+  /* Glass panel, the workhorse surface treatment. Slightly more
+     restrained than the previous values, less consumer-marketing
+     glow, more agency-portfolio chrome. */
   .glass {
-    background: rgba(255, 255, 255, 0.04);
-    backdrop-filter: blur(18px) saturate(140%);
-    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(16px) saturate(120%);
+    -webkit-backdrop-filter: blur(16px) saturate(120%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow:
+      0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
+      0 24px 48px -16px rgba(0, 0, 0, 0.55);
+  }
+  .glass-strong {
+    background: rgba(20, 20, 28, 0.55);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow:
       0 1px 0 0 rgba(255, 255, 255, 0.06) inset,
-      0 30px 60px -20px rgba(0, 0, 0, 0.6);
-  }
-  .glass-strong {
-    background: rgba(20, 20, 28, 0.6);
-    backdrop-filter: blur(28px) saturate(160%);
-    -webkit-backdrop-filter: blur(28px) saturate(160%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow:
-      0 1px 0 0 rgba(255, 255, 255, 0.08) inset,
-      0 40px 80px -24px rgba(0, 0, 0, 0.8);
+      0 32px 64px -20px rgba(0, 0, 0, 0.7);
   }
 
-  /* Editorial dot grid */
+  /* Editorial dot grid, kept as a subtle agency-portfolio texture */
   .bg-dot-grid {
-    background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.07) 1px, transparent 0);
+    background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.06) 1px, transparent 0);
     background-size: 28px 28px;
   }
 
-  /* Lattice scene, navy → violet → cream wash */
+  /* Lattice scene, was navy → warm-violet → cream (editorial-magazine).
+     Now toned down: desaturated near-black base with a single muted
+     coral wash. Reads agency-portfolio, not literary site. */
   .bg-lattice {
     background:
-      radial-gradient(70% 60% at 100% 0%, rgba(255, 107, 107, 0.22) 0%, transparent 60%),
-      radial-gradient(60% 90% at 0% 100%, rgba(245, 230, 211, 0.10) 0%, transparent 60%),
-      linear-gradient(180deg, #0a1230 0%, #16143a 50%, #0a0a14 100%);
+      radial-gradient(60% 50% at 100% 0%, rgba(255, 107, 107, 0.10) 0%, transparent 60%),
+      radial-gradient(50% 70% at 0% 100%, rgba(245, 230, 211, 0.04) 0%, transparent 60%),
+      linear-gradient(180deg, #0c0e1a 0%, #0e1024 50%, #07080f 100%);
   }
 
-  /* Studio Mix scene, near-black → indigo aurora */
+  /* Studio Mix scene, kept as the operator-aurora signal but with
+     reduced saturation so it stops fighting Lattice for attention. */
   .bg-studio-mix {
     background:
-      radial-gradient(60% 60% at 80% 0%, rgba(0, 225, 255, 0.18) 0%, transparent 55%),
-      radial-gradient(50% 70% at 10% 100%, rgba(255, 45, 149, 0.18) 0%, transparent 60%),
-      linear-gradient(180deg, #070a14 0%, #0e0820 60%, #050508 100%);
+      radial-gradient(60% 60% at 80% 0%, rgba(0, 225, 255, 0.12) 0%, transparent 55%),
+      radial-gradient(50% 70% at 10% 100%, rgba(255, 45, 149, 0.12) 0%, transparent 60%),
+      linear-gradient(180deg, #070a14 0%, #0a0820 60%, #050508 100%);
   }
 
-  /* Gallery landing, bigger, mixed palette */
+  /* Gallery landing, mixed palette. Toned to match the new scene
+     gradients, less fluorescent, more gradient agency-poster. */
   .bg-gallery {
     background:
-      radial-gradient(70% 60% at 100% 0%, rgba(255, 45, 149, 0.18) 0%, transparent 55%),
-      radial-gradient(50% 80% at 0% 50%, rgba(0, 225, 255, 0.14) 0%, transparent 55%),
-      radial-gradient(40% 50% at 100% 100%, rgba(255, 107, 107, 0.18) 0%, transparent 55%),
+      radial-gradient(70% 60% at 100% 0%, rgba(255, 45, 149, 0.10) 0%, transparent 55%),
+      radial-gradient(50% 80% at 0% 50%, rgba(0, 225, 255, 0.08) 0%, transparent 55%),
+      radial-gradient(40% 50% at 100% 100%, rgba(255, 107, 107, 0.10) 0%, transparent 55%),
       linear-gradient(180deg, #050508 0%, #0a0814 60%, #050508 100%);
   }
 
@@ -101,20 +111,23 @@
     animation: scenePulse 2.2s ease-out infinite;
   }
 
-  /* Window chrome, three traffic-light dots, top-left of a panel */
+  /* Window chrome, three traffic-light dots, top-left of a panel.
+     Kept available for Studio Mix's operator console where it earns
+     its place; removed from Lattice client-portal panels (per design
+     feedback: too overdesigned for a client-facing surface). */
   .window-dots::before {
     content: "";
     position: absolute;
     top: 14px;
     left: 14px;
-    width: 10px;
-    height: 10px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
     background: #ff5f57;
     box-shadow:
-      18px 0 0 0 #febc2e,
-      36px 0 0 0 #28c840;
-    opacity: 0.85;
+      16px 0 0 0 #febc2e,
+      32px 0 0 0 #28c840;
+    opacity: 0.7;
   }
 
   /* Scene-scoped accent utility, uses the CSS vars set on each scene root */
@@ -122,4 +135,24 @@
   .bg-scene { background: var(--color-scene-1); }
   .border-scene { border-color: var(--color-scene-1); }
   .ring-scene { box-shadow: 0 0 0 1px var(--color-scene-1); }
+
+  /* Agency-style card surface, matches the marketing site's
+     card-surface utility shape so the visual language reads as one
+     family across both sites. */
+  .scene-card {
+    background: linear-gradient(180deg, rgba(24, 24, 32, 0.45) 0%, rgba(8, 8, 12, 0.65) 100%);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+      0 1px 0 0 rgba(255, 255, 255, 0.02);
+    transition:
+      box-shadow 220ms ease-out,
+      transform 220ms ease-out,
+      background 220ms ease-out;
+  }
+  .scene-card:hover {
+    background: linear-gradient(180deg, rgba(28, 28, 36, 0.55) 0%, rgba(10, 10, 14, 0.7) 100%);
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+      0 8px 32px -8px rgba(0, 0, 0, 0.4);
+  }
 }

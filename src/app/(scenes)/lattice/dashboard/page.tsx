@@ -11,6 +11,7 @@ import {
 import { approveTaskAction, requestRevisionAction } from "@/lib/actions/lattice";
 import { GlassPanel } from "@/components/demo/GlassPanel";
 import { WindowDots } from "@/components/demo/WindowChrome";
+import { TryNext } from "@/components/demo/TryNext";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +32,7 @@ export default async function LatticeDashboard() {
           <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-[var(--color-scene-1)]">
             {persona.role} dashboard
           </p>
-          <h1 className="mt-4 font-display-serif text-4xl font-light leading-tight tracking-tight md:text-6xl">
+          <h1 className="mt-4 font-display-serif text-4xl font-medium leading-tight tracking-tight md:text-6xl">
             Welcome back, {persona.name.split(" ")[0]}.
           </h1>
           <p className="mt-4 max-w-xl text-zinc-400">
@@ -61,9 +62,29 @@ export default async function LatticeDashboard() {
         </div>
       </div>
 
+      <div className="mt-10">
+        <TryNext>
+          {pendingReview.length > 0 ? (
+            <>
+              Approve a deliverable, or click <em>request revision</em> to
+              loop it back to the designer. Then sign in as <strong>Nox</strong> from
+              the gallery to see your action in the audit log. Use <em>↻ reset scene</em>{" "}
+              in the topbar to try the loop again.
+            </>
+          ) : (
+            <>
+              All caught up — meaning Sage hasn&apos;t submitted anything new yet.
+              Sign in as <strong>Sage</strong> from the gallery, submit a draft for
+              client, then come back here. Use <em>↻ reset scene</em> in the topbar
+              if you want a fresh seed.
+            </>
+          )}
+        </TryNext>
+      </div>
+
       {pendingReview.length > 0 ? (
-        <div className="mt-12">
-          <h2 className="font-mono text-[11px] uppercase tracking-widest text-[var(--color-scene-1)]">
+        <div className="mt-10">
+          <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
             awaiting your review
           </h2>
           <ul className="mt-4 divide-y divide-white/5 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md">
@@ -102,7 +123,7 @@ export default async function LatticeDashboard() {
       ) : null}
 
       <div className="mt-16">
-        <h2 className="mb-6 font-display-serif text-2xl font-light tracking-tight">
+        <h2 className="mb-6 font-display-serif text-2xl font-medium tracking-tight">
           Your projects
         </h2>
         {projects.length === 0 ? (
@@ -131,7 +152,7 @@ function Stat({ k, v, accent = false }: { k: string; v: string; accent?: boolean
     <div className="flex flex-col">
       <dt className="text-[10px] uppercase tracking-widest text-zinc-500">{k}</dt>
       <dd
-        className={`mt-1 text-2xl font-light tracking-tight ${
+        className={`mt-1 text-2xl font-medium tracking-tight ${
           accent ? "text-[var(--color-scene-1)]" : "text-zinc-100"
         }`}
       >
@@ -163,7 +184,7 @@ function ProjectCard({
   return (
     <div className="group relative rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-md transition-all hover:-translate-y-0.5 hover:border-[var(--color-scene-1)]/40">
       <div className="flex items-start justify-between gap-2">
-        <h3 className="font-display-serif text-xl font-light leading-tight tracking-tight">
+        <h3 className="font-display-serif text-xl font-medium leading-tight tracking-tight">
           {name}
         </h3>
         <span className={`rounded-full border px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest ${tone}`}>

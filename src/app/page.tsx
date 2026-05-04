@@ -1,21 +1,38 @@
 import Link from "next/link";
 import { SCENES } from "@/lib/scenes";
 
+const HOW_IT_WORKS = [
+  {
+    n: "01",
+    title: "Pick a scene",
+    body: "Each scene is a different client + visual identity, with its own data model and persona set.",
+  },
+  {
+    n: "02",
+    title: "Sign in as a persona",
+    body: "No password, no signup. Click a persona card and you drop into their view of the system.",
+  },
+  {
+    n: "03",
+    title: "Try the loop, reset anytime",
+    body: "Each persona has one closed loop to try. Hit reset in the topbar to start over with fresh seed data.",
+  },
+] as const;
+
 export default function GalleryLanding() {
   const live = SCENES.filter((s) => s.status === "live");
   const coming = SCENES.filter((s) => s.status === "coming-online");
 
   return (
     <main className="bg-gallery min-h-[calc(100dvh-40px)] pb-24">
-      {/* Hero, agency-portfolio header */}
-      <section className="relative px-6 pb-20 pt-16 md:px-10 md:pt-24 lg:px-16 lg:pt-32">
+      {/* Hero */}
+      <section className="relative px-6 pb-16 pt-16 md:px-10 md:pt-24 lg:px-16 lg:pt-32">
         <div
           aria-hidden
           className="bg-dot-grid pointer-events-none absolute inset-0 opacity-40"
         />
         <div className="relative mx-auto max-w-7xl">
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
-            {/* Eyebrow + title */}
             <div className="lg:col-span-8">
               <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-400">
                 gravixar, demo gallery
@@ -28,24 +45,51 @@ export default function GalleryLanding() {
                 </span>
               </h1>
             </div>
-            {/* Lede */}
             <div className="lg:col-span-4 lg:pt-6">
               <p className="max-w-md text-lg leading-relaxed text-zinc-300 md:text-xl">
                 A working showroom of the kinds of systems Gravixar builds.
-                Each scene is its own client, its own visual identity,
-                its own running portal, with personas you log in as and
-                AI that actually responds.
+                Each scene is a real running portal with personas you sign in
+                as and AI that actually responds.
               </p>
               <p className="mt-4 max-w-md font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                this whole site resets every sunday
+                weekly seed reset · interactive · no signup
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Live scenes */}
+      {/* How it works */}
       <section className="relative px-6 md:px-10 lg:px-16">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-6 flex items-baseline justify-between">
+            <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-400">
+              how this demo works
+            </h2>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+              90-second walkthrough
+            </p>
+          </div>
+          <ol className="grid gap-4 md:grid-cols-3 md:gap-5">
+            {HOW_IT_WORKS.map((step) => (
+              <li key={step.n} className="scene-card rounded-2xl p-6">
+                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+                  step {step.n}
+                </p>
+                <h3 className="mt-3 text-lg font-medium tracking-[-0.01em] text-zinc-100">
+                  {step.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-zinc-400">
+                  {step.body}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* Live scenes */}
+      <section className="relative mt-16 px-6 md:px-10 lg:px-16">
         <div className="mx-auto max-w-7xl">
           <div className="mb-6 flex items-baseline justify-between">
             <h2 className="text-2xl font-medium tracking-[-0.015em] md:text-3xl">
@@ -82,7 +126,7 @@ export default function GalleryLanding() {
         </div>
       </section>
 
-      {/* Footer mini-strip */}
+      {/* Footer */}
       <footer className="mt-24 px-6 md:px-10 lg:px-16">
         <div className="mx-auto max-w-7xl border-t border-white/5 pt-8">
           <div className="flex flex-wrap items-baseline justify-between gap-4">
@@ -114,7 +158,6 @@ function SceneCard({
       href={`/${scene.slug}`}
       className="scene-card group relative block overflow-hidden rounded-2xl"
     >
-      {/* Per-card gradient wash from its swatches, toned down */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-50 transition-opacity group-hover:opacity-70"
@@ -144,7 +187,6 @@ function SceneCard({
           {scene.description}
         </p>
 
-        {/* Swatches + CTA */}
         <div className="mt-8 flex items-center justify-between">
           <div className="flex gap-1.5">
             {scene.swatches.map((c, i) => (

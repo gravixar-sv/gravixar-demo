@@ -4,8 +4,10 @@ import { redirect } from "next/navigation";
 import { findLatticePersona } from "@/lib/personas/lattice";
 import { getActivePersonaId } from "@/lib/demo/session";
 import { getPmInquiries, getPmActiveProjects } from "@/lib/queries/lattice";
+import { sendFirstReplyAction } from "@/lib/actions/lattice";
 import { GlassPanel } from "@/components/demo/GlassPanel";
 import { WindowDots } from "@/components/demo/WindowChrome";
+import { TryNext } from "@/components/demo/TryNext";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +29,7 @@ export default async function LatticeInbox() {
           <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-[var(--color-scene-1)]">
             pm inbox
           </p>
-          <h1 className="mt-4 font-display-serif text-4xl font-light leading-tight tracking-tight md:text-6xl">
+          <h1 className="mt-4 font-display-serif text-4xl font-medium leading-tight tracking-tight md:text-6xl">
             Hi {persona.name.split(" ")[0]}, {inquiries.length} inquir{inquiries.length === 1 ? "y" : "ies"}.
           </h1>
           <p className="mt-4 max-w-xl text-zinc-400">
@@ -53,9 +55,19 @@ export default async function LatticeInbox() {
         </div>
       </div>
 
+      {/* Try-this callout */}
+      <div className="mt-10">
+        <TryNext>
+          A new inquiry is sitting in <strong>PM_ASSIGNED</strong>. Click{" "}
+          <em>send first reply</em> to advance it to AWAITING_CALL, write a
+          message into the thread, and trigger an audit row Nox can see.
+          Use <em>↻ reset scene</em> in the topbar to start over.
+        </TryNext>
+      </div>
+
       {/* Inquiries */}
-      <div className="mt-14">
-        <h2 className="font-mono text-[11px] uppercase tracking-widest text-[var(--color-scene-1)]">
+      <div className="mt-10">
+        <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
           inquiries
         </h2>
         {inquiries.length === 0 ? (
@@ -66,11 +78,11 @@ export default async function LatticeInbox() {
               const lastMessage = iq.messages[0];
               const clientName = iq.client.user.name;
               return (
-                <li key={iq.id} className="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-start sm:justify-between">
+                <li key={iq.id} className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline gap-3">
                       <p className="text-sm font-medium text-zinc-100">{clientName}</p>
-                      <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">{iq.client.company}</p>
+                      <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">{iq.client.company}</p>
                     </div>
                     <p className="mt-1 text-sm text-zinc-300">{iq.summary}</p>
                     {lastMessage ? (
@@ -79,11 +91,25 @@ export default async function LatticeInbox() {
                       </p>
                     ) : null}
                   </div>
-                  <div className="flex flex-shrink-0 flex-col items-end gap-1">
-                    <span className="rounded-full border border-[var(--color-scene-1)]/40 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-[var(--color-scene-1)]">
+                  <div className="flex flex-shrink-0 flex-col items-end gap-2">
+                    <span className="rounded-full border border-[var(--color-scene-1)]/40 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
                       {iq.status.replace("_", " ").toLowerCase()}
                     </span>
-                    <p className="font-mono text-[10px] text-zinc-600">{iq._count.messages} msg</p>
+                    {iq.status === "PM_ASSIGNED" ? (
+                      <form action={sendFirstReplyAction}>
+                        <input type="hidden" name="inquiryId" value={iq.id} />
+                        <button
+                          type="submit"
+                          className="rounded-md border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/15 px-3 py-1.5 text-xs text-[var(--color-scene-1)] transition-colors hover:bg-[var(--color-scene-1)]/25"
+                        >
+                          send first reply →
+                        </button>
+                      </form>
+                    ) : (
+                      <p className="font-mono text-[10px] text-zinc-600">
+                        {iq._count.messages} msg
+                      </p>
+                    )}
                   </div>
                 </li>
               );
@@ -109,7 +135,7 @@ export default async function LatticeInbox() {
                 <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">
                   {p.client.company}
                 </p>
-                <h3 className="mt-2 font-display-serif text-lg font-light tracking-tight">
+                <h3 className="mt-2 font-display-serif text-lg font-medium tracking-tight">
                   {p.name}
                 </h3>
                 <p className="mt-3 font-mono text-[10px] uppercase tracking-widest text-zinc-600">
@@ -137,7 +163,7 @@ function Stat({
     <div className="flex flex-col">
       <dt className="text-[10px] uppercase tracking-widest text-zinc-500">{k}</dt>
       <dd
-        className={`mt-1 text-2xl font-light tracking-tight ${
+        className={`mt-1 text-2xl font-medium tracking-tight ${
           accent ? "text-[var(--color-scene-1)]" : "text-zinc-100"
         }`}
       >

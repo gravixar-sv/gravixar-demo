@@ -17,6 +17,7 @@ import {
 import { approveLeaveAction, rejectLeaveAction } from "@/lib/actions/lattice";
 import { GlassPanel } from "@/components/demo/GlassPanel";
 import { WindowDots } from "@/components/demo/WindowChrome";
+import { TryNext } from "@/components/demo/TryNext";
 
 export const dynamic = "force-dynamic";
 
@@ -42,7 +43,7 @@ export default async function LatticeAdmin() {
           <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-[var(--color-scene-1)]">
             admin console
           </p>
-          <h1 className="mt-4 font-display-serif text-4xl font-light leading-tight tracking-tight md:text-6xl">
+          <h1 className="mt-4 font-display-serif text-4xl font-medium leading-tight tracking-tight md:text-6xl">
             Studio operations.
           </h1>
           <p className="mt-4 max-w-xl text-zinc-400">
@@ -66,6 +67,27 @@ export default async function LatticeAdmin() {
             </dl>
           </GlassPanel>
         </div>
+      </div>
+
+      <div className="mt-10">
+        <TryNext>
+          {pendingLeave.length > 0 ? (
+            <>
+              <strong>{pendingLeave.length}</strong> leave request
+              {pendingLeave.length === 1 ? "" : "s"} pending. Approve or reject one
+              and watch the audit log section below pick up your decision in
+              real time. <em>↻ reset scene</em> in the topbar gets you a fresh
+              queue.
+            </>
+          ) : (
+            <>
+              Leave queue is clear. Scroll down to the activity log — every
+              action across the studio shows up here, including the ones
+              other personas just performed. <em>↻ reset scene</em> in the
+              topbar restores pending requests to retry.
+            </>
+          )}
+        </TryNext>
       </div>
 
       {/* Section: Team status today */}
@@ -176,7 +198,7 @@ export default async function LatticeAdmin() {
             <p className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">
               total spend
             </p>
-            <p className="mt-2 font-display-serif text-4xl font-light tracking-tight text-zinc-100">
+            <p className="mt-2 font-display-serif text-4xl font-medium tracking-tight text-zinc-100">
               {formatMoney(finance.total30d)}
             </p>
             <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-zinc-600">
@@ -289,7 +311,7 @@ function Section({
   return (
     <section className="mt-14">
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="font-display-serif text-2xl font-light tracking-tight md:text-3xl">
+        <h2 className="font-display-serif text-2xl font-medium tracking-tight md:text-3xl">
           {title}
         </h2>
         {subtitle ? (
@@ -316,7 +338,7 @@ function Stat({
     <div className="flex flex-col">
       <dt className="text-[10px] uppercase tracking-widest text-zinc-500">{k}</dt>
       <dd
-        className={`mt-1 text-2xl font-light tracking-tight ${
+        className={`mt-1 text-2xl font-medium tracking-tight ${
           accent ? "text-[var(--color-scene-1)]" : "text-zinc-100"
         }`}
       >

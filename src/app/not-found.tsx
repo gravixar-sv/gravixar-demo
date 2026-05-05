@@ -6,7 +6,7 @@ export default function NotFound() {
       <p className="font-mono text-xs uppercase tracking-[0.25em] text-zinc-500">
         404
       </p>
-      <h1 className="mt-4 font-display-serif text-4xl font-light tracking-tight md:text-5xl">
+      <h1 className="mt-4 text-4xl font-medium tracking-[-0.015em] md:text-5xl">
         That scene doesn&apos;t exist.
       </h1>
       <p className="mt-3 text-zinc-400">

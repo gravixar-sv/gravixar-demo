@@ -1,23 +1,22 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Fraunces, JetBrains_Mono } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { DemoBanner } from "@/components/demo/DemoBanner";
 import "@/styles/globals.css";
 
-const inter = Inter({
+// Geist + Geist Mono replace the previous Inter + Fraunces + JetBrains
+// Mono trio. Aligning with the marketing site's typography and dropping
+// the editorial-magazine feel (Fraunces) in favour of agency-tech.
+// Fewer faces loaded means faster TTFB on the demo subdomain too.
+const geistSans = Geist({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-geist",
   display: "swap",
 });
-const fraunces = Fraunces({
+const geistMono = Geist_Mono({
   subsets: ["latin"],
-  variable: "--font-fraunces",
-  display: "swap",
-});
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-jetbrains",
+  variable: "--font-geist-mono",
   display: "swap",
 });
 
@@ -43,7 +42,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${fraunces.variable} ${jetbrains.variable}`}
+      className={`${geistSans.variable} ${geistMono.variable}`}
     >
       <body className="bg-[#050508] text-[#f5f5f7]">
         <DemoBanner />

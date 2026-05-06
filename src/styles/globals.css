@@ -136,6 +136,40 @@
   .border-scene { border-color: var(--color-scene-1); }
   .ring-scene { box-shadow: 0 0 0 1px var(--color-scene-1); }
 
+  /* Tour-step fade-in. Each tour step mounts fresh and animates in
+     from a small downward offset so the auto-progression reads as one
+     continuous flow rather than abrupt swaps. */
+  @keyframes tourFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .tour-step-enter {
+    animation: tourFadeIn 320ms ease-out both;
+  }
+
+  /* Subtle pulse used on the audit log's "new" rows so the visitor's
+     just-completed actions stand out without being loud. */
+  @keyframes tourFreshPulse {
+    0%, 100% { background-color: rgba(255, 107, 107, 0.04); }
+    50%      { background-color: rgba(255, 107, 107, 0.10); }
+  }
+  .tour-fresh-pulse {
+    animation: tourFreshPulse 2.4s ease-in-out infinite;
+  }
+
+  /* Honour system reduce-motion. The tour still works, just skips the
+     entrance fade and the pulse animation. */
+  @media (prefers-reduced-motion: reduce) {
+    .tour-step-enter { animation: none; }
+    .tour-fresh-pulse { animation: none; background-color: rgba(255, 107, 107, 0.06); }
+  }
+
   /* Agency-style card surface, matches the marketing site's
      card-surface utility shape so the visual language reads as one
      family across both sites. */

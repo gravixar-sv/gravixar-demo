@@ -26,12 +26,10 @@ Open http://localhost:3400, or http://demo.localhost:3400 for a labeled tab.
 
 ## Scenes
 
-See [DEMO-SCENES.md](DEMO-SCENES.md) for the full catalog. MVP launches with two scenes:
+MVP launches with two scenes:
 
 - **Lattice Studio**, agency client portal. Login as Mira Voss (client), Kai Render (PM), Nox Bellini (admin), or Sage Holloway (designer).
 - **Studio Mix**, AI agents playground. No login, operator-style sandbox showing live SEO drafter, anomaly cron, suspicion classifier, content review queue.
-
-Coming next: **Northbeam Goods** (DTC brand admin), **Verus Partners** (professional services intake).
 
 ## Demo-mode infrastructure
 

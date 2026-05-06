@@ -156,12 +156,9 @@ applies to demo work too):
 - `project_gravixar_locked_decisions.md` — pre-decided choices
 - `feedback_no_background_dev_server.md` — don't run `next dev` in bg
 
-## Active projects
-
-- **DEMO-TOUR-PLAN.md** — the V1 spec for a guided onboarding tour
-  for small/medium business buyers. Replaces (or augments) the
-  current Lattice persona-pick experience. Read this before any
-  tour-related work.
+Internal planning docs (specs, scene catalog, roadmaps) live outside
+this repo at `C:\dev\gravixar-notes\`, not committed. Ask the user
+for the specific doc you need if it's relevant to the task.
 
 ## Database access
 

@@ -88,6 +88,55 @@ export default function GalleryLanding() {
         </div>
       </section>
 
+      {/* Tour hero — primary entry path for SMB buyers, sits above the
+          scene grid. Routes into /tour. The /lattice scene is still
+          reachable via the scene grid below as the deep-dive option. */}
+      <section className="relative mt-12 px-6 md:px-10 lg:px-16">
+        <div className="mx-auto max-w-7xl">
+          <Link
+            href="/tour"
+            className="scene-card group relative block overflow-hidden rounded-2xl"
+          >
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 opacity-60 transition-opacity group-hover:opacity-90"
+              style={{
+                background:
+                  "radial-gradient(60% 80% at 100% 0%, rgba(255, 107, 107, 0.20) 0%, transparent 60%), radial-gradient(50% 80% at 0% 100%, rgba(0, 225, 255, 0.10) 0%, transparent 55%)",
+              }}
+            />
+            <div className="relative px-7 pb-8 pt-7 md:px-10 md:py-10">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#FF6B6B]">
+                  new · 60-second guided tour
+                </span>
+                <span className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500 sm:inline">
+                  start here
+                </span>
+              </div>
+              <h3 className="mt-7 max-w-2xl text-3xl font-medium leading-tight tracking-[-0.015em] md:text-4xl">
+                See what your portal would feel like.
+              </h3>
+              <p className="mt-3 max-w-xl text-sm leading-relaxed text-zinc-300 md:text-base">
+                Three roles, one system, one audit trail. We walk you
+                through it as the client, the project manager, and the
+                admin. About a minute, then you decide whether to dig
+                deeper or talk to us.
+              </p>
+              <div className="mt-8 flex items-center justify-between">
+                <span className="inline-flex items-center gap-2 rounded-md border border-[#FF6B6B]/40 bg-[#FF6B6B]/10 px-4 py-2 text-sm font-medium text-[#FF6B6B] transition-colors group-hover:bg-[#FF6B6B]/20">
+                  start the tour
+                  <span aria-hidden className="transition-transform group-hover:translate-x-1">→</span>
+                </span>
+                <p className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500 sm:block">
+                  or scroll to explore
+                </p>
+              </div>
+            </div>
+          </Link>
+        </div>
+      </section>
+
       {/* Live scenes */}
       <section className="relative mt-16 px-6 md:px-10 lg:px-16">
         <div className="mx-auto max-w-7xl">

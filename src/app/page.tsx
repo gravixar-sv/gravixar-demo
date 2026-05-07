@@ -1,272 +1,101 @@
+// Gallery landing, reframed as the dashboard for the demo. Polish
+// session 1 (2026-05-07): replaces the previous long-scroll marketing
+// landing with a single-screen-ish dashboard layout. The
+// DashboardShell provides the persistent rail; this file fills the
+// main pane with hero + scene tiles + modules strip + coming-online
+// strip.
+
 import Link from "next/link";
 import { SCENES } from "@/lib/scenes";
+import { DashboardShell } from "@/components/demo/DashboardShell";
 
-const HOW_IT_WORKS = [
-  {
-    n: "01",
-    title: "Pick a scene",
-    body: "Each scene is a different client + visual identity, with its own data model and persona set.",
-  },
-  {
-    n: "02",
-    title: "Sign in as a persona",
-    body: "No password, no signup. Click a persona card and you drop into their view of the system.",
-  },
-  {
-    n: "03",
-    title: "Try the loop, reset anytime",
-    body: "Each persona has one closed loop to try. Hit reset in the topbar to start over with fresh seed data.",
-  },
-] as const;
-
-export default function GalleryLanding() {
+export default function GalleryDashboard() {
   const live = SCENES.filter((s) => s.status === "live");
   const coming = SCENES.filter((s) => s.status === "coming-online");
 
   return (
-    <main className="bg-gallery min-h-[calc(100dvh-40px)] pb-24">
-      {/* Hero */}
-      <section className="relative px-6 pb-16 pt-16 md:px-10 md:pt-24 lg:px-16 lg:pt-32">
-        <div
-          aria-hidden
-          className="bg-dot-grid pointer-events-none absolute inset-0 opacity-40"
-        />
-        <div className="relative mx-auto max-w-7xl">
-          <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
-            <div className="lg:col-span-8">
-              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-400">
-                gravixar, demo gallery
-              </p>
-              <h1 className="mt-6 text-5xl font-medium leading-[0.98] tracking-[-0.02em] text-zinc-50 md:text-7xl lg:text-[80px]">
-                Pick a portal.
-                <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B6B] to-[#00E1FF]">
-                  Click around.
-                </span>
-              </h1>
-            </div>
-            <div className="lg:col-span-4 lg:pt-6">
-              <p className="max-w-md text-lg leading-relaxed text-zinc-300 md:text-xl">
-                A working showroom of the kinds of systems Gravixar builds.
-                Each scene is a real running portal with personas you sign in
-                as and AI that actually responds.
-              </p>
-              <p className="mt-4 max-w-md font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                weekly seed reset · interactive · no signup
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="relative px-6 md:px-10 lg:px-16">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-6 flex items-baseline justify-between">
-            <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-400">
-              how this demo works
-            </h2>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
-              90-second walkthrough
-            </p>
-          </div>
-          <ol className="grid gap-4 md:grid-cols-3 md:gap-5">
-            {HOW_IT_WORKS.map((step) => (
-              <li key={step.n} className="scene-card rounded-2xl p-6">
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                  step {step.n}
-                </p>
-                <h3 className="mt-3 text-lg font-medium tracking-[-0.01em] text-zinc-100">
-                  {step.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-zinc-400">
-                  {step.body}
-                </p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
-      {/* Tour hero — primary entry path for SMB buyers, sits above the
-          scene grid. Routes into /tour. The /lattice scene is still
-          reachable via the scene grid below as the deep-dive option. */}
-      <section className="relative mt-12 px-6 md:px-10 lg:px-16">
-        <div className="mx-auto max-w-7xl">
-          <Link
-            href="/tour"
-            className="scene-card group relative block overflow-hidden rounded-2xl"
-          >
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 opacity-60 transition-opacity group-hover:opacity-90"
-              style={{
-                background:
-                  "radial-gradient(60% 80% at 100% 0%, rgba(255, 107, 107, 0.20) 0%, transparent 60%), radial-gradient(50% 80% at 0% 100%, rgba(0, 225, 255, 0.10) 0%, transparent 55%)",
-              }}
-            />
-            <div className="relative px-7 pb-8 pt-7 md:px-10 md:py-10">
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#FF6B6B]">
-                  new · 60-second guided tour
-                </span>
-                <span className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500 sm:inline">
-                  start here
-                </span>
-              </div>
-              <h3 className="mt-7 max-w-2xl text-3xl font-medium leading-tight tracking-[-0.015em] md:text-4xl">
-                See what your portal would feel like.
-              </h3>
-              <p className="mt-3 max-w-xl text-sm leading-relaxed text-zinc-300 md:text-base">
-                Three roles, one system, one audit trail. We walk you
-                through it as the client, the project manager, and the
-                admin. About a minute, then you decide whether to dig
-                deeper or talk to us.
-              </p>
-              <div className="mt-8 flex items-center justify-between">
-                <span className="inline-flex items-center gap-2 rounded-md border border-[#FF6B6B]/40 bg-[#FF6B6B]/10 px-4 py-2 text-sm font-medium text-[#FF6B6B] transition-colors group-hover:bg-[#FF6B6B]/20">
-                  start the tour
-                  <span aria-hidden className="transition-transform group-hover:translate-x-1">→</span>
-                </span>
-                <p className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500 sm:block">
-                  or scroll to explore
-                </p>
-              </div>
-            </div>
-          </Link>
-        </div>
-      </section>
-
-      {/* Live scenes */}
-      <section className="relative mt-16 px-6 md:px-10 lg:px-16">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-6 flex items-baseline justify-between">
-            <h2 className="text-2xl font-medium tracking-[-0.015em] md:text-3xl">
-              Live now
-            </h2>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-              {live.length} scene{live.length === 1 ? "" : "s"}
-            </p>
-          </div>
-          <div className="grid gap-6 md:grid-cols-2 md:gap-8">
-            {live.map((scene, i) => (
-              <SceneCard key={scene.slug} scene={scene} index={i} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Modules surface, parallel to scenes */}
-      <section className="relative mt-16 px-6 md:px-10 lg:px-16">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-6 flex items-baseline justify-between">
-            <h2 className="text-2xl font-medium tracking-[-0.015em] md:text-3xl">
-              Modules, the building blocks
-            </h2>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-              12 patterns
-            </p>
-          </div>
-          <Link
-            href="/modules"
-            className="scene-card group relative block overflow-hidden rounded-2xl"
-          >
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 opacity-50 transition-opacity group-hover:opacity-70"
-              style={{
-                background:
-                  "radial-gradient(70% 80% at 100% 0%, #FF6B3528 0%, transparent 60%), radial-gradient(50% 80% at 0% 100%, #00E1FF1a 0%, transparent 55%)",
-              }}
-            />
-            <div className="relative px-7 pb-7 pt-7 md:px-9 md:py-9">
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                  03 / library
-                </span>
-                <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/90">
-                  <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 text-emerald-400" />
-                  3 interactive · 9 coming
-                </span>
-              </div>
-              <h3 className="mt-8 max-w-2xl text-3xl font-medium leading-tight tracking-[-0.015em] md:text-4xl">
-                Skip the scenes. Try one capability at a time.
-              </h3>
-              <p className="mt-3 max-w-xl text-sm leading-relaxed text-zinc-300 md:text-base">
-                Review state machine. Daily check-in. Audit log + restore. AI
-                intake wizard. HIPAA-aware AI guardrail. The 12 patterns
-                running in production across Broomstick Hub and Beeline,
-                each a 30-second sandbox you can poke at without signing in.
-              </p>
-              <div className="mt-8 flex items-center justify-between">
-                <div className="flex flex-wrap gap-1.5">
-                  {[
-                    "auth",
-                    "audit",
-                    "ai",
-                    "finance",
-                    "ops",
-                  ].map((c) => (
-                    <span
-                      key={c}
-                      className="rounded-sm border border-white/10 bg-white/[0.04] px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-400"
-                    >
-                      {c}
-                    </span>
-                  ))}
-                </div>
-                <span className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-200 transition-colors group-hover:text-white">
-                  open library
-                  <span aria-hidden className="transition-transform group-hover:translate-x-1">
-                    →
-                  </span>
-                </span>
-              </div>
-            </div>
-          </Link>
-        </div>
-      </section>
-
-      {/* Coming online */}
-      <section className="relative mt-16 px-6 md:px-10 lg:px-16">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-6 flex items-baseline justify-between">
-            <h2 className="text-2xl font-medium tracking-[-0.015em] md:text-3xl">
-              Coming online
-            </h2>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-              {coming.length} in build
-            </p>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2 md:gap-6">
-            {coming.map((scene) => (
-              <ComingSoonCard key={scene.slug} scene={scene} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="mt-24 px-6 md:px-10 lg:px-16">
-        <div className="mx-auto max-w-7xl border-t border-white/5 pt-8">
-          <div className="flex flex-wrap items-baseline justify-between gap-4">
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-              gravixar, operations, ai tooling, brand &amp; visuals
-            </p>
-            <Link
-              href="https://gravixar.com"
-              className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-300 hover:text-white"
-            >
-              gravixar.com →
-            </Link>
-          </div>
-        </div>
-      </footer>
-    </main>
+    <DashboardShell>
+      <div className="space-y-12">
+        <HeroTile />
+        <LiveScenes scenes={live} />
+        <ModulesStrip />
+        {coming.length > 0 ? <ComingOnline scenes={coming} /> : null}
+      </div>
+    </DashboardShell>
   );
 }
 
-function SceneCard({
+// ── Hero ──────────────────────────────────────────────────────────
+
+function HeroTile() {
+  return (
+    <section
+      aria-labelledby="hero-title"
+      className="scene-card relative overflow-hidden rounded-2xl"
+    >
+      <div
+        aria-hidden
+        className="bg-dot-grid pointer-events-none absolute inset-0 opacity-30"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-60"
+        style={{
+          background:
+            "radial-gradient(60% 80% at 100% 0%, rgba(255, 107, 107, 0.18) 0%, transparent 60%), radial-gradient(50% 80% at 0% 100%, rgba(0, 225, 255, 0.10) 0%, transparent 55%)",
+        }}
+      />
+      <div className="relative px-6 pb-8 pt-8 md:px-10 md:py-10">
+        <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#FF6B6B]">
+          gravixar, demo gallery
+        </p>
+        <h1
+          id="hero-title"
+          className="mt-5 text-4xl font-medium leading-[1.02] tracking-[-0.02em] text-zinc-50 md:text-5xl lg:text-6xl"
+        >
+          Pick a portal.{" "}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B6B] to-[#00E1FF]">
+            Click around.
+          </span>
+        </h1>
+        <p className="mt-5 max-w-2xl text-base leading-relaxed text-zinc-300 md:text-lg">
+          The same shapes run for agencies, clinics, accountants, consultancies,
+          and DTC brands. Each scene below is a real running portal — sign in
+          as a persona, try the workflow, see what fits.
+        </p>
+        <div className="mt-7 flex flex-wrap items-center gap-3">
+          <Link
+            href="/tour"
+            className="inline-flex items-center gap-2 rounded-md border border-[#FF6B6B]/40 bg-[#FF6B6B]/15 px-4 py-2.5 text-sm font-medium text-[#FF6B6B] transition-colors hover:bg-[#FF6B6B]/25"
+          >
+            Start the 60-second tour
+            <span aria-hidden>→</span>
+          </Link>
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+            or scroll to pick a scene
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ── Live scenes section ──────────────────────────────────────────
+
+function LiveScenes({ scenes }: { scenes: typeof SCENES }) {
+  return (
+    <section aria-labelledby="live-scenes-title">
+      <SectionHeader id="live-scenes-title" title="Live now" meta={`${scenes.length} ${scenes.length === 1 ? "scene" : "scenes"}`} />
+      <div className="mt-5 grid gap-5 md:grid-cols-2">
+        {scenes.map((scene, i) => (
+          <SceneTile key={scene.slug} scene={scene} index={i} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function SceneTile({
   scene,
   index,
 }: {
@@ -280,45 +109,39 @@ function SceneCard({
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-50 transition-opacity group-hover:opacity-70"
+        className="pointer-events-none absolute inset-0 opacity-50 transition-opacity group-hover:opacity-80"
         style={{
           background: `radial-gradient(70% 80% at 100% 0%, ${scene.swatches[1]}28 0%, transparent 60%), radial-gradient(50% 80% at 0% 100%, ${scene.swatches[2]}1a 0%, transparent 55%)`,
         }}
       />
-      <div className="relative px-7 pb-7 pt-7 md:px-9 md:pt-9 md:pb-9">
+      <div className="relative px-6 pb-6 pt-6 md:px-7 md:pt-7 md:pb-7">
         <div className="flex items-center justify-between">
           <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
             {String(index + 1).padStart(2, "0")} / {scene.bucket}
           </span>
           <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/90">
-            <span
-              className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 text-emerald-400"
-            />
+            <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 text-emerald-400" />
             live
           </span>
         </div>
-        <h3 className="mt-8 text-3xl font-medium leading-tight tracking-[-0.015em] md:text-4xl">
+        <h3 className="mt-6 text-2xl font-medium leading-tight tracking-[-0.015em] md:text-[1.7rem]">
           {scene.name}
         </h3>
-        <p className="mt-3 max-w-md text-sm leading-relaxed text-zinc-300 md:text-base">
+        <p className="mt-2 max-w-md text-sm leading-relaxed text-zinc-300">
           {scene.tagline}
         </p>
-        <p className="mt-4 max-w-md text-xs leading-relaxed text-zinc-500">
-          {scene.description}
-        </p>
-
-        <div className="mt-8 flex items-center justify-between">
+        <div className="mt-6 flex items-center justify-between">
           <div className="flex gap-1.5">
             {scene.swatches.map((c, i) => (
               <span
                 key={`${c}-${i}`}
-                className="h-5 w-5 rounded-full border border-white/15"
+                className="h-4 w-4 rounded-full border border-white/15"
                 style={{ background: c }}
                 aria-hidden
               />
             ))}
           </div>
-          <span className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-200 transition-colors group-hover:text-white">
+          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-200 transition-colors group-hover:text-white">
             enter scene
             <span aria-hidden className="transition-transform group-hover:translate-x-1">→</span>
           </span>
@@ -328,32 +151,102 @@ function SceneCard({
   );
 }
 
-function ComingSoonCard({ scene }: { scene: (typeof SCENES)[number] }) {
+// ── Modules strip ────────────────────────────────────────────────
+
+function ModulesStrip() {
   return (
-    <div className="scene-card relative overflow-hidden rounded-2xl p-6 md:p-8">
-      <div className="flex items-center justify-between">
-        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
-          {scene.bucket}
-        </span>
-        <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-          <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-zinc-500 text-zinc-500" />
-          coming online
-        </span>
-      </div>
-      <h3 className="mt-6 text-2xl font-medium tracking-[-0.015em] text-zinc-300 md:text-3xl">
-        {scene.name}
-      </h3>
-      <p className="mt-2 text-sm text-zinc-500">{scene.tagline}</p>
-      <div className="mt-5 flex gap-1.5">
-        {scene.swatches.map((c, i) => (
-          <span
-            key={`${c}-${i}`}
-            className="h-4 w-4 rounded-full border border-white/10 opacity-50"
-            style={{ background: c }}
-            aria-hidden
-          />
+    <section aria-labelledby="modules-title">
+      <SectionHeader id="modules-title" title="Modules, the building blocks" meta="12 patterns" />
+      <Link
+        href="/modules"
+        className="scene-card group mt-5 block overflow-hidden rounded-2xl"
+      >
+        <div className="relative px-6 pb-6 pt-6 md:px-7 md:pt-7 md:pb-7">
+          <div className="flex items-center justify-between">
+            <p className="text-base text-zinc-200 md:text-lg">
+              Skip the scenes. Try one capability at a time.
+            </p>
+            <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/90">
+              <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 text-emerald-400" />
+              3 interactive
+            </span>
+          </div>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-400">
+            Review state machine, daily check-in, audit log + restore — three
+            interactive sandboxes plus nine more coming online.
+          </p>
+          <div className="mt-5 flex items-center justify-between">
+            <div className="flex flex-wrap gap-1.5">
+              {["auth", "audit", "ai", "finance", "ops"].map((c) => (
+                <span
+                  key={c}
+                  className="rounded-sm border border-white/10 bg-white/[0.04] px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-400"
+                >
+                  {c}
+                </span>
+              ))}
+            </div>
+            <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-200 transition-colors group-hover:text-white">
+              open library
+              <span aria-hidden className="transition-transform group-hover:translate-x-1">→</span>
+            </span>
+          </div>
+        </div>
+      </Link>
+    </section>
+  );
+}
+
+// ── Coming online strip ──────────────────────────────────────────
+
+function ComingOnline({ scenes }: { scenes: typeof SCENES }) {
+  return (
+    <section aria-labelledby="coming-title">
+      <SectionHeader id="coming-title" title="Coming online" meta={`${scenes.length} in build`} />
+      <div className="mt-5 grid gap-3 md:grid-cols-2">
+        {scenes.map((scene) => (
+          <div
+            key={scene.slug}
+            className="scene-card flex items-center justify-between rounded-2xl px-5 py-4"
+          >
+            <div>
+              <p className="text-sm text-zinc-200">{scene.name}</p>
+              <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+                {scene.bucket}
+              </p>
+            </div>
+            <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+              <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-zinc-500 text-zinc-500" />
+              soon
+            </span>
+          </div>
         ))}
       </div>
+    </section>
+  );
+}
+
+// ── Section header (shared) ──────────────────────────────────────
+
+function SectionHeader({
+  id,
+  title,
+  meta,
+}: {
+  id: string;
+  title: string;
+  meta?: string;
+}) {
+  return (
+    <div className="flex items-baseline justify-between gap-3">
+      <h2 id={id} className="text-xl font-medium tracking-[-0.015em] text-zinc-100 md:text-2xl">
+        {title}
+      </h2>
+      {meta ? (
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+          {meta}
+        </p>
+      ) : null}
     </div>
   );
 }

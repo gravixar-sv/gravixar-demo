@@ -2,7 +2,7 @@
 
 > Read first at session start. Updated on every PR.
 >
-> Last updated: 2026-05-09
+> Last updated: 2026-05-09 (no demo changes today; HQ family layer absorbed all session time)
 
 ## Live now
 
@@ -11,10 +11,14 @@
   the full app for internal review.
 - Main at `2b4044b` (tag `v1.1-dashboard-shell`) — dashboard shell +
   reframed gallery merged (PR #6, "session 1/3" of the demo polish).
+- **Cross-surface note (2026-05-09)**: huge HQ progress today (V1 closed
+  + Phases 2 / 3 / 3B / 3C+D / 3E / 3F / 4 / 4A / 4B / 4C / 4D all
+  shipped, family chat + subjects + AI breakdown live). Demo remains
+  paused; resume after Phase 5 (HQ Inbox) lands.
 
 ## Currently working on
 
-- (nothing — demo work paused 2026-05-07 PM)
+- (nothing — demo work paused since 2026-05-07 PM)
 
 ## Next session
 

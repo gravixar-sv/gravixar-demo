@@ -135,7 +135,13 @@ demos.
 
 ### Branch + commit conventions
 
-Same as gravixar-ai. See its AGENTS.md.
+- Feature branches: `feat/DDMMYY-HHMM-demo` (date+time stamp + repo
+  tag — `demo` for this repo; `hq` and `mkt` for the sister repos so
+  cross-repo branches stay distinguishable at a glance)
+- Fixes: `fix/DDMMYY-HHMM-demo`. Chores: `chore/DDMMYY-HHMM-demo`.
+- One PR per concern, squash-merge by default.
+- See gravixar-ai's AGENTS.md for the full commit-message + Git
+  identity conventions; they apply unchanged here.
 
 ## Sister project relationship
 

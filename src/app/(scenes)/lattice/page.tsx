@@ -5,6 +5,7 @@ import Link from "next/link";
 import { LATTICE_PERSONAS } from "@/lib/personas/lattice";
 import { GlassPanel } from "@/components/demo/GlassPanel";
 import { TryNext } from "@/components/demo/TryNext";
+import { SceneCTA } from "@/components/demo/SceneCTA";
 
 // Closed-loop hint per persona, surfaced on each card so visitors know
 // what to actually try after they sign in.
@@ -129,12 +130,14 @@ export default function LatticePersonaPick() {
         </p>
       </div>
 
-      <div className="mt-16 border-t border-white/5 pt-8">
+      <SceneCTA personaLabel="Agency" />
+
+      <div className="mt-10 border-t border-white/5 pt-8">
         <Link
           href="/"
           className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500 hover:text-zinc-200"
         >
-          ← back to gallery
+          ← back to scenes
         </Link>
       </div>
     </div>

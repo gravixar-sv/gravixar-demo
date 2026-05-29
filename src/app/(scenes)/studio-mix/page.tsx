@@ -4,6 +4,7 @@
 
 import Link from "next/link";
 import { GlassPanel } from "@/components/demo/GlassPanel";
+import { SceneCTA } from "@/components/demo/SceneCTA";
 import { WindowDots } from "@/components/demo/WindowChrome";
 import { EchoRunner } from "@/components/scenes/studio-mix/EchoRunner";
 import { PulseRunner } from "@/components/scenes/studio-mix/PulseRunner";
@@ -127,12 +128,14 @@ export default function StudioMixConsole() {
         ⚠ ECHO + RIVER + ATLAS come fully live the moment AI_GATEWAY_API_KEY is set · PULSE is SQL-only and works now
       </p>
 
-      <div className="mt-16 border-t border-white/5 pt-8">
+      <SceneCTA personaLabel="Founders & Product" />
+
+      <div className="mt-10 border-t border-white/5 pt-8">
         <Link
           href="/"
           className="text-[10px] uppercase tracking-widest text-zinc-500 hover:text-zinc-200"
         >
-          ← back to gallery
+          ← back to scenes
         </Link>
       </div>
     </div>

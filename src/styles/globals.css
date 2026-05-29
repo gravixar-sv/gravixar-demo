@@ -163,11 +163,38 @@
     animation: tourFreshPulse 2.4s ease-in-out infinite;
   }
 
+  /* ── Playground (multi-column live workspace) ──────────────────── */
+
+  /* Fresh audit/feed row: a one-shot highlight that fades to rest. The
+     reducer flips `fresh` off after a beat; this animates the arrival. */
+  @keyframes pgFreshIn {
+    0%   { background-color: var(--color-scene-glow, rgba(255,107,107,0.18)); transform: translateY(-3px); opacity: 0; }
+    35%  { opacity: 1; transform: translateY(0); }
+    100% { background-color: rgba(255,255,255,0.02); }
+  }
+  .pg-fresh {
+    animation: pgFreshIn 2s ease-out both;
+  }
+
+  /* Cross-column cue banner: when an action in one column ripples to
+     another, the cue slides in and gives a single accent pulse so the
+     eye is drawn to the reaction. */
+  @keyframes pgCueIn {
+    0%   { opacity: 0; transform: translateY(6px); box-shadow: 0 0 0 0 var(--color-scene-glow, rgba(255,107,107,0.35)); }
+    40%  { opacity: 1; transform: translateY(0); box-shadow: 0 0 0 4px transparent; }
+    100% { box-shadow: 0 0 0 0 transparent; }
+  }
+  .pg-cue {
+    animation: pgCueIn 1.6s ease-out both;
+  }
+
   /* Honour system reduce-motion. The tour still works, just skips the
      entrance fade and the pulse animation. */
   @media (prefers-reduced-motion: reduce) {
     .tour-step-enter { animation: none; }
     .tour-fresh-pulse { animation: none; background-color: rgba(255, 107, 107, 0.06); }
+    .pg-fresh { animation: none; }
+    .pg-cue { animation: none; }
   }
 
   /* Agency-style card surface, matches the marketing site's

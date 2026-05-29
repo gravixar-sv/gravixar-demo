@@ -1,149 +1,168 @@
-// Gallery landing, reframed as the dashboard for the demo. Polish
-// session 1 (2026-05-07): replaces the previous long-scroll marketing
-// landing with a single-screen-ish dashboard layout. The
-// DashboardShell provides the persistent rail; this file fills the
-// main pane with hero + scene tiles + modules strip + coming-online
-// strip.
-
 import Link from "next/link";
-import { SCENES } from "@/lib/scenes";
-import { DashboardShell } from "@/components/demo/DashboardShell";
+import type { Metadata } from "next";
+import { SCENES, type Scene } from "@/lib/scenes";
 
-export default function GalleryDashboard() {
-  const live = SCENES.filter((s) => s.status === "live");
-  const coming = SCENES.filter((s) => s.status === "coming-online");
+export const metadata: Metadata = {
+  title: "Gravixar Demo — What are you building for?",
+  description:
+    "Pick the context closest to yours. I built each of these for a real client problem.",
+};
+
+export default function EntryScreen() {
+  const agencyScene = SCENES.find((s) => s.persona === "agency" && s.status === "live")!;
+  const foundersScene = SCENES.find((s) => s.persona === "founders" && s.status === "live")!;
+  const brandScene = SCENES.find((s) => s.persona === "brand")!;
 
   return (
-    <DashboardShell>
-      <div className="space-y-12">
-        <HeroTile />
-        <LiveScenes scenes={live} />
-        <ModulesStrip />
-        {coming.length > 0 ? <ComingOnline scenes={coming} /> : null}
-      </div>
-    </DashboardShell>
-  );
-}
+    <div className="bg-gallery min-h-[calc(100dvh-40px)]">
+      <div className="mx-auto max-w-5xl px-6 py-10 md:px-10 md:py-16">
 
-// ── Hero ──────────────────────────────────────────────────────────
-
-function HeroTile() {
-  return (
-    <section
-      aria-labelledby="hero-title"
-      className="scene-card relative overflow-hidden rounded-2xl"
-    >
-      <div
-        aria-hidden
-        className="bg-dot-grid pointer-events-none absolute inset-0 opacity-30"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-60"
-        style={{
-          background:
-            "radial-gradient(60% 80% at 100% 0%, rgba(255, 107, 107, 0.18) 0%, transparent 60%), radial-gradient(50% 80% at 0% 100%, rgba(0, 225, 255, 0.10) 0%, transparent 55%)",
-        }}
-      />
-      <div className="relative px-6 pb-8 pt-8 md:px-10 md:py-10">
-        <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#FF6B6B]">
-          gravixar, demo gallery
-        </p>
-        <h1
-          id="hero-title"
-          className="mt-5 text-4xl font-medium leading-[1.02] tracking-[-0.02em] text-zinc-50 md:text-5xl lg:text-6xl"
-        >
-          Pick a portal.{" "}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B6B] to-[#00E1FF]">
-            Click around.
-          </span>
-        </h1>
-        <p className="mt-5 max-w-2xl text-base leading-relaxed text-zinc-300 md:text-lg">
-          The same shapes run for agencies, clinics, accountants, consultancies,
-          and DTC brands. Each scene below is a real running portal — sign in
-          as a persona, try the workflow, see what fits.
-        </p>
-        <div className="mt-7 flex flex-wrap items-center gap-3">
-          <Link
-            href="/tour"
-            className="inline-flex items-center gap-2 rounded-md border border-[#FF6B6B]/40 bg-[#FF6B6B]/15 px-4 py-2.5 text-sm font-medium text-[#FF6B6B] transition-colors hover:bg-[#FF6B6B]/25"
+        {/* ── Header ─────────────────────────────────────────────── */}
+        <header className="flex items-start justify-between gap-6">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+              Gravixar · Demo
+            </p>
+            <h1 className="mt-4 text-5xl font-medium leading-[1.02] tracking-[-0.03em] text-zinc-50 md:text-6xl lg:text-7xl">
+              What are you
+              <br />
+              <span
+                className="text-transparent bg-clip-text"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(90deg, #FF6B6B 0%, #FF2D95 55%, #00E1FF 100%)",
+                }}
+              >
+                building for?
+              </span>
+            </h1>
+            <p className="mt-5 max-w-lg text-base leading-relaxed text-zinc-400 md:text-lg">
+              Pick the context closest to yours. I built each of these for a
+              real client problem.
+            </p>
+          </div>
+          <a
+            href="https://gravixar.com"
+            rel="noreferrer"
+            className="hidden shrink-0 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500 transition-colors hover:text-zinc-200 md:block"
           >
-            Start the 60-second tour
-            <span aria-hidden>→</span>
-          </Link>
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-            or scroll to pick a scene
-          </p>
+            gravixar.com →
+          </a>
+        </header>
+
+        {/* ── Identity tiles — live scenes ───────────────────────── */}
+        <div className="mt-12 grid gap-4 md:grid-cols-2">
+          <LiveTile scene={agencyScene} accentColor="#FF6B6B" />
+          <LiveTile scene={foundersScene} accentColor="#00E1FF" />
         </div>
+
+        {/* ── Brand & DTC — coming soon ───────────────────────────── */}
+        <div className="mt-4">
+          <ComingSoonTile scene={brandScene} />
+        </div>
+
+        {/* ── Footer note ─────────────────────────────────────────── */}
+        <p className="mt-10 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+          Sandboxed · Resets every Sunday · No sign-in required
+        </p>
       </div>
-    </section>
+    </div>
   );
 }
 
-// ── Live scenes section ──────────────────────────────────────────
+// ── Live scene tile ────────────────────────────────────────────────
 
-function LiveScenes({ scenes }: { scenes: typeof SCENES }) {
-  return (
-    <section aria-labelledby="live-scenes-title">
-      <SectionHeader id="live-scenes-title" title="Live now" meta={`${scenes.length} ${scenes.length === 1 ? "scene" : "scenes"}`} />
-      <div className="mt-5 grid gap-5 md:grid-cols-2">
-        {scenes.map((scene, i) => (
-          <SceneTile key={scene.slug} scene={scene} index={i} />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function SceneTile({
+function LiveTile({
   scene,
-  index,
+  accentColor,
 }: {
-  scene: (typeof SCENES)[number];
-  index: number;
+  scene: Scene;
+  accentColor: string;
 }) {
   return (
     <Link
       href={`/${scene.slug}`}
-      className="scene-card group relative block overflow-hidden rounded-2xl"
+      className="group relative block overflow-hidden rounded-2xl"
+      style={{ minHeight: "300px" }}
     >
+      {/* Scene background fills the tile */}
+      <div className={`absolute inset-0 ${scene.bgUtility}`} />
+
+      {/* Dot-grid texture */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-50 transition-opacity group-hover:opacity-80"
+        className="bg-dot-grid pointer-events-none absolute inset-0 opacity-20"
+      />
+
+      {/* Hover accent glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
         style={{
-          background: `radial-gradient(70% 80% at 100% 0%, ${scene.swatches[1]}28 0%, transparent 60%), radial-gradient(50% 80% at 0% 100%, ${scene.swatches[2]}1a 0%, transparent 55%)`,
+          background: `radial-gradient(60% 60% at 100% 0%, ${accentColor}18 0%, transparent 70%)`,
         }}
       />
-      <div className="relative px-6 pb-6 pt-6 md:px-7 md:pt-7 md:pb-7">
+
+      {/* scene-card border + surface over the bg */}
+      <div
+        className="absolute inset-0 rounded-2xl transition-all duration-220"
+        style={{
+          boxShadow:
+            "inset 0 0 0 1px rgba(255,255,255,0.06), 0 1px 0 0 rgba(255,255,255,0.02)",
+        }}
+      />
+      <div
+        className="absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-220 group-hover:opacity-100"
+        style={{
+          boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.12)",
+        }}
+      />
+
+      {/* Content */}
+      <div className="relative flex h-full flex-col justify-between px-7 pb-7 pt-7">
+        {/* Top: persona + status */}
         <div className="flex items-center justify-between">
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-            {String(index + 1).padStart(2, "0")} / {scene.bucket}
+          <span
+            className="font-mono text-[10px] uppercase tracking-[0.22em]"
+            style={{ color: accentColor }}
+          >
+            {scene.personaLabel}
           </span>
           <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/90">
-            <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 text-emerald-400" />
+            <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
             live
           </span>
         </div>
-        <h3 className="mt-6 text-2xl font-medium leading-tight tracking-[-0.015em] md:text-[1.7rem]">
-          {scene.name}
-        </h3>
-        <p className="mt-2 max-w-md text-sm leading-relaxed text-zinc-300">
-          {scene.tagline}
-        </p>
-        <div className="mt-6 flex items-center justify-between">
-          <div className="flex gap-1.5">
-            {scene.swatches.map((c, i) => (
-              <span
-                key={`${c}-${i}`}
-                className="h-4 w-4 rounded-full border border-white/15"
-                style={{ background: c }}
-                aria-hidden
-              />
-            ))}
+
+        {/* Middle: problem statement */}
+        <div className="mt-8">
+          <p className="text-xl font-medium leading-snug tracking-[-0.015em] text-zinc-50 md:text-2xl">
+            {scene.problemStatement}
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-zinc-400">
+            {scene.description}
+          </p>
+        </div>
+
+        {/* Bottom: scene name + enter */}
+        <div className="mt-8 flex items-end justify-between gap-4 border-t border-white/5 pt-5">
+          <div>
+            <p className="text-sm font-medium text-zinc-100">{scene.name}</p>
+            <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+              {scene.bucket}
+            </p>
           </div>
-          <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-200 transition-colors group-hover:text-white">
-            enter scene
-            <span aria-hidden className="transition-transform group-hover:translate-x-1">→</span>
+          <span
+            className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.18em] transition-colors group-hover:text-white"
+            style={{ color: accentColor }}
+          >
+            Enter scene
+            <span
+              aria-hidden
+              className="transition-transform group-hover:translate-x-1"
+            >
+              →
+            </span>
           </span>
         </div>
       </div>
@@ -151,102 +170,34 @@ function SceneTile({
   );
 }
 
-// ── Modules strip ────────────────────────────────────────────────
+// ── Coming-soon tile ───────────────────────────────────────────────
 
-function ModulesStrip() {
+function ComingSoonTile({ scene }: { scene: Scene }) {
   return (
-    <section aria-labelledby="modules-title">
-      <SectionHeader id="modules-title" title="Modules, the building blocks" meta="12 patterns" />
-      <Link
-        href="/modules"
-        className="scene-card group mt-5 block overflow-hidden rounded-2xl"
-      >
-        <div className="relative px-6 pb-6 pt-6 md:px-7 md:pt-7 md:pb-7">
-          <div className="flex items-center justify-between">
-            <p className="text-base text-zinc-200 md:text-lg">
-              Skip the scenes. Try one capability at a time.
-            </p>
-            <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/90">
-              <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 text-emerald-400" />
-              3 interactive
-            </span>
-          </div>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-400">
-            Review state machine, daily check-in, audit log + restore — three
-            interactive sandboxes plus nine more coming online.
+    <div className="scene-card relative overflow-hidden rounded-2xl px-7 py-6">
+      <div
+        aria-hidden
+        className="bg-dot-grid pointer-events-none absolute inset-0 opacity-10"
+      />
+      <div className="relative flex flex-wrap items-center justify-between gap-6">
+        <div>
+          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-600">
+            {scene.personaLabel}
+          </span>
+          <p className="mt-2 text-base font-medium text-zinc-500">
+            {scene.problemStatement}
           </p>
-          <div className="mt-5 flex items-center justify-between">
-            <div className="flex flex-wrap gap-1.5">
-              {["auth", "audit", "ai", "finance", "ops"].map((c) => (
-                <span
-                  key={c}
-                  className="rounded-sm border border-white/10 bg-white/[0.04] px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-400"
-                >
-                  {c}
-                </span>
-              ))}
-            </div>
-            <span className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-200 transition-colors group-hover:text-white">
-              open library
-              <span aria-hidden className="transition-transform group-hover:translate-x-1">→</span>
-            </span>
-          </div>
         </div>
-      </Link>
-    </section>
-  );
-}
-
-// ── Coming online strip ──────────────────────────────────────────
-
-function ComingOnline({ scenes }: { scenes: typeof SCENES }) {
-  return (
-    <section aria-labelledby="coming-title">
-      <SectionHeader id="coming-title" title="Coming online" meta={`${scenes.length} in build`} />
-      <div className="mt-5 grid gap-3 md:grid-cols-2">
-        {scenes.map((scene) => (
-          <div
-            key={scene.slug}
-            className="scene-card flex items-center justify-between rounded-2xl px-5 py-4"
-          >
-            <div>
-              <p className="text-sm text-zinc-200">{scene.name}</p>
-              <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                {scene.bucket}
-              </p>
-            </div>
-            <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-              <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-zinc-500 text-zinc-500" />
-              soon
-            </span>
-          </div>
-        ))}
+        <div className="flex items-center gap-3">
+          <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+            <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-zinc-600" />
+            Building now
+          </span>
+          <span className="rounded-sm border border-white/8 bg-white/[0.03] px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-600">
+            {scene.name}
+          </span>
+        </div>
       </div>
-    </section>
-  );
-}
-
-// ── Section header (shared) ──────────────────────────────────────
-
-function SectionHeader({
-  id,
-  title,
-  meta,
-}: {
-  id: string;
-  title: string;
-  meta?: string;
-}) {
-  return (
-    <div className="flex items-baseline justify-between gap-3">
-      <h2 id={id} className="text-xl font-medium tracking-[-0.015em] text-zinc-100 md:text-2xl">
-        {title}
-      </h2>
-      {meta ? (
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-          {meta}
-        </p>
-      ) : null}
     </div>
   );
 }

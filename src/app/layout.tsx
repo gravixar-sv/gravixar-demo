@@ -21,9 +21,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Gravixar, demo gallery",
+  title: "Gravixar Demo",
   description:
-    "demo.gravixar.com, design + capability showroom. Pick a scene to explore the kinds of systems Gravixar builds.",
+    "demo.gravixar.com — capability showroom. Pick the context closest to yours and see what Gravixar builds.",
   // Demo subdomain, discouraged from indexing so keyword juice stays on gravixar.com
   robots: { index: false, follow: false },
 };

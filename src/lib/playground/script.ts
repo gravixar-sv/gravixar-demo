@@ -13,6 +13,8 @@ export const PLAYGROUND_AGENCY = {
 
 export type PlaygroundPersonaKey = "mira" | "kai" | "nox";
 
+import type { AvatarHue } from "@/components/demo/Avatar";
+
 export type PlaygroundPersona = {
   key: PlaygroundPersonaKey;
   name: string;
@@ -20,6 +22,8 @@ export type PlaygroundPersona = {
   role: string;
   initials: string;
   contextLine: string;
+  /** Distinct avatar gradient so each role reads as a different person. */
+  hue: AvatarHue;
 };
 
 export const PLAYGROUND_PERSONAS: Record<PlaygroundPersonaKey, PlaygroundPersona> = {
@@ -30,6 +34,7 @@ export const PLAYGROUND_PERSONAS: Record<PlaygroundPersonaKey, PlaygroundPersona
     role: "Client",
     initials: "MV",
     contextLine: `Active project: ${PLAYGROUND_AGENCY.studioName} — Spring rebrand`,
+    hue: { from: "#FF8A8A", to: "#C2410C", ink: "#2A0E08" },
   },
   kai: {
     key: "kai",
@@ -38,6 +43,7 @@ export const PLAYGROUND_PERSONAS: Record<PlaygroundPersonaKey, PlaygroundPersona
     role: "PM",
     initials: "KR",
     contextLine: "Pipeline: 3 / 12 retainers active",
+    hue: { from: "#7DD3FC", to: "#4338CA", ink: "#0A1230" },
   },
   nox: {
     key: "nox",
@@ -46,6 +52,7 @@ export const PLAYGROUND_PERSONAS: Record<PlaygroundPersonaKey, PlaygroundPersona
     role: "Admin",
     initials: "NB",
     contextLine: "Activity, real-time",
+    hue: { from: "#D8B4FE", to: "#6D28D9", ink: "#1E0A33" },
   },
 };
 

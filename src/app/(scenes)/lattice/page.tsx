@@ -19,6 +19,7 @@ import {
   type AuditEntry,
 } from "@/lib/playground/reducer";
 import { SceneCTA } from "@/components/demo/SceneCTA";
+import { Avatar } from "@/components/demo/Avatar";
 
 const FRESH_DECAY_MS = 2000;
 
@@ -116,9 +117,7 @@ function ColumnShell({
   return (
     <section className="scene-card rounded-2xl p-5">
       <header className="flex items-center gap-3 border-b border-white/5 pb-4">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--color-scene-1)] to-[var(--color-scene-2)] font-mono text-[11px] font-semibold text-[#0a1230]">
-          {persona.initials}
-        </span>
+        <Avatar initials={persona.initials} hue={persona.hue} size="md" />
         <div className="min-w-0">
           <p className="truncate text-sm font-medium text-zinc-50">
             {persona.name}

@@ -99,7 +99,7 @@ export default function NorthbeamGovernance() {
       </div>
 
       <ActivityFeed feed={state.feed} />
-      <SceneCTA personaLabel="Brands & DTC" />
+      <SceneCTA personaLabel="Brands & DTC" noun="brand" />
     </div>
   );
 }

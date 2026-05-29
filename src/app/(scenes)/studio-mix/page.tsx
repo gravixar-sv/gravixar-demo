@@ -87,7 +87,7 @@ export default function StudioMixPlayground() {
         <FeedColumn feed={state.feed} />
       </div>
 
-      <SceneCTA personaLabel="Founders & Product" />
+      <SceneCTA personaLabel="Ops & technical teams" noun="ops team" />
     </div>
   );
 }

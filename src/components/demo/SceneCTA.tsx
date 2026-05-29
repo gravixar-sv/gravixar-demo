@@ -2,7 +2,17 @@
 // Visitor has just seen what Gravixar builds for their context —
 // this is the bridge to a real conversation.
 
-export function SceneCTA({ personaLabel }: { personaLabel: string }) {
+export function SceneCTA({
+  personaLabel,
+  noun,
+}: {
+  /** Shown in the eyebrow, e.g. "Brands & DTC". */
+  personaLabel: string;
+  /** Clean word after "Want this for your …?", e.g. "brand", "agency",
+   *  "business". Defaults to the lowercased label. */
+  noun?: string;
+}) {
+  const ctaNoun = noun ?? personaLabel.toLowerCase();
   return (
     <section className="mt-16 overflow-hidden rounded-2xl" aria-labelledby="scene-cta-heading">
       <div
@@ -32,7 +42,7 @@ export function SceneCTA({ personaLabel }: { personaLabel: string }) {
             >
               Want this for your{" "}
               <span style={{ color: "var(--color-scene-1, #FF6B6B)" }}>
-                {personaLabel.toLowerCase()}?
+                {ctaNoun}?
               </span>
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-zinc-400">
@@ -45,9 +55,9 @@ export function SceneCTA({ personaLabel }: { personaLabel: string }) {
           {/* Right — CTA */}
           <div className="flex shrink-0 flex-col items-start gap-3 md:items-end">
             <a
-              href="https://gravixar.com"
+              href="https://gravixar.com/contact"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-medium text-white transition-all hover:brightness-110 active:scale-[0.98]"
+              className="inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold text-[#0a0a0a] shadow-lg shadow-black/30 transition-all hover:brightness-110 active:scale-[0.98]"
               style={{
                 background:
                   "linear-gradient(135deg, var(--color-scene-1, #FF6B6B) 0%, var(--color-scene-2, #FF2D95) 100%)",

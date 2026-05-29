@@ -38,10 +38,10 @@ export function Topbar({
             <>
               <Link
                 href="/"
-                className="flex items-center gap-2 text-sm text-zinc-300 transition-colors hover:text-white"
+                className="inline-flex items-center gap-1.5 rounded-md border border-white/15 bg-white/[0.05] px-3 py-1.5 text-xs font-medium text-zinc-200 transition-colors hover:border-white/30 hover:bg-white/[0.1] hover:text-white"
               >
                 <span aria-hidden>←</span>
-                <span>all scenes</span>
+                <span>All scenes</span>
               </Link>
               <span className="hidden text-zinc-700 sm:inline">·</span>
               <div className="hidden items-center gap-3 sm:flex">

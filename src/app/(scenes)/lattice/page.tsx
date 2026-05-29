@@ -120,7 +120,7 @@ export default function LatticeReviewLoop() {
 
       <ActivityFeed feed={state.feed} />
 
-      <SceneCTA personaLabel="Agency" />
+      <SceneCTA personaLabel="Agencies" noun="agency" />
     </div>
   );
 }

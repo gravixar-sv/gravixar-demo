@@ -93,7 +93,7 @@ export default function FounderCockpit() {
       </div>
 
       <ActivityFeed feed={state.feed} />
-      <SceneCTA personaLabel="Founders & small teams" />
+      <SceneCTA personaLabel="Founders & small teams" noun="business" />
     </div>
   );
 }

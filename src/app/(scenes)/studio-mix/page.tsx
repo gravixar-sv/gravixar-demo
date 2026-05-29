@@ -14,6 +14,8 @@ import {
 import {
   createInitialStudioState,
   studioReducer,
+  type GateState,
+  type StudioEvent,
 } from "@/lib/playground/studio-reducer";
 import type { AuditEntry } from "@/lib/playground/reducer";
 import { SceneCTA } from "@/components/demo/SceneCTA";
@@ -77,13 +79,13 @@ export default function StudioMixPlayground() {
       </header>
 
       {/* ── 3 columns ───────────────────────────────────────────── */}
-      <div className="mt-8 grid gap-5 lg:grid-cols-[0.9fr_1.2fr_1fr]">
+      <div className="mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-[0.9fr_1.2fr_1fr] lg:gap-5 lg:overflow-visible lg:pb-0">
         <AgentsColumn
           currentKey={state.current}
           ran={state.ran}
           onRun={(key) => dispatch({ type: "RUN", key })}
         />
-        <OutputColumn agent={current} />
+        <OutputColumn agent={current} gate={state.gate} dispatch={dispatch} />
         <FeedColumn feed={state.feed} />
       </div>
 
@@ -104,7 +106,7 @@ function ColumnShell({
   children: React.ReactNode;
 }) {
   return (
-    <section className="scene-card rounded-2xl p-5">
+    <section className="scene-card min-w-[82%] shrink-0 snap-start rounded-2xl p-5 sm:min-w-[48%] lg:min-w-0">
       <div className="flex items-center gap-2 border-b border-white/5 pb-3">
         <span className="flex gap-1.5">
           <span className="h-2 w-2 rounded-full bg-zinc-700" />
@@ -193,7 +195,15 @@ function AgentsColumn({
 
 // ─── Column 2 — Output (result) ─────────────────────────────────────
 
-function OutputColumn({ agent }: { agent: StudioAgent | null }) {
+function OutputColumn({
+  agent,
+  gate,
+  dispatch,
+}: {
+  agent: StudioAgent | null;
+  gate: GateState;
+  dispatch: React.Dispatch<StudioEvent>;
+}) {
   return (
     <ColumnShell label="output" status={agent ? `${agent.name.toLowerCase()} · ${agent.outputTitle}` : "no run yet"}>
       {agent ? (
@@ -216,6 +226,45 @@ function OutputColumn({ agent }: { agent: StudioAgent | null }) {
           <pre className="mt-3 whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-zinc-300">
             {agent.outputLines.join("\n")}
           </pre>
+
+          {/* Approval gate — writer agents wait for a human; read-only run autonomously */}
+          {agent.gated ? (
+            gate === "pending" ? (
+              <div className="mt-3 border-t border-white/5 pt-3">
+                <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-amber-300/90">
+                  ⏸ waiting on you · this would publish
+                </p>
+                <div className="mt-2 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => dispatch({ type: "APPROVE" })}
+                    className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-colors hover:bg-emerald-400/20"
+                  >
+                    Approve &amp; publish →
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => dispatch({ type: "DISCARD" })}
+                    className="rounded-lg px-2 py-1.5 text-xs text-zinc-500 hover:text-zinc-300"
+                  >
+                    Discard
+                  </button>
+                </div>
+              </div>
+            ) : gate === "approved" ? (
+              <p className="mt-3 border-t border-white/5 pt-3 font-mono text-[9px] uppercase tracking-[0.18em] text-emerald-300/80">
+                ✓ approved + published
+              </p>
+            ) : gate === "discarded" ? (
+              <p className="mt-3 border-t border-white/5 pt-3 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+                ✕ draft discarded
+              </p>
+            ) : null
+          ) : (
+            <p className="mt-3 border-t border-white/5 pt-3 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-600">
+              ✓ ran autonomously · read-only, nothing to approve
+            </p>
+          )}
         </div>
       ) : (
         <div className="mt-3 flex min-h-[180px] items-center justify-center rounded-xl border border-dashed border-white/10 px-6 text-center">

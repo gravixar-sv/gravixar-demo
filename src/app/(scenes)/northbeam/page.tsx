@@ -68,7 +68,7 @@ export default function NorthbeamGovernance() {
         </button>
       </header>
 
-      <div className="mt-7 grid gap-5 lg:grid-cols-3">
+      <div className="mt-7 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:pb-0">
         {/* Templates */}
         <Col label="Templates" status="locked · team self-serves">
           {state.templates.map((t) => (
@@ -114,7 +114,7 @@ function Col({
   children: React.ReactNode;
 }) {
   return (
-    <section className="scene-card rounded-2xl p-5">
+    <section className="scene-card min-w-[82%] shrink-0 snap-start rounded-2xl p-5 sm:min-w-[48%] lg:min-w-0">
       <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-300">{label}</p>
       <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-600">{status}</p>
       <div className="mt-4 space-y-3">{children}</div>

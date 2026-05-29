@@ -92,6 +92,16 @@
       linear-gradient(180deg, #070a14 0%, #0a0820 60%, #050508 100%);
   }
 
+  /* Founder Cockpit scene — warm amber/gold "daily brief" wash on a
+     near-black base. Distinct from Lattice (coral), Studio Mix (cyan),
+     Northbeam (green). */
+  .bg-cockpit {
+    background:
+      radial-gradient(60% 55% at 100% 0%, rgba(251, 191, 36, 0.12) 0%, transparent 58%),
+      radial-gradient(50% 70% at 0% 100%, rgba(180, 83, 9, 0.10) 0%, transparent 60%),
+      linear-gradient(180deg, #14110a 0%, #16120c 55%, #07060f 100%);
+  }
+
   /* Gallery landing, mixed palette. Toned to match the new scene
      gradients, less fluorescent, more gradient agency-poster. */
   .bg-gallery {

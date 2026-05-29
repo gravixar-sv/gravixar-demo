@@ -1,18 +1,17 @@
 import Link from "next/link";
-import { ResetButton } from "./ResetButton";
 
 // Small topbar shown above scene content. The DemoBanner is above this.
-// Persona name + back-to-gallery link + scene reset, scene-tinted via
-// CSS vars. The reset button appears on scene pages only (showReset=true)
-// so the gallery landing isn't littered with it.
+// Back-to-scenes link + scene name (+ optional flavour label), scene-
+// tinted via CSS vars. The playground scenes own their own reset, so
+// the topbar no longer renders one.
 
 export function Topbar({
   sceneName,
   personaLabel,
-  showReset = true,
 }: {
   sceneName: string;
   personaLabel?: string;
+  /** Deprecated, retained so existing call sites compile; ignored. */
   showReset?: boolean;
 }) {
   return (
@@ -42,8 +41,6 @@ export function Topbar({
             ) : null}
           </div>
         </div>
-
-        {showReset ? <ResetButton /> : null}
       </div>
       {/* Mobile-only line for scene + persona info (hidden on sm+) */}
       {personaLabel ? (

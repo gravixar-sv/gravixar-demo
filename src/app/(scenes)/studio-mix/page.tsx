@@ -1,227 +1,285 @@
-// Studio Mix, operator console. Four agents you can poke. ECHO is the
-// only one wired through real Anthropic via AI Gateway in MVP. PULSE,
-// RIVER, ATLAS are partly mocked at launch and progressively wired.
+"use client";
 
-import Link from "next/link";
-import { GlassPanel } from "@/components/demo/GlassPanel";
+// Studio Mix playground — the AI-agents console as a 3-column live
+// workspace. Run an agent in column 1 → its output appears in column 2
+// → the run logs to the shared feed in column 3. Same cascade pattern
+// as the Lattice playground; deterministic mock output (no live API).
+
+import { useEffect, useReducer } from "react";
+import {
+  STUDIO_AGENTS,
+  findStudioAgent,
+  type StudioAgent,
+} from "@/lib/playground/studio-script";
+import {
+  createInitialStudioState,
+  studioReducer,
+} from "@/lib/playground/studio-reducer";
+import type { AuditEntry } from "@/lib/playground/reducer";
 import { SceneCTA } from "@/components/demo/SceneCTA";
-import { WindowDots } from "@/components/demo/WindowChrome";
-import { EchoRunner } from "@/components/scenes/studio-mix/EchoRunner";
-import { PulseRunner } from "@/components/scenes/studio-mix/PulseRunner";
-import { RiverRunner } from "@/components/scenes/studio-mix/RiverRunner";
-import { AtlasRunner } from "@/components/scenes/studio-mix/AtlasRunner";
-import { AgentRunFeed } from "@/components/scenes/studio-mix/AgentRunFeed";
 
-const AGENTS = [
-  {
-    id: "echo",
-    name: "ECHO",
-    role: "SEO drafter",
-    status: "live",
-    description:
-      "Drafts blog posts on-demand via Anthropic. Streams tokens straight into the panel. Drafts land in a review queue, never auto-published.",
-    color: "#00E1FF",
-  },
-  {
-    id: "pulse",
-    name: "PULSE",
-    role: "Anomaly cron",
-    status: "scheduled",
-    description:
-      "Sweeps the audit log every night for spikes, DELETE bursts, lockout cascades, stuck states. Emails a digest if anything trips.",
-    color: "#FFC857",
-  },
-  {
-    id: "river",
-    name: "RIVER",
-    role: "Suspicion classifier",
-    status: "live",
-    description:
-      "Takes inbound submissions and classifies them as legit / suspicious / spam, with the reasoning surfaced for human override.",
-    color: "#FF2D95",
-  },
-  {
-    id: "atlas",
-    name: "ATLAS",
-    role: "Content reviewer",
-    status: "preview",
-    description:
-      "Reads a draft against your style guide, flags voice mismatches, suggests edits inline. Designed as a second opinion, not a publish gate.",
-    color: "#7C7CFF",
-  },
-];
+const FRESH_DECAY_MS = 2000;
 
-export default function StudioMixConsole() {
+export default function StudioMixPlayground() {
+  const [state, dispatch] = useReducer(
+    studioReducer,
+    undefined,
+    createInitialStudioState,
+  );
+
+  useEffect(() => {
+    const freshIds = state.feed.filter((a) => a.fresh).map((a) => a.id);
+    if (freshIds.length === 0) return;
+    const timers = freshIds.map((id) =>
+      window.setTimeout(() => dispatch({ type: "DECAY_FRESH", id }), FRESH_DECAY_MS),
+    );
+    return () => {
+      for (const t of timers) window.clearTimeout(t);
+    };
+  }, [state.feed]);
+
+  const current = state.current ? findStudioAgent(state.current) ?? null : null;
+
   return (
-    <div className="mx-auto max-w-7xl px-6 pb-20 pt-12 md:px-10 lg:px-16">
-      {/* Operator header, mono-styled, terminal-flavored */}
-      <div className="grid gap-8 lg:grid-cols-12">
-        <div className="lg:col-span-8">
-          <p className="text-[10px] uppercase tracking-[0.25em] text-[var(--color-scene-1)]">
-            ai-agents console · for ops teams · sandbox
+    <div className="mx-auto max-w-7xl px-6 pb-20 pt-10 md:px-10 lg:px-12">
+      {/* ── Orientation ─────────────────────────────────────────── */}
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div className="max-w-2xl">
+          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--color-scene-1)]">
+            ai-agents console · for ops teams · live sandbox
           </p>
-          <h1 className="mt-5 font-display-mono text-3xl font-medium leading-tight tracking-tight text-zinc-50 md:text-5xl lg:text-[60px]">
-            <span className="text-[var(--color-scene-1)]">$</span> studio-mix &mdash;
-            <span className="text-[var(--color-scene-2)]"> agents.online</span>
+          <h1 className="mt-3 font-display-mono text-3xl font-medium leading-tight tracking-tight text-zinc-50 md:text-4xl">
+            <span className="text-[var(--color-scene-1)]">$</span> run an agent,
+            watch it work.
           </h1>
-          <p className="mt-6 max-w-xl text-sm leading-relaxed text-zinc-300">
-            Four agents you can poke. Each runs the same way I&apos;d wire one
-            into a client&apos;s system: human-in-the-loop, no auto-publish,
-            provider-agnostic via AI Gateway.
+          <p className="mt-3 text-sm leading-relaxed text-zinc-400">
+            Four agents I&apos;d wire into a client&apos;s system — drafting,
+            anomaly watch, classifying, reviewing. Run one on the left, its
+            output lands in the middle, every run logs to the feed on the
+            right. Human-in-the-loop, never auto-publish.
           </p>
         </div>
-        <div className="lg:col-span-4 lg:pt-6">
-          <GlassPanel variant="strong" className="px-5 py-5">
-            <div className="flex items-center gap-3 border-b border-white/10 pb-3">
-              <WindowDots />
-              <span className="ml-1 text-[10px] uppercase tracking-widest text-zinc-400">
-                console / status
-              </span>
-            </div>
-            <dl className="mt-4 space-y-2.5 text-[11px]">
-              <Row k="agents" v="4 registered" />
-              <Row k="provider" v="anthropic via gateway" />
-              <Row k="rate limit" v="unlocked for demo" />
-              <Row k="reset" v="sunday 03:00 utc" />
-            </dl>
-          </GlassPanel>
+        <div className="flex items-center gap-3">
+          {state.ran.length > 0 ? (
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+              {state.ran.length}/4 agents run
+            </span>
+          ) : null}
+          <button
+            type="button"
+            onClick={() => dispatch({ type: "RESET" })}
+            className="rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-300 transition-colors hover:border-white/20 hover:bg-white/[0.06] hover:text-zinc-50"
+          >
+            ↻ reset
+          </button>
         </div>
-      </div>
+      </header>
 
-      {/* Agents grid */}
-      <div className="mt-16">
-        <h2 className="mb-6 text-xl uppercase tracking-widest text-zinc-300">
-          / agents
-        </h2>
-        <div className="grid gap-4 md:grid-cols-2 lg:gap-6">
-          {AGENTS.map((agent) => (
-            <AgentCard key={agent.id} agent={agent} />
-          ))}
-        </div>
+      {/* ── 3 columns ───────────────────────────────────────────── */}
+      <div className="mt-8 grid gap-5 lg:grid-cols-[0.9fr_1.2fr_1fr]">
+        <AgentsColumn
+          currentKey={state.current}
+          ran={state.ran}
+          onRun={(key) => dispatch({ type: "RUN", key })}
+        />
+        <OutputColumn agent={current} />
+        <FeedColumn feed={state.feed} />
       </div>
-
-      {/* Live runners */}
-      <div className="mt-16">
-        <h2 className="mb-2 text-xl uppercase tracking-widest text-zinc-300">
-          / try them live
-        </h2>
-        <p className="mb-6 max-w-2xl text-xs leading-relaxed text-zinc-500">
-          ECHO drafts content in Qamar&apos;s voice via streaming Anthropic
-          tokens. PULSE sweeps the demo&apos;s data for anomalies, same SQL
-          rules that fire nightly in production. Each run logs to the
-          activity feed below.
-        </p>
-        <div className="grid gap-4 lg:grid-cols-2 lg:gap-6">
-          <EchoRunner />
-          <PulseRunner />
-          <RiverRunner />
-          <AtlasRunner />
-        </div>
-      </div>
-
-      {/* Activity feed */}
-      <div className="mt-12">
-        <AgentRunFeed />
-      </div>
-
-      <p className="mt-12 text-[10px] uppercase tracking-widest text-zinc-600">
-        ⚠ ECHO + RIVER + ATLAS come fully live the moment AI_GATEWAY_API_KEY is set · PULSE is SQL-only and works now
-      </p>
 
       <SceneCTA personaLabel="Founders & Product" />
-
-      <div className="mt-10 border-t border-white/5 pt-8">
-        <Link
-          href="/"
-          className="text-[10px] uppercase tracking-widest text-zinc-500 hover:text-zinc-200"
-        >
-          ← back to scenes
-        </Link>
-      </div>
     </div>
   );
 }
 
-function AgentCard({
-  agent,
+// ─── Column shell ───────────────────────────────────────────────────
+
+function ColumnShell({
+  label,
+  status,
+  children,
 }: {
-  agent: (typeof AGENTS)[number];
+  label: string;
+  status: string;
+  children: React.ReactNode;
 }) {
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-white/10 bg-zinc-950/50 backdrop-blur-md transition-all hover:-translate-y-0.5 hover:border-white/20">
-      {/* Edge glow per agent */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -inset-px rounded-2xl opacity-50 transition-opacity group-hover:opacity-90"
-        style={{
-          background: `radial-gradient(60% 60% at 100% 0%, ${agent.color}33 0%, transparent 60%)`,
-        }}
-      />
-      <div className="relative">
-        <div className="flex items-center justify-between border-b border-white/5 px-5 py-3">
-          <div className="flex items-center gap-3">
-            <WindowDots />
-            <span className="text-[10px] uppercase tracking-widest text-zinc-500">
-              agent / {agent.id}
-            </span>
-          </div>
-          <StatusPill status={agent.status} color={agent.color} />
-        </div>
-        <div className="px-5 pb-6 pt-5">
-          <div className="flex items-baseline justify-between gap-3">
-            <h3
-              className="text-2xl font-medium tracking-tight"
+    <section className="scene-card rounded-2xl p-5">
+      <div className="flex items-center gap-2 border-b border-white/5 pb-3">
+        <span className="flex gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-zinc-700" />
+          <span className="h-2 w-2 rounded-full bg-zinc-700" />
+          <span className="h-2 w-2 rounded-full bg-zinc-700" />
+        </span>
+        <span className="ml-1 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400">
+          {label}
+        </span>
+      </div>
+      <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600">
+        {status}
+      </p>
+      {children}
+    </section>
+  );
+}
+
+// ─── Column 1 — Agents (trigger) ────────────────────────────────────
+
+function AgentsColumn({
+  currentKey,
+  ran,
+  onRun,
+}: {
+  currentKey: string | null;
+  ran: string[];
+  onRun: (key: StudioAgent["key"]) => void;
+}) {
+  return (
+    <ColumnShell label="agents" status="4 registered · click run">
+      <ul className="mt-3 space-y-2.5">
+        {STUDIO_AGENTS.map((agent) => {
+          const isCurrent = currentKey === agent.key;
+          const hasRun = ran.includes(agent.key);
+          return (
+            <li
+              key={agent.key}
+              className={[
+                "rounded-xl border bg-black/20 p-3 transition-colors",
+                isCurrent
+                  ? "border-[var(--color-scene-1)]/50"
+                  : "border-white/10",
+              ].join(" ")}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span
+                  className="font-mono text-sm font-semibold tracking-tight"
+                  style={{ color: agent.color }}
+                >
+                  {agent.name}
+                </span>
+                <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+                  {agent.role}
+                </span>
+              </div>
+              <p className="mt-2 text-[11px] leading-relaxed text-zinc-400">
+                {agent.blurb}
+              </p>
+              <div className="mt-3 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => onRun(agent.key)}
+                  className="rounded-lg border px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.15em] transition-colors"
+                  style={{
+                    borderColor: `${agent.color}55`,
+                    backgroundColor: `${agent.color}1a`,
+                    color: agent.color,
+                  }}
+                >
+                  ▸ run{hasRun ? " again" : ""}
+                </button>
+                {hasRun ? (
+                  <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-emerald-300/80">
+                    ✓ ran
+                  </span>
+                ) : null}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </ColumnShell>
+  );
+}
+
+// ─── Column 2 — Output (result) ─────────────────────────────────────
+
+function OutputColumn({ agent }: { agent: StudioAgent | null }) {
+  return (
+    <ColumnShell label="output" status={agent ? `${agent.name.toLowerCase()} · ${agent.outputTitle}` : "no run yet"}>
+      {agent ? (
+        <div
+          key={agent.key}
+          className="pg-fresh mt-3 rounded-xl border p-4"
+          style={{ borderColor: `${agent.color}40` }}
+        >
+          <div className="flex items-center gap-2 border-b border-white/5 pb-2">
+            <span
+              className="font-mono text-xs font-semibold"
               style={{ color: agent.color }}
             >
               {agent.name}
-            </h3>
-            <span className="text-[10px] uppercase tracking-widest text-zinc-500">
+            </span>
+            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
               {agent.role}
             </span>
           </div>
-          <p className="mt-4 text-xs leading-relaxed text-zinc-300 font-sans">
-            {agent.description}
-          </p>
-          <button
-            type="button"
-            disabled
-            className="mt-6 inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.03] px-3 py-2 text-[11px] uppercase tracking-widest text-zinc-300 transition-colors hover:border-white/20 disabled:cursor-not-allowed disabled:opacity-60"
-            title="wires up after AI Gateway key is set"
-          >
-            <span style={{ color: agent.color }}>▸</span> run agent
-          </button>
+          <pre className="mt-3 whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-zinc-300">
+            {agent.outputLines.join("\n")}
+          </pre>
         </div>
-      </div>
-    </div>
+      ) : (
+        <div className="mt-3 flex min-h-[180px] items-center justify-center rounded-xl border border-dashed border-white/10 px-6 text-center">
+          <p className="text-xs leading-relaxed text-zinc-500">
+            Run an agent on the left.
+            <br />
+            Its output streams in here.
+          </p>
+        </div>
+      )}
+    </ColumnShell>
   );
 }
 
-function StatusPill({ status, color }: { status: string; color: string }) {
-  const styles: Record<string, string> = {
-    live: "border-emerald-400/40 text-emerald-300",
-    scheduled: "border-amber-400/40 text-amber-300",
-    preview: "border-zinc-600 text-zinc-400",
-  };
+// ─── Column 3 — Run feed (cascade target) ───────────────────────────
+
+function FeedColumn({ feed }: { feed: AuditEntry[] }) {
   return (
-    <span
-      className={`flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[9px] uppercase tracking-widest ${
-        styles[status] ?? styles.preview
-      }`}
-    >
-      <span
-        className="pulse-dot inline-block h-1.5 w-1.5 rounded-full"
-        style={{ background: color, color }}
-      />
-      {status}
-    </span>
+    <ColumnShell label="run feed" status="every run logs here · real-time">
+      <ul className="mt-3 space-y-2">
+        {feed.map((entry) => (
+          <li
+            key={entry.id}
+            className={[
+              "rounded-lg border px-3 py-2 text-xs",
+              entry.fresh
+                ? "pg-fresh border-[var(--color-scene-1)]/40 text-zinc-100"
+                : "border-white/10 bg-white/[0.02] text-zinc-300",
+            ].join(" ")}
+          >
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+                {formatRelative(entry.ts)}
+              </span>
+              {entry.fresh ? (
+                <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
+                  new
+                </span>
+              ) : null}
+            </div>
+            <p className="mt-1 leading-relaxed text-zinc-200">
+              <span className="font-mono font-medium">{entry.actor}</span>{" "}
+              <span className="text-zinc-400">{entry.action}</span>
+              {entry.detail ? (
+                <>
+                  {" "}
+                  <span className="text-zinc-600">·</span>{" "}
+                  <span className="text-zinc-400">{entry.detail}</span>
+                </>
+              ) : null}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </ColumnShell>
   );
 }
 
-function Row({ k, v }: { k: string; v: string }) {
-  return (
-    <div className="flex items-baseline justify-between gap-3">
-      <dt className="text-zinc-500">{k}</dt>
-      <dd className="text-zinc-200">{v}</dd>
-    </div>
-  );
+// ─── helpers ────────────────────────────────────────────────────────
+
+function formatRelative(ts: number): string {
+  const deltaSec = Math.max(0, Math.round((Date.now() - ts) / 1000));
+  if (deltaSec < 30) return "just now";
+  if (deltaSec < 90) return "1 min ago";
+  if (deltaSec < 3600) return `${Math.round(deltaSec / 60)} min ago`;
+  if (deltaSec < 7200) return "1 hr ago";
+  return `${Math.round(deltaSec / 3600)} hr ago`;
 }

@@ -3,29 +3,31 @@ import type { Metadata } from "next";
 import { SCENES, type Scene } from "@/lib/scenes";
 
 export const metadata: Metadata = {
-  title: "Gravixar Demo — What are you building for?",
+  title: "Gravixar Demo — live software I built for clients",
   description:
-    "Pick the context closest to yours. I built each of these for a real client problem.",
+    "Real, working apps with sample data. Open one and use it. Not slides, not a signup.",
 };
 
-export default function EntryScreen() {
-  const agencyScene = SCENES.find((s) => s.persona === "agency" && s.status === "live")!;
-  const foundersScene = SCENES.find((s) => s.persona === "founders" && s.status === "live")!;
-  const brandScene = SCENES.find((s) => s.persona === "brand")!;
+export default function SceneIndex() {
+  const live = SCENES.filter((s) => s.status === "live");
+  // Show one "coming soon" placeholder (the brand/DTC scene) so the
+  // visitor knows the showcase is growing without cluttering the index.
+  const upcoming = SCENES.find((s) => s.status === "coming-online" && s.persona === "brand");
 
   return (
     <div className="bg-gallery min-h-[calc(100dvh-40px)]">
       <div className="mx-auto max-w-5xl px-6 py-10 md:px-10 md:py-16">
 
-        {/* ── Header ─────────────────────────────────────────────── */}
+        {/* ── Header: answers "what is this?" in the first 10 seconds ── */}
         <header className="flex items-start justify-between gap-6">
-          <div>
+          <div className="max-w-2xl">
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
               Gravixar · Demo
             </p>
-            <h1 className="mt-4 text-5xl font-medium leading-[1.02] tracking-[-0.03em] text-zinc-50 md:text-6xl lg:text-7xl">
-              What are you
-              <br />
+            <h1 className="mt-4 text-4xl font-medium leading-[1.05] tracking-[-0.03em] text-zinc-50 md:text-5xl lg:text-[3.5rem]">
+              Live software I built
+              <br className="hidden sm:block" />{" "}
+              for clients.{" "}
               <span
                 className="text-transparent bg-clip-text"
                 style={{
@@ -33,12 +35,12 @@ export default function EntryScreen() {
                     "linear-gradient(90deg, #FF6B6B 0%, #FF2D95 55%, #00E1FF 100%)",
                 }}
               >
-                building for?
+                Open one and use it.
               </span>
             </h1>
-            <p className="mt-5 max-w-lg text-base leading-relaxed text-zinc-400 md:text-lg">
-              Pick the context closest to yours. I built each of these for a
-              real client problem.
+            <p className="mt-5 max-w-xl text-base leading-relaxed text-zinc-400 md:text-lg">
+              Real, working apps with sample data — not slides, not a signup.
+              Click into one and try the actual workflow.
             </p>
           </div>
           <a
@@ -50,113 +52,99 @@ export default function EntryScreen() {
           </a>
         </header>
 
-        {/* ── Identity tiles — live scenes ───────────────────────── */}
+        {/* ── Scene cards ─────────────────────────────────────────── */}
         <div className="mt-12 grid gap-4 md:grid-cols-2">
-          <LiveTile scene={agencyScene} accentColor="#FF6B6B" />
-          <LiveTile scene={foundersScene} accentColor="#00E1FF" />
+          {live.map((scene) => (
+            <SceneCard key={scene.slug} scene={scene} />
+          ))}
         </div>
 
-        {/* ── Brand & DTC — coming soon ───────────────────────────── */}
-        <div className="mt-4">
-          <ComingSoonTile scene={brandScene} />
-        </div>
+        {/* ── Coming soon ─────────────────────────────────────────── */}
+        {upcoming ? (
+          <div className="mt-4">
+            <ComingSoonCard scene={upcoming} />
+          </div>
+        ) : null}
 
-        {/* ── Footer note ─────────────────────────────────────────── */}
+        {/* ── Sandbox reassurance ─────────────────────────────────── */}
         <p className="mt-10 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
-          Sandboxed · Resets every Sunday · No sign-in required
+          Sandbox · sample data · resets every Sunday · no sign-in
         </p>
       </div>
     </div>
   );
 }
 
-// ── Live scene tile ────────────────────────────────────────────────
+// ── Live scene card — strong information scent: branded name + plain
+//    subtitle + who-it's-for + one concrete thing to do + open button.
+function SceneCard({ scene }: { scene: Scene }) {
+  const accent = scene.swatches[1];
 
-function LiveTile({
-  scene,
-  accentColor,
-}: {
-  scene: Scene;
-  accentColor: string;
-}) {
   return (
     <Link
       href={`/${scene.slug}`}
       className="group relative block overflow-hidden rounded-2xl"
-      style={{ minHeight: "300px" }}
+      style={{ minHeight: "260px" }}
     >
-      {/* Scene background fills the tile */}
+      {/* Scene's own background so each card feels like its portal */}
       <div className={`absolute inset-0 ${scene.bgUtility}`} />
-
-      {/* Dot-grid texture */}
       <div
         aria-hidden
         className="bg-dot-grid pointer-events-none absolute inset-0 opacity-20"
       />
-
-      {/* Hover accent glow */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
         style={{
-          background: `radial-gradient(60% 60% at 100% 0%, ${accentColor}18 0%, transparent 70%)`,
+          background: `radial-gradient(60% 60% at 100% 0%, ${accent}1f 0%, transparent 70%)`,
         }}
       />
-
-      {/* scene-card border + surface over the bg */}
+      {/* Border surface */}
       <div
-        className="absolute inset-0 rounded-2xl transition-all duration-220"
+        className="absolute inset-0 rounded-2xl"
         style={{
           boxShadow:
             "inset 0 0 0 1px rgba(255,255,255,0.06), 0 1px 0 0 rgba(255,255,255,0.02)",
         }}
       />
       <div
-        className="absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-220 group-hover:opacity-100"
-        style={{
-          boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.12)",
-        }}
+        className="absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{ boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.14)" }}
       />
 
-      {/* Content */}
       <div className="relative flex h-full flex-col justify-between px-7 pb-7 pt-7">
-        {/* Top: persona + status */}
-        <div className="flex items-center justify-between">
-          <span
-            className="font-mono text-[10px] uppercase tracking-[0.22em]"
-            style={{ color: accentColor }}
-          >
-            {scene.personaLabel}
-          </span>
-          <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/90">
-            <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
-            live
-          </span>
-        </div>
-
-        {/* Middle: problem statement */}
-        <div className="mt-8">
-          <p className="text-xl font-medium leading-snug tracking-[-0.015em] text-zinc-50 md:text-2xl">
-            {scene.problemStatement}
-          </p>
-          <p className="mt-3 text-sm leading-relaxed text-zinc-400">
-            {scene.description}
-          </p>
-        </div>
-
-        {/* Bottom: scene name + enter */}
-        <div className="mt-8 flex items-end justify-between gap-4 border-t border-white/5 pt-5">
-          <div>
-            <p className="text-sm font-medium text-zinc-100">{scene.name}</p>
-            <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-              {scene.bucket}
-            </p>
+        {/* Top: branded name + plain subtitle, LIVE badge */}
+        <div>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h2 className="text-2xl font-medium tracking-[-0.015em] text-zinc-50">
+                {scene.name}
+              </h2>
+              <p className="mt-1 text-sm text-zinc-300">{scene.whatItIs}</p>
+            </div>
+            <span className="mt-1 flex shrink-0 items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/90">
+              <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              live
+            </span>
           </div>
           <span
-            className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.18em] transition-colors group-hover:text-white"
-            style={{ color: accentColor }}
+            className="mt-4 inline-block rounded-full border px-2.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.18em]"
+            style={{ borderColor: `${accent}40`, color: accent }}
           >
-            Enter scene
+            for {scene.personaLabel}
+          </span>
+        </div>
+
+        {/* Bottom: what you can do + open button */}
+        <div className="mt-6 border-t border-white/5 pt-5">
+          <p className="text-sm leading-relaxed text-zinc-400">
+            {scene.tryLine}
+          </p>
+          <span
+            className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium transition-colors group-hover:text-white"
+            style={{ color: accent }}
+          >
+            {scene.openLabel}
             <span
               aria-hidden
               className="transition-transform group-hover:translate-x-1"
@@ -170,9 +158,8 @@ function LiveTile({
   );
 }
 
-// ── Coming-soon tile ───────────────────────────────────────────────
-
-function ComingSoonTile({ scene }: { scene: Scene }) {
+// ── Coming-soon card — present but clearly not yet clickable.
+function ComingSoonCard({ scene }: { scene: Scene }) {
   return (
     <div className="scene-card relative overflow-hidden rounded-2xl px-7 py-6">
       <div
@@ -181,22 +168,18 @@ function ComingSoonTile({ scene }: { scene: Scene }) {
       />
       <div className="relative flex flex-wrap items-center justify-between gap-6">
         <div>
-          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-600">
-            {scene.personaLabel}
-          </span>
-          <p className="mt-2 text-base font-medium text-zinc-500">
-            {scene.problemStatement}
-          </p>
+          <div className="flex items-baseline gap-3">
+            <h2 className="text-lg font-medium text-zinc-300">{scene.name}</h2>
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+              for {scene.personaLabel}
+            </span>
+          </div>
+          <p className="mt-1 text-sm text-zinc-500">{scene.whatItIs}</p>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
-            <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-zinc-600" />
-            Building now
-          </span>
-          <span className="rounded-sm border border-white/8 bg-white/[0.03] px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-600">
-            {scene.name}
-          </span>
-        </div>
+        <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+          <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-zinc-600" />
+          building now
+        </span>
       </div>
     </div>
   );

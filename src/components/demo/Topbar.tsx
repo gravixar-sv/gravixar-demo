@@ -24,7 +24,7 @@ export function Topbar({
             className="flex items-center gap-2 text-sm text-zinc-300 transition-colors hover:text-white"
           >
             <span aria-hidden>←</span>
-            <span>gallery</span>
+            <span>all scenes</span>
           </Link>
           <span className="hidden text-zinc-700 sm:inline">·</span>
           <div className="hidden items-center gap-3 sm:flex">

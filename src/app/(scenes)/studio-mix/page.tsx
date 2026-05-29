@@ -58,7 +58,7 @@ export default function StudioMixConsole() {
       <div className="grid gap-8 lg:grid-cols-12">
         <div className="lg:col-span-8">
           <p className="text-[10px] uppercase tracking-[0.25em] text-[var(--color-scene-1)]">
-            scene 02, ai tooling
+            ai-agents console · for ops teams · sandbox
           </p>
           <h1 className="mt-5 font-display-mono text-3xl font-medium leading-tight tracking-tight text-zinc-50 md:text-5xl lg:text-[60px]">
             <span className="text-[var(--color-scene-1)]">$</span> studio-mix &mdash;

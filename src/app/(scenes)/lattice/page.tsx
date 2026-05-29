@@ -23,16 +23,16 @@ export default function LatticePersonaPick() {
       <div className="grid gap-8 lg:grid-cols-12">
         <div className="lg:col-span-7">
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--color-scene-1)]">
-            scene 01, operations infrastructure
+            client portal · built for agencies · sandbox
           </p>
           <h1 className="mt-5 text-5xl font-medium leading-[0.98] tracking-[-0.02em] md:text-7xl lg:text-[80px]">
             Lattice Studio
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-zinc-300">
-            A creative studio runs its delivery, scope, and review on this
-            portal. Pick a role and step into it. Every persona sees the
-            same data, filtered to what they&apos;re allowed to touch, with a
-            small interactive loop to try.
+            This is the client portal I built for a creative agency. The same
+            portal looks different depending on who&apos;s signed in. Pick a role
+            below to see their view, then try the one interactive loop on that
+            page. Sample data, resets weekly.
           </p>
         </div>
         <div className="lg:col-span-5 lg:pt-6">
@@ -75,8 +75,11 @@ export default function LatticePersonaPick() {
       {/* Persona cards */}
       <div className="mt-12">
         <h2 className="text-2xl font-medium tracking-[-0.015em] md:text-3xl">
-          Pick who you are.
+          View it from each role.
         </h2>
+        <p className="mt-2 max-w-xl text-sm leading-relaxed text-zinc-400">
+          Same portal, four perspectives. Pick one to step into their view.
+        </p>
         <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {LATTICE_PERSONAS.map((p, i) => {
             const firstName = p.name.split(" ")[0]?.toLowerCase() ?? "";

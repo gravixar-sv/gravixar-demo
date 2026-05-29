@@ -1,7 +1,8 @@
-// Scene registry. The entry screen and gallery both read this. Each
-// scene has its own URL prefix, palette tokens, display font, and
-// visitor copy. The `persona` and `problemStatement` fields power
-// the identity-fork entry screen (Session 1 redesign).
+// Scene registry. The entry screen (self-explaining scene index) and
+// each scene layout read this. Plain-English fields (whatItIs, tryLine,
+// openLabel) power the scene-index cards so a first-time visitor knows
+// exactly what each scene is, who it's for, and what they'll do —
+// per the NN/g information-scent + "link is a promise" findings.
 
 export type SceneStatus = "live" | "coming-online";
 export type ScenePersona = "agency" | "founders" | "brand";
@@ -15,9 +16,16 @@ export type Scene = {
   status: SceneStatus;
   /** The audience persona this scene is built for. */
   persona: ScenePersona;
-  /** Display label for the persona on the identity-fork entry screen. */
+  /** Display label for the persona — shown as a "for X" tag on the card. */
   personaLabel: string;
-  /** The visitor's pain this scene addresses — shown on the entry tile. */
+  /** Plain-English "what this is" subtitle. Sits next to the branded
+   *  scene name so the jargon name is never unexplained. */
+  whatItIs: string;
+  /** One concrete line: what the visitor can actually do in this scene. */
+  tryLine: string;
+  /** Action-button label, scene-specific ("Open the portal" etc.). */
+  openLabel: string;
+  /** The visitor's pain this scene addresses (kept for reference / SEO). */
   problemStatement: string;
   /** Tailwind utility class that applies the scene's CSS-var overrides. */
   paletteClass: string;
@@ -39,7 +47,10 @@ export const SCENES: Scene[] = [
     bucket: "operations",
     status: "live",
     persona: "agency",
-    personaLabel: "Agency",
+    personaLabel: "agencies",
+    whatItIs: "A client portal for a creative agency",
+    tryLine: "Approvals, briefs, and delivery in one place",
+    openLabel: "Open the portal",
     problemStatement:
       "Your clients live in Slack threads and shared spreadsheets.",
     paletteClass: "scene-lattice",
@@ -56,7 +67,10 @@ export const SCENES: Scene[] = [
     bucket: "ai",
     status: "live",
     persona: "founders",
-    personaLabel: "Founders & Product",
+    personaLabel: "founders & product teams",
+    whatItIs: "An AI-agents console for ops teams",
+    tryLine: "Four agents that draft, flag, classify, and review",
+    openLabel: "Open the console",
     problemStatement:
       "Your AI tooling is impressive in demos, invisible in production.",
     paletteClass: "scene-studio-mix",
@@ -73,7 +87,10 @@ export const SCENES: Scene[] = [
     bucket: "brand",
     status: "coming-online",
     persona: "brand",
-    personaLabel: "Brand & DTC",
+    personaLabel: "brands & DTC",
+    whatItIs: "A brand & campaign ops workspace for DTC",
+    tryLine: "Brand system, Amazon A+ workflow, motion review",
+    openLabel: "Open the workspace",
     problemStatement:
       "Your campaign ops are scattered across six tools none of your team fully knows.",
     paletteClass: "scene-northbeam",
@@ -90,7 +107,10 @@ export const SCENES: Scene[] = [
     bucket: "ai",
     status: "coming-online",
     persona: "founders",
-    personaLabel: "Founders & Product",
+    personaLabel: "founders & product teams",
+    whatItIs: "An AI intake wizard for professional services",
+    tryLine: "Adaptive intake that writes the brief for you",
+    openLabel: "Open the wizard",
     problemStatement:
       "Your AI tooling is impressive in demos, invisible in production.",
     paletteClass: "scene-verus",

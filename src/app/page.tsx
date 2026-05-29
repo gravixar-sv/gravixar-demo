@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { SCENES, type Scene } from "@/lib/scenes";
+import { Topbar } from "@/components/demo/Topbar";
 
 export const metadata: Metadata = {
   title: "Gravixar Demo — live software I built for clients",
@@ -16,40 +17,32 @@ export default function SceneIndex() {
 
   return (
     <div className="bg-gallery min-h-[calc(100dvh-40px)]">
-      <div className="mx-auto max-w-5xl px-6 py-10 md:px-10 md:py-16">
+      <Topbar home />
+      <div className="mx-auto max-w-7xl px-6 pb-20 pt-10 md:px-10 lg:px-12">
 
         {/* ── Header: answers "what is this?" in the first 10 seconds ── */}
-        <header className="flex items-start justify-between gap-6">
-          <div className="max-w-2xl">
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
-              Gravixar · Demo
-            </p>
-            <h1 className="mt-4 text-4xl font-medium leading-[1.05] tracking-[-0.03em] text-zinc-50 md:text-5xl lg:text-[3.5rem]">
-              Live software I built
-              <br className="hidden sm:block" />{" "}
-              for clients.{" "}
-              <span
-                className="text-transparent bg-clip-text"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(90deg, #FF6B6B 0%, #FF2D95 55%, #00E1FF 100%)",
-                }}
-              >
-                Open one and use it.
-              </span>
-            </h1>
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-zinc-400 md:text-lg">
-              Real, working apps with sample data — not slides, not a signup.
-              Click into one and try the actual workflow.
-            </p>
-          </div>
-          <a
-            href="https://gravixar.com"
-            rel="noreferrer"
-            className="hidden shrink-0 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500 transition-colors hover:text-zinc-200 md:block"
-          >
-            gravixar.com →
-          </a>
+        <header className="max-w-2xl">
+          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--color-scene-1,#FF6B6B)]">
+            capability showroom
+          </p>
+          <h1 className="mt-3 text-4xl font-medium leading-[1.05] tracking-[-0.03em] text-zinc-50 md:text-5xl lg:text-[3.5rem]">
+            Live software I built
+            <br className="hidden sm:block" />{" "}
+            for clients.{" "}
+            <span
+              className="text-transparent bg-clip-text"
+              style={{
+                backgroundImage:
+                  "linear-gradient(90deg, #FF6B6B 0%, #FF2D95 55%, #00E1FF 100%)",
+              }}
+            >
+              Open one and use it.
+            </span>
+          </h1>
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-zinc-400 md:text-lg">
+            Real, working apps with sample data — not slides, not a signup.
+            Click into one and try the actual workflow.
+          </p>
         </header>
 
         {/* ── Scene cards ─────────────────────────────────────────── */}

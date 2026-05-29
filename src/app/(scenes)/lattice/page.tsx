@@ -1,71 +1,70 @@
 "use client";
 
-// Lattice playground — a single-page, 3-column live workspace.
-// Client / PM / Admin columns share one reducer: an action in any
-// column prepends an audit row and ripples a cue into the others.
-// This is the "watch the other panels react" demo. No sign-in, no DB;
-// each visitor gets isolated client-side state.
+// Lattice review-loop — a deliverable handoff across three columns.
+// Client (Mira) · PM (Kai) · Editor (Sage). A deliverable is a real
+// object that moves column→column as it's approved / revised / pushed
+// back, with an attachment that pops on hover and an activity feed
+// logging every hop. See src/lib/playground/lattice-deliverables.ts.
 
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useState } from "react";
 import {
-  PLAYGROUND_DELIVERABLE,
-  PLAYGROUND_INQUIRY,
-  PLAYGROUND_PERSONAS,
-  type PlaygroundPersona,
-} from "@/lib/playground/script";
-import {
-  createInitialPlaygroundState,
-  playgroundReducer,
-  type AuditEntry,
-} from "@/lib/playground/reducer";
+  PERSONAS,
+  createInitialLatticeState,
+  latticeReducer,
+  type Deliverable,
+  type FeedEntry,
+  type Persona,
+} from "@/lib/playground/lattice-deliverables";
+import { Avatar } from "@/components/demo/Avatar";
+import { MockupThumb } from "@/components/demo/DeliverableMockup";
 import { SceneCTA } from "@/components/demo/SceneCTA";
 
-const FRESH_DECAY_MS = 2000;
+const FRESH_DECAY_MS = 2200;
 
-export default function LatticePlayground() {
+export default function LatticeReviewLoop() {
   const [state, dispatch] = useReducer(
-    playgroundReducer,
+    latticeReducer,
     undefined,
-    createInitialPlaygroundState,
+    createInitialLatticeState,
   );
 
-  // After each fresh row appears, settle it back to rest so the next
-  // action's highlight reads as new.
   useEffect(() => {
-    const freshIds = state.audit.filter((a) => a.fresh).map((a) => a.id);
-    if (freshIds.length === 0) return;
-    const timers = freshIds.map((id) =>
+    const ids = [
+      ...state.deliverables.filter((d) => d.fresh).map((d) => d.id),
+      ...state.feed.filter((f) => f.fresh).map((f) => f.id),
+    ];
+    if (ids.length === 0) return;
+    const timers = ids.map((id) =>
       window.setTimeout(() => dispatch({ type: "DECAY_FRESH", id }), FRESH_DECAY_MS),
     );
-    return () => {
-      for (const t of timers) window.clearTimeout(t);
-    };
-  }, [state.audit]);
+    return () => timers.forEach((t) => window.clearTimeout(t));
+  }, [state.deliverables, state.feed]);
 
-  const actionsTaken =
-    Number(state.approved || state.revisionRequested) + Number(state.replied);
+  const byState = (...states: Deliverable["state"][]) =>
+    state.deliverables.filter((d) => states.includes(d.state));
+
+  const shipped = byState("shipped").length;
 
   return (
     <div className="mx-auto max-w-7xl px-6 pb-20 pt-10 md:px-10 lg:px-12">
-      {/* ── Orientation ─────────────────────────────────────────── */}
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div className="max-w-2xl">
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--color-scene-1)]">
             client portal · built for agencies · live sandbox
           </p>
           <h1 className="mt-3 text-3xl font-medium leading-tight tracking-[-0.02em] text-zinc-50 md:text-4xl">
-            Three roles, one system.
+            Watch a deliverable move.
           </h1>
           <p className="mt-3 text-base leading-relaxed text-zinc-400">
-            This is the client portal I built for a creative agency — the
-            client, the project manager, and the admin, side by side. Do
-            something in any column and watch the others react in real time.
+            The agency&apos;s work flows Editor → PM → Client and back. Act in
+            any column — approve, request a revision, push it back — and watch
+            the card hand off to the next person. Hover any thumbnail to preview.
           </p>
         </div>
         <div className="flex items-center gap-3">
-          {actionsTaken > 0 ? (
-            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
-              {actionsTaken} action{actionsTaken > 1 ? "s" : ""} · feed live
+          {shipped > 0 ? (
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80">
+              {shipped} shipped
             </span>
           ) : null}
           <button
@@ -78,47 +77,69 @@ export default function LatticePlayground() {
         </div>
       </header>
 
-      {/* ── 3 columns (stack on mobile, Admin widest on lg) ──────── */}
-      <div className="mt-8 grid gap-5 lg:grid-cols-[1fr_1fr_1.15fr]">
-        <ClientColumn
-          approved={state.approved}
-          revisionRequested={state.revisionRequested}
-          comment={state.comment}
-          replied={state.replied}
-          onApprove={() => dispatch({ type: "APPROVE" })}
-          onRevise={() => dispatch({ type: "REVISE" })}
-          onCommentChange={(value) => dispatch({ type: "SET_COMMENT", value })}
-        />
-        <PMColumn
-          replied={state.replied}
-          approved={state.approved}
-          onSendReply={() => dispatch({ type: "SEND_REPLY" })}
-        />
-        <AdminColumn audit={state.audit} />
+      <div className="mt-8 grid gap-5 lg:grid-cols-3">
+        {/* ── Client ── */}
+        <Column persona={PERSONAS.client} status="your review">
+          {byState("with_client").map((d) => (
+            <ClientCard key={d.id} d={d} dispatch={dispatch} />
+          ))}
+          {byState("shipped").map((d) => (
+            <DoneCard key={d.id} d={d} label="Shipped" tone="emerald" />
+          ))}
+          <EmptyIf
+            show={byState("with_client", "shipped").length === 0}
+            text="Nothing waiting on you right now."
+          />
+        </Column>
+
+        {/* ── PM ── */}
+        <Column persona={PERSONAS.pm} status="queue">
+          {byState("in_pm_review").map((d) => (
+            <PMReviewCard key={d.id} d={d} dispatch={dispatch} />
+          ))}
+          {byState("revision_requested").map((d) => (
+            <PMRevisionCard key={d.id} d={d} dispatch={dispatch} />
+          ))}
+          <EmptyIf
+            show={byState("in_pm_review", "revision_requested").length === 0}
+            text="Inbox clear."
+          />
+        </Column>
+
+        {/* ── Editor ── */}
+        <Column persona={PERSONAS.editor} status="in progress">
+          {byState("editing").map((d) => (
+            <EditorCard key={d.id} d={d} dispatch={dispatch} />
+          ))}
+          <EmptyIf
+            show={byState("editing").length === 0}
+            text="No revisions to action."
+          />
+        </Column>
       </div>
+
+      <ActivityFeed feed={state.feed} />
 
       <SceneCTA personaLabel="Agency" />
     </div>
   );
 }
 
-// ─── Column shell ───────────────────────────────────────────────────
+// ─── Shared bits ────────────────────────────────────────────────────
 
-function ColumnShell({
+function Column({
   persona,
   status,
   children,
 }: {
-  persona: PlaygroundPersona;
+  persona: Persona;
   status: string;
   children: React.ReactNode;
 }) {
   return (
     <section className="scene-card rounded-2xl p-5">
       <header className="flex items-center gap-3 border-b border-white/5 pb-4">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[var(--color-scene-1)] to-[var(--color-scene-2)] font-mono text-[11px] font-semibold text-[#0a1230]">
-          {persona.initials}
-        </span>
+        <Avatar initials={persona.initials} hue={persona.hue} size="md" />
         <div className="min-w-0">
           <p className="truncate text-sm font-medium text-zinc-50">
             {persona.name}
@@ -126,224 +147,261 @@ function ColumnShell({
               {persona.role}
             </span>
           </p>
-          <p className="truncate text-[11px] text-zinc-500">
-            {persona.contextLine}
-          </p>
+          <p className="truncate text-[11px] text-zinc-500">{persona.contextLine}</p>
         </div>
       </header>
       <p className="mt-4 font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600">
         {status}
       </p>
-      {children}
+      <div className="mt-3 space-y-3">{children}</div>
     </section>
   );
 }
 
-// ─── Cross-column cue (the "ripple") ────────────────────────────────
-
-function Cue({ children }: { children: React.ReactNode }) {
+function CardShell({
+  d,
+  children,
+}: {
+  d: Deliverable;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="pg-cue mt-4 flex items-start gap-2 rounded-lg border border-[var(--color-scene-1)]/30 bg-[var(--color-scene-1)]/[0.08] px-3 py-2 text-xs text-zinc-200">
-      <span aria-hidden className="mt-0.5 text-[var(--color-scene-1)]">⟳</span>
-      <span>{children}</span>
+    <div
+      className={[
+        "rounded-xl border p-3.5",
+        d.fresh
+          ? "pg-fresh border-[var(--color-scene-1)]/45"
+          : "border-white/10 bg-black/20",
+      ].join(" ")}
+    >
+      <div className="flex items-start gap-3">
+        <MockupThumb kind={d.kind} />
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium leading-tight text-zinc-100">{d.title}</p>
+          <p className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+            v{d.version}
+          </p>
+        </div>
+      </div>
+      {children}
     </div>
   );
 }
 
-// ─── Client column ──────────────────────────────────────────────────
+function EmptyIf({ show, text }: { show: boolean; text: string }) {
+  if (!show) return null;
+  return (
+    <p className="rounded-lg border border-dashed border-white/10 px-3 py-4 text-center text-[11px] text-zinc-600">
+      {text}
+    </p>
+  );
+}
 
-function ClientColumn({
-  approved,
-  revisionRequested,
-  comment,
-  replied,
-  onApprove,
-  onRevise,
-  onCommentChange,
+// ─── Client cards ───────────────────────────────────────────────────
+
+function ClientCard({
+  d,
+  dispatch,
 }: {
-  approved: boolean;
-  revisionRequested: boolean;
-  comment: string;
-  replied: boolean;
-  onApprove: () => void;
-  onRevise: () => void;
-  onCommentChange: (value: string) => void;
+  d: Deliverable;
+  dispatch: React.Dispatch<import("@/lib/playground/lattice-deliverables").LatticeEvent>;
 }) {
-  const locked = approved || revisionRequested;
+  const [note, setNote] = useState("");
+  const [revising, setRevising] = useState(false);
 
   return (
-    <ColumnShell persona={PLAYGROUND_PERSONAS.mira} status="awaiting your review">
-      <div className="mt-3 rounded-xl border border-white/10 bg-black/20 p-4">
-        <p className="text-sm font-medium text-zinc-100">
-          {PLAYGROUND_DELIVERABLE.fullTitle}
-        </p>
-        <p className="mt-1 text-[11px] text-zinc-500">
-          submitted by {PLAYGROUND_DELIVERABLE.designer}
-        </p>
-        <p className="mt-3 text-xs leading-relaxed text-zinc-400">
-          {PLAYGROUND_DELIVERABLE.blurb}
-        </p>
-
-        <label className="mt-4 block">
-          <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
-            note for the designer (optional)
-          </span>
+    <CardShell d={d}>
+      {revising ? (
+        <div className="mt-3">
           <textarea
-            value={comment}
-            onChange={(e) => onCommentChange(e.target.value)}
-            disabled={locked}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
             rows={2}
-            placeholder="Looks great — just check the kerning on the wordmark…"
-            className="mt-1.5 w-full rounded-lg border border-white/10 bg-black/30 px-2.5 py-2 text-xs text-zinc-100 placeholder:text-zinc-600 focus:border-[var(--color-scene-1)]/40 focus:outline-none disabled:opacity-50"
+            placeholder="What should change?"
+            className="w-full rounded-lg border border-white/10 bg-black/30 px-2.5 py-2 text-xs text-zinc-100 placeholder:text-zinc-600 focus:border-[var(--color-scene-1)]/40 focus:outline-none"
           />
-        </label>
-
+          <div className="mt-2 flex gap-2">
+            <button
+              type="button"
+              onClick={() => dispatch({ type: "CLIENT_REVISE", id: d.id, note })}
+              className="rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-1.5 text-xs font-medium text-amber-200 transition-colors hover:bg-amber-400/20"
+            >
+              Send revision →
+            </button>
+            <button
+              type="button"
+              onClick={() => setRevising(false)}
+              className="rounded-lg px-2 py-1.5 text-xs text-zinc-500 hover:text-zinc-300"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ) : (
         <div className="mt-3 flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={onApprove}
-            disabled={locked}
-            className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-colors hover:bg-emerald-400/20 disabled:cursor-not-allowed disabled:opacity-40"
+            onClick={() => dispatch({ type: "CLIENT_APPROVE", id: d.id })}
+            className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-colors hover:bg-emerald-400/20"
           >
             Approve →
           </button>
           <button
             type="button"
-            onClick={onRevise}
-            disabled={locked}
-            className="rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-1.5 text-xs font-medium text-amber-200 transition-colors hover:bg-amber-400/20 disabled:cursor-not-allowed disabled:opacity-40"
+            onClick={() => setRevising(true)}
+            className="rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-1.5 text-xs font-medium text-amber-200 transition-colors hover:bg-amber-400/20"
           >
             Request revision
           </button>
         </div>
-
-        {approved ? (
-          <p className="mt-3 text-xs text-emerald-300">
-            ✓ Approved · {PLAYGROUND_DELIVERABLE.title}
-          </p>
-        ) : null}
-        {revisionRequested ? (
-          <p className="mt-3 text-xs text-amber-300">
-            ↺ Revision requested · {PLAYGROUND_DELIVERABLE.title}
-          </p>
-        ) : null}
-      </div>
-
-      {/* Ripple in from the PM column */}
-      {replied ? (
-        <Cue>
-          {PLAYGROUND_PERSONAS.kai.firstName} just replied on the{" "}
-          {PLAYGROUND_INQUIRY.fromCompany} inquiry — you&apos;re in the loop.
-        </Cue>
-      ) : null}
-    </ColumnShell>
+      )}
+    </CardShell>
   );
 }
 
-// ─── PM column ──────────────────────────────────────────────────────
+// ─── PM cards ───────────────────────────────────────────────────────
 
-function PMColumn({
-  replied,
-  approved,
-  onSendReply,
+function PMReviewCard({
+  d,
+  dispatch,
 }: {
-  replied: boolean;
-  approved: boolean;
-  onSendReply: () => void;
+  d: Deliverable;
+  dispatch: React.Dispatch<import("@/lib/playground/lattice-deliverables").LatticeEvent>;
 }) {
   return (
-    <ColumnShell persona={PLAYGROUND_PERSONAS.kai} status="new inquiry · awaiting reply">
-      <div className="mt-3 rounded-xl border border-white/10 bg-black/20 p-4">
-        <p className="text-sm font-medium text-zinc-100">
-          {PLAYGROUND_INQUIRY.fromCompany}
-        </p>
-        <p className="mt-1 text-[11px] text-zinc-500">
-          {PLAYGROUND_INQUIRY.fromName} · {PLAYGROUND_INQUIRY.summary}
-        </p>
-        <p className="mt-3 text-xs leading-relaxed text-zinc-400">
-          {PLAYGROUND_INQUIRY.preview}
-        </p>
-
-        <div className="mt-3">
-          <span className="rounded-md border border-white/10 bg-white/[0.04] px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-400">
-            {replied ? "awaiting_call" : "pm_assigned"}
-          </span>
-        </div>
-
-        <div className="mt-3">
-          <button
-            type="button"
-            onClick={onSendReply}
-            disabled={replied}
-            className="rounded-lg border border-sky-400/30 bg-sky-400/10 px-3 py-1.5 text-xs font-medium text-sky-200 transition-colors hover:bg-sky-400/20 disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            Send first reply →
-          </button>
-        </div>
-
-        {replied ? (
-          <p className="mt-3 text-xs text-sky-300">
-            ✓ Reply sent · awaiting discovery call
-          </p>
-        ) : null}
-      </div>
-
-      {/* Ripple in from the Client column */}
-      {approved ? (
-        <Cue>
-          {PLAYGROUND_PERSONAS.mira.firstName} just approved{" "}
-          {PLAYGROUND_DELIVERABLE.title} — schedule the Tuesday call.
-        </Cue>
-      ) : null}
-    </ColumnShell>
+    <CardShell d={d}>
+      <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+        from editor · needs your sign-off
+      </p>
+      <button
+        type="button"
+        onClick={() => dispatch({ type: "PM_APPROVE", id: d.id })}
+        className="mt-2 rounded-lg border border-sky-400/30 bg-sky-400/10 px-3 py-1.5 text-xs font-medium text-sky-200 transition-colors hover:bg-sky-400/20"
+      >
+        Approve &amp; send to client →
+      </button>
+    </CardShell>
   );
 }
 
-// ─── Admin column (live feed) ───────────────────────────────────────
-
-function AdminColumn({ audit }: { audit: AuditEntry[] }) {
+function PMRevisionCard({
+  d,
+  dispatch,
+}: {
+  d: Deliverable;
+  dispatch: React.Dispatch<import("@/lib/playground/lattice-deliverables").LatticeEvent>;
+}) {
   return (
-    <ColumnShell persona={PLAYGROUND_PERSONAS.nox} status="activity feed · real-time">
-      <ul className="mt-3 space-y-2">
-        {audit.map((entry) => (
+    <CardShell d={d}>
+      <p className="mt-2 rounded-md border border-amber-400/20 bg-amber-400/[0.06] px-2.5 py-1.5 text-[11px] leading-relaxed text-amber-200/90">
+        <span className="font-mono text-[8px] uppercase tracking-[0.18em] text-amber-300/70">
+          client note ·{" "}
+        </span>
+        {d.revisionNote}
+      </p>
+      <button
+        type="button"
+        onClick={() => dispatch({ type: "PM_TO_EDITOR", id: d.id })}
+        className="mt-2 rounded-lg border border-violet-400/30 bg-violet-400/10 px-3 py-1.5 text-xs font-medium text-violet-200 transition-colors hover:bg-violet-400/20"
+      >
+        Push to editor →
+      </button>
+    </CardShell>
+  );
+}
+
+// ─── Editor card ────────────────────────────────────────────────────
+
+function EditorCard({
+  d,
+  dispatch,
+}: {
+  d: Deliverable;
+  dispatch: React.Dispatch<import("@/lib/playground/lattice-deliverables").LatticeEvent>;
+}) {
+  return (
+    <CardShell d={d}>
+      {d.revisionNote ? (
+        <p className="mt-2 text-[11px] leading-relaxed text-zinc-400">
+          Reworking against the client&apos;s note. New cut staged.
+        </p>
+      ) : (
+        <p className="mt-2 text-[11px] leading-relaxed text-zinc-400">
+          Drafting the first cut.
+        </p>
+      )}
+      <button
+        type="button"
+        onClick={() => dispatch({ type: "EDITOR_SUBMIT", id: d.id })}
+        className="mt-2 rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-colors hover:bg-emerald-400/20"
+      >
+        ↑ Submit for review
+      </button>
+    </CardShell>
+  );
+}
+
+// ─── Done card ──────────────────────────────────────────────────────
+
+function DoneCard({
+  d,
+  label,
+}: {
+  d: Deliverable;
+  label: string;
+  tone: "emerald";
+}) {
+  return (
+    <div
+      className={[
+        "flex items-center gap-3 rounded-xl border px-3.5 py-3",
+        d.fresh ? "pg-fresh border-emerald-400/40" : "border-white/10 bg-black/20",
+      ].join(" ")}
+    >
+      <MockupThumb kind={d.kind} />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium text-zinc-200">{d.title}</p>
+        <p className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.18em] text-emerald-300/80">
+          ✓ {label} · v{d.version}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Activity feed ──────────────────────────────────────────────────
+
+function ActivityFeed({ feed }: { feed: FeedEntry[] }) {
+  return (
+    <section className="mt-5 scene-card rounded-2xl p-5">
+      <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600">
+        activity feed · real-time
+      </p>
+      <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        {feed.slice(0, 6).map((e) => (
           <li
-            key={entry.id}
+            key={e.id}
             className={[
               "rounded-lg border px-3 py-2 text-xs",
-              entry.fresh
+              e.fresh
                 ? "pg-fresh border-[var(--color-scene-1)]/40 text-zinc-100"
                 : "border-white/10 bg-white/[0.02] text-zinc-300",
             ].join(" ")}
           >
-            <div className="flex items-baseline justify-between gap-2">
-              <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
-                {formatRelative(entry.ts)}
-              </span>
-              {entry.fresh ? (
-                <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
-                  new
-                </span>
-              ) : null}
-            </div>
-            <p className="mt-1 leading-relaxed text-zinc-200">
-              <span className="font-medium">{entry.actor}</span>{" "}
-              <span className="text-zinc-400">{entry.action}</span>
-              {entry.detail ? (
-                <>
-                  {" "}
-                  <span className="text-zinc-600">·</span>{" "}
-                  <span className="text-zinc-400">{entry.detail}</span>
-                </>
-              ) : null}
+            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+              {formatRelative(e.ts)}
+            </span>
+            <p className="mt-1 leading-relaxed">
+              <span className="font-medium text-zinc-200">{e.actor}</span>{" "}
+              <span className="text-zinc-400">{e.action}</span>
+              {e.detail ? <span className="text-zinc-500"> · {e.detail}</span> : null}
             </p>
           </li>
         ))}
       </ul>
-    </ColumnShell>
+    </section>
   );
 }
-
-// ─── helpers ────────────────────────────────────────────────────────
 
 function formatRelative(ts: number): string {
   const deltaSec = Math.max(0, Math.round((Date.now() - ts) / 1000));

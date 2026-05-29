@@ -18,8 +18,7 @@ type RailItem =
 
 const ITEMS: RailItem[] = [
   { kind: "header", label: "Demo" },
-  { kind: "link", href: "/", label: "Overview" },
-  { kind: "link", href: "/tour", label: "Tour", badge: "60s" },
+  { kind: "link", href: "/", label: "← All scenes" },
   { kind: "header", label: "Live scenes" },
   { kind: "link", href: "/lattice", label: "Lattice Studio" },
   { kind: "link", href: "/studio-mix", label: "Studio Mix" },

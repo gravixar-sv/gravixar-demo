@@ -46,17 +46,18 @@ export default function StudioMixPlayground() {
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div className="max-w-2xl">
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--color-scene-1)]">
-            ai-agents console · for ops teams · live sandbox
+            supervised agent console · for ops &amp; technical teams · live sandbox
           </p>
           <h1 className="mt-3 font-display-mono text-3xl font-medium leading-tight tracking-tight text-zinc-50 md:text-4xl">
-            <span className="text-[var(--color-scene-1)]">$</span> run an agent,
-            watch it work.
+            <span className="text-[var(--color-scene-1)]">$</span> agents that
+            ask before they act.
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-zinc-400">
-            Four agents I&apos;d wire into a client&apos;s system — drafting,
-            anomaly watch, classifying, reviewing. Run one on the left, its
-            output lands in the middle, every run logs to the feed on the
-            right. Human-in-the-loop, never auto-publish.
+            A drafter, a watcher, a classifier and a reviewer — the kind I wire
+            into a client&apos;s ops. Read-only work runs on its own; anything
+            that writes, spends, or publishes waits behind a human. Run one on
+            the left, see its output in the middle, every action lands in the
+            audit log on the right. Never auto-publish.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -233,7 +234,7 @@ function OutputColumn({ agent }: { agent: StudioAgent | null }) {
 
 function FeedColumn({ feed }: { feed: AuditEntry[] }) {
   return (
-    <ColumnShell label="run feed" status="every run logs here · real-time">
+    <ColumnShell label="audit log" status="every action logged · real-time">
       <ul className="mt-3 space-y-2">
         {feed.map((entry) => (
           <li

@@ -92,6 +92,15 @@
       linear-gradient(180deg, #070a14 0%, #0a0820 60%, #050508 100%);
   }
 
+  /* Northbeam (DTC/brand governance) scene — muted sage-green + cream
+     wash on a deep green-black base. */
+  .bg-northbeam {
+    background:
+      radial-gradient(60% 55% at 100% 0%, rgba(157, 190, 110, 0.12) 0%, transparent 58%),
+      radial-gradient(50% 70% at 0% 100%, rgba(242, 221, 193, 0.06) 0%, transparent 60%),
+      linear-gradient(180deg, #121a0e 0%, #10160c 55%, #07080f 100%);
+  }
+
   /* Founder Cockpit scene — warm amber/gold "daily brief" wash on a
      near-black base. Distinct from Lattice (coral), Studio Mix (cyan),
      Northbeam (green). */

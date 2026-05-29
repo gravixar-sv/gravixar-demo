@@ -25,6 +25,9 @@ export type StudioAgent = {
   outputTitle: string;
   /** Output body lines rendered in column 2 after a run. */
   outputLines: string[];
+  /** Writer agents (publish/act) wait behind a human approval; read-only
+   *  agents (watch/classify/review) run autonomously. */
+  gated?: boolean;
 };
 
 export const STUDIO_AGENTS: StudioAgent[] = [
@@ -33,6 +36,7 @@ export const STUDIO_AGENTS: StudioAgent[] = [
     name: "ECHO",
     role: "SEO drafter",
     color: "#00E1FF",
+    gated: true,
     blurb: "Drafts a blog post on demand, in your voice. Lands in review, never auto-published.",
     feedAction: "drafted a blog post",
     feedDetail: "“The hidden cost of almost-working ops”",

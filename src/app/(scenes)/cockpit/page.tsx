@@ -86,7 +86,7 @@ export default function FounderCockpit() {
         ) : null}
       </p>
 
-      <div className="mt-7 grid gap-5 lg:grid-cols-3">
+      <div className="mt-7 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:pb-0">
         <InboxColumn signals={state.signals} dispatch={dispatch} />
         <TodayColumn todos={state.todos} dispatch={dispatch} />
         <MoneyColumn money={state.money} dispatch={dispatch} />
@@ -110,7 +110,7 @@ function Col({
   children: React.ReactNode;
 }) {
   return (
-    <section className="scene-card rounded-2xl p-5">
+    <section className="scene-card min-w-[82%] shrink-0 snap-start rounded-2xl p-5 sm:min-w-[48%] lg:min-w-0">
       <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-300">
         {label}
       </p>

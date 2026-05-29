@@ -77,7 +77,7 @@ export default function LatticeReviewLoop() {
         </div>
       </header>
 
-      <div className="mt-8 grid gap-5 lg:grid-cols-3">
+      <div className="mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:pb-0">
         {/* ── Client ── */}
         <Column persona={PERSONAS.client} status="your review">
           {byState("with_client").map((d) => (
@@ -137,7 +137,7 @@ function Column({
   children: React.ReactNode;
 }) {
   return (
-    <section className="scene-card rounded-2xl p-5">
+    <section className="scene-card min-w-[82%] shrink-0 snap-start rounded-2xl p-5 sm:min-w-[48%] lg:min-w-0">
       <header className="flex items-center gap-3 border-b border-white/5 pb-4">
         <Avatar initials={persona.initials} hue={persona.hue} size="md" />
         <div className="min-w-0">

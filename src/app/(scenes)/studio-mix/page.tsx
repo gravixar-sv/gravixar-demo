@@ -55,7 +55,7 @@ export default function StudioMixPlayground() {
             ask before they act.
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-zinc-400">
-            A drafter, a watcher, a classifier and a reviewer — the kind I wire
+            A drafter, a watcher, a classifier and a reviewer, the kind I wire
             into a client&apos;s ops. Read-only work runs on its own; anything
             that writes, spends, or publishes waits behind a human. Run one on
             the left, see its output in the middle, every action lands in the
@@ -89,7 +89,12 @@ export default function StudioMixPlayground() {
         <FeedColumn feed={state.feed} />
       </div>
 
-      <SceneCTA personaLabel="Ops & technical teams" noun="ops team" />
+      <SceneCTA
+        personaLabel="Ops & technical teams"
+        noun="ops team"
+        headline="Put your agents behind a human."
+        blurb="I wire supervised agent consoles like this into a team's ops: read-only agents run on their own, anything that writes or publishes waits for approval. One call to scope what to automate first."
+      />
     </div>
   );
 }

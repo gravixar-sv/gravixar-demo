@@ -83,7 +83,7 @@ export const SCENES: Scene[] = [
     name: "Driftwood",
     tagline: "A solo founder's run-the-business cockpit.",
     description:
-      "The morning brief for a one-person business: AI triages the inbox, surfaces what needs you today, and watches the money — you just approve.",
+      "The morning brief for a one-person business: AI triages the inbox, surfaces what needs you today, and watches the money, you just approve.",
     bucket: "operations",
     status: "live",
     persona: "founders",

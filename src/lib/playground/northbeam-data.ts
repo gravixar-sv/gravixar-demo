@@ -89,9 +89,9 @@ const RECIPES: Record<string, Recipe> = {
   "req-spring": {
     draft: {
       lines: [
-        "Headline — Brighter days, brighter routines.",
-        "Sub — Spring picks, 20% off through Sunday.",
-        "CTA — Refresh yours →",
+        "Headline: Brighter days, brighter routines.",
+        "Sub: Spring picks, 20% off through Sunday.",
+        "CTA: Refresh yours →",
       ],
       applied: [
         "Benefit-led headline (offer moved to the subhead)",
@@ -105,9 +105,9 @@ const RECIPES: Record<string, Recipe> = {
   "req-bundle": {
     draft: {
       lines: [
-        "Module H1 — The set that does the work for you.",
-        "Body — Three essentials, one routine. Bundled.",
-        "Badge — Best value · ships free",
+        "Module H1: The set that does the work for you.",
+        "Body: Three essentials, one routine. Bundled.",
+        "Badge: Best value · ships free",
       ],
       applied: [
         "Claims match the approved product copy",
@@ -121,9 +121,9 @@ const RECIPES: Record<string, Recipe> = {
   "req-email": {
     draft: {
       lines: [
-        "Subject — Your spring lineup is here (and lighter).",
-        "Hero — Five minutes to a fresher routine.",
-        "Preheader — New picks, plus a little something off.",
+        "Subject: Your spring lineup is here (and lighter).",
+        "Hero: Five minutes to a fresher routine.",
+        "Preheader: New picks, plus a little something off.",
       ],
       applied: [
         "Subject under 45 characters",
@@ -139,14 +139,14 @@ const RECIPES: Record<string, Recipe> = {
 // The override path: a clean, compliant version of the off-brand flash request.
 const OVERRIDE_DRAFT: { lines: string[]; applied: string[] } = {
   lines: [
-    "Headline — The spring edit, while it lasts.",
-    "Sub — Up to 60% off — ends Sunday.",
-    "CTA — See the edit →",
+    "Headline: The spring edit, while it lasts.",
+    "Sub: Up to 60% off, ends Sunday.",
+    "CTA: See the edit →",
   ],
   applied: [
     "Urgency kept, the all-caps shout dropped",
     "Offer moved out of the headline",
-    "On-palette — no neon banner",
+    "On-palette, no neon banner",
   ],
 };
 
@@ -160,7 +160,7 @@ const DRIFT_VIOLATIONS = [
 const REQUESTS_SEED: BrandRequest[] = [
   {
     id: "req-spring",
-    title: "Spring sale — IG promo",
+    title: "Spring sale: IG promo",
     kind: "social",
     brief: "Promote the 20% spring sale. One Instagram promo.",
     by: "Jordan · social",
@@ -168,7 +168,7 @@ const REQUESTS_SEED: BrandRequest[] = [
   },
   {
     id: "req-bundle",
-    title: "Bundle launch — A+ module",
+    title: "Bundle launch: A+ module",
     kind: "web",
     brief: "Launch the 3-pack bundle on the Amazon A+ module.",
     by: "Priya · marketplace",
@@ -184,7 +184,7 @@ const REQUESTS_SEED: BrandRequest[] = [
   },
   {
     id: "req-flash",
-    title: "Flash banner — “60% OFF”",
+    title: "Flash banner: “60% OFF”",
     kind: "social",
     brief: "Loud 60% OFF flash banner. ALL CAPS, neon. Make it scream.",
     by: "Marketing · rush",
@@ -201,7 +201,7 @@ const RULES_SEED: BrandRule[] = [
 ];
 
 const FEED_SEED: Array<{ id: string; offsetMs: number; actor: string; action: string; detail?: string }> = [
-  { id: "nf-1", offsetMs: 300_000, actor: "Brand agent", action: "drafted + published", detail: "Bundle teaser — IG" },
+  { id: "nf-1", offsetMs: 300_000, actor: "Brand agent", action: "drafted + published", detail: "Bundle teaser: IG" },
   { id: "nf-2", offsetMs: 180_000, actor: "You", action: "approved a draft", detail: "agent learned 1 rule" },
 ];
 
@@ -266,7 +266,7 @@ export function northbeamReducer(
           violations: DRIFT_VIOLATIONS,
           lines: [
             "The brief asks for “60% OFF” in all-caps neon.",
-            "That breaks two locked brand rules — I won’t publish it as-is.",
+            "That breaks two locked brand rules. I won’t publish it as-is.",
             "I can draft a compliant version that still lands the urgency.",
           ],
         };

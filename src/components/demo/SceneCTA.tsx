@@ -2,15 +2,23 @@
 // Visitor has just seen what Gravixar builds for their context —
 // this is the bridge to a real conversation.
 
+import type { ReactNode } from "react";
+
 export function SceneCTA({
   personaLabel,
   noun,
+  headline,
+  blurb,
 }: {
   /** Shown in the eyebrow, e.g. "Brands & DTC". */
   personaLabel: string;
-  /** Clean word after "Want this for your …?", e.g. "brand", "agency",
-   *  "business". Defaults to the lowercased label. */
+  /** Clean word after the default "Want this for your …?" headline.
+   *  Defaults to the lowercased label. */
   noun?: string;
+  /** Scene-specific headline. Defaults to "Want this for your {noun}?". */
+  headline?: ReactNode;
+  /** Scene-specific supporting line under the headline. */
+  blurb?: string;
 }) {
   const ctaNoun = noun ?? personaLabel.toLowerCase();
   return (
@@ -40,15 +48,18 @@ export function SceneCTA({
               id="scene-cta-heading"
               className="mt-3 text-2xl font-medium leading-tight tracking-[-0.02em] text-zinc-50 md:text-3xl"
             >
-              Want this for your{" "}
-              <span style={{ color: "var(--color-scene-1, #FF6B6B)" }}>
-                {ctaNoun}?
-              </span>
+              {headline ?? (
+                <>
+                  Want this for your{" "}
+                  <span style={{ color: "var(--color-scene-1, #FF6B6B)" }}>
+                    {ctaNoun}?
+                  </span>
+                </>
+              )}
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-zinc-400">
-              I build systems like this from scratch — scoped to your workflow,
-              owned by you. Most engagements run 4–8 weeks. One call to scope
-              it, no obligation.
+              {blurb ??
+                "I build systems like this from scratch, scoped to your workflow and owned by you. Most engagements run 4 to 8 weeks. One call to scope it, no obligation."}
             </p>
           </div>
 

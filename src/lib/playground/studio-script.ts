@@ -47,7 +47,7 @@ export const STUDIO_AGENTS: StudioAgent[] = [
       "Most small teams don't have no system. They have almost a system:",
       "Notion plus a few sheets plus a Slack channel that sort of works.",
       "That word, almost, is where the real cost hides…",
-      "— 920 words drafted · queued for human review",
+      "920 words drafted · queued for human review",
     ],
   },
   {
@@ -96,8 +96,8 @@ export const STUDIO_AGENTS: StudioAgent[] = [
     outputLines: [
       "Draft: Q2 launch post (by ECHO)",
       "Flag 1: “leverage” used as a verb (banned in style guide)",
-      "Flag 2: passive voice in paragraph 2 — suggest active rewrite",
-      "Tone: on-brand · reading level: grade 8 (target 7–9) ✓",
+      "Flag 2: passive voice in paragraph 2, suggest active rewrite",
+      "Tone: on-brand · reading level: grade 8 (target 7 to 9) ✓",
       "Verdict: ship after 2 small edits · not a publish blocker",
     ],
   },

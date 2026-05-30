@@ -14,16 +14,20 @@
   --color-scene-2: #f5e6d3;     /* secondary */
   --color-scene-glow: rgba(255, 107, 107, 0.35);
 
-  /* Typography. Aligned with the marketing site (Geist Sans + Geist
-     Mono). The legacy `--font-display-serif` and `--font-display-mono`
-     names are kept to avoid changing every Tailwind class on every
-     page; they now both resolve to Geist faces, so the design reads
-     as agency-tech rather than editorial-magazine. */
-  --font-sans: var(--font-geist), "Geist", ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-geist), "Geist", ui-sans-serif, system-ui, sans-serif;
-  --font-display-serif: var(--font-geist), "Geist", ui-sans-serif, system-ui, sans-serif;
+  /* Typography. Hubot Sans (display) + Mona Sans (body), GitHub's open
+     variable grotesks, self-hosted via @fontsource-variable and matched
+     to the marketing site. The legacy `--font-display-serif` /
+     `--font-display-mono` names are kept so existing Tailwind classes
+     resolve; serif now points at Hubot, mono stays Geist Mono. */
+  --font-sans: "Mona Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Hubot Sans Variable", "Mona Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display-serif: "Hubot Sans Variable", "Mona Sans Variable", ui-sans-serif, system-ui, sans-serif;
   --font-display-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Consolas, monospace;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, "SF Mono", Consolas, monospace;
+
+  /* Motion: strong custom curves, never raw linear / ease-in-out on UI. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 }
 
 @layer base {
@@ -37,6 +41,13 @@
   }
   body {
     min-height: 100dvh;
+  }
+  /* Headings carry the display face. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
   }
   ::selection {
     background: var(--color-scene-1, #ff1f2d);
@@ -121,13 +132,10 @@
       linear-gradient(180deg, #050508 0%, #0a0814 60%, #050508 100%);
   }
 
-  /* Pulsing dot for live/coming indicators */
-  @keyframes scenePulse {
-    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 currentColor; }
-    50% { opacity: 0.55; box-shadow: 0 0 0 6px transparent; }
-  }
+  /* Static status dot. A fixed, soft halo rather than an idle pulse
+     (the pulsing read as generated); the ring still signals "live". */
   .pulse-dot {
-    animation: scenePulse 2.2s ease-out infinite;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
   }
 
   /* Window chrome, three traffic-light dots, top-left of a panel.
@@ -225,14 +233,15 @@
       inset 0 0 0 1px rgba(255, 255, 255, 0.05),
       0 1px 0 0 rgba(255, 255, 255, 0.02);
     transition:
-      box-shadow 220ms ease-out,
-      transform 220ms ease-out,
-      background 220ms ease-out;
+      box-shadow 240ms var(--ease-out),
+      transform 240ms var(--ease-out),
+      background 240ms var(--ease-out);
   }
   .scene-card:hover {
     background: linear-gradient(180deg, rgba(28, 28, 36, 0.55) 0%, rgba(10, 10, 14, 0.7) 100%);
     box-shadow:
       inset 0 0 0 1px rgba(255, 255, 255, 0.12),
       0 8px 32px -8px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
   }
 }

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "60-second tour, Gravixar demo",
   description:
-    "A guided 60-second walk-through of a working client portal — three roles, one system, one audit trail.",
+    "A guided 60-second walk-through of a working client portal: three roles, one system, one audit trail.",
 };
 
 export default function TourLayout({

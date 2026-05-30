@@ -15,6 +15,7 @@ import {
   type CockpitEvent,
   type FeedEntry,
   type MoneyItem,
+  type Rule,
   type Signal,
   type Todo,
 } from "@/lib/playground/cockpit-data";
@@ -40,6 +41,7 @@ export default function FounderCockpit() {
     const ids = [
       ...state.signals.filter((s) => s.fresh).map((s) => s.id),
       ...state.todos.filter((t) => t.fresh).map((t) => t.id),
+      ...state.rules.filter((r) => r.fresh).map((r) => r.id),
       ...state.feed.filter((f) => f.fresh).map((f) => f.id),
     ];
     if (ids.length === 0) return;
@@ -47,9 +49,10 @@ export default function FounderCockpit() {
       window.setTimeout(() => dispatch({ type: "DECAY_FRESH", id }), FRESH_DECAY_MS),
     );
     return () => timers.forEach((t) => window.clearTimeout(t));
-  }, [state.signals, state.todos, state.feed]);
+  }, [state.signals, state.todos, state.rules, state.feed]);
 
   const openTodos = state.todos.filter((t) => !t.done).length;
+  const learnedCount = state.rules.filter((r) => r.learned).length;
 
   return (
     <div className="mx-auto max-w-7xl px-6 pb-20 pt-10 md:px-10 lg:px-12">
@@ -80,7 +83,8 @@ export default function FounderCockpit() {
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
         Your inbox, your day, and your money — triaged by AI overnight. Send
         what matters to Today, approve the drafts, chase the late invoice. You
-        decide; the cockpit does the typing.{" "}
+        decide; the cockpit does the typing — <span className="text-zinc-300">and
+        learns from every approval below</span>.{" "}
         {openTodos > 0 ? (
           <span className="text-zinc-300">{openTodos} waiting on you.</span>
         ) : null}
@@ -92,6 +96,7 @@ export default function FounderCockpit() {
         <MoneyColumn money={state.money} dispatch={dispatch} />
       </div>
 
+      <LearnBeat rules={state.rules} learnedCount={learnedCount} />
       <ActivityFeed feed={state.feed} />
       <SceneCTA personaLabel="Founders & small teams" noun="business" />
     </div>
@@ -308,6 +313,77 @@ function MoneyColumn({
         </div>
       ))}
     </Col>
+  );
+}
+
+// ─── Learn-beat ─────────────────────────────────────────────────────
+
+function LearnBeat({
+  rules,
+  learnedCount,
+}: {
+  rules: Rule[];
+  learnedCount: number;
+}) {
+  return (
+    <section className="mt-5 scene-card rounded-2xl p-5">
+      <div className="flex items-baseline justify-between gap-2">
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600">
+          what it learned from you
+        </p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+          {rules.length} {rules.length === 1 ? "rule" : "rules"}
+          {learnedCount > 0 ? (
+            <>
+              {" "}
+              ·{" "}
+              <span className="text-[var(--color-scene-1)]">
+                {learnedCount} learned from you
+              </span>
+            </>
+          ) : null}
+        </p>
+      </div>
+      {rules.length === 0 ? (
+        <p className="mt-3 rounded-lg border border-dashed border-white/10 px-3 py-4 text-center text-[11px] text-zinc-600">
+          Approve a draft below — the cockpit starts learning your shape.
+        </p>
+      ) : (
+        <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {rules.map((rule) => (
+            <RuleRow key={rule.id} rule={rule} />
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+function RuleRow({ rule }: { rule: Rule }) {
+  const isDo = rule.kind === "do";
+  return (
+    <li
+      className={[
+        "rounded-lg border px-3 py-2",
+        rule.fresh
+          ? "pg-fresh border-[var(--color-scene-1)]/45"
+          : "border-white/10 bg-white/[0.02]",
+      ].join(" ")}
+    >
+      <div className="flex items-start gap-2">
+        <span className={isDo ? "text-emerald-400" : "text-rose-400"}>
+          {isDo ? "✓" : "✗"}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-[12px] leading-relaxed text-zinc-200">{rule.text}</p>
+          {rule.learned ? (
+            <p className="mt-0.5 font-mono text-[8px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
+              learned from your approval
+            </p>
+          ) : null}
+        </div>
+      </div>
+    </li>
   );
 }
 

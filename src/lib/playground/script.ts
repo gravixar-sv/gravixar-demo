@@ -33,7 +33,7 @@ export const PLAYGROUND_PERSONAS: Record<PlaygroundPersonaKey, PlaygroundPersona
     firstName: "Mira",
     role: "Client",
     initials: "MV",
-    contextLine: `Active project: ${PLAYGROUND_AGENCY.studioName} — Spring rebrand`,
+    contextLine: `Active project: ${PLAYGROUND_AGENCY.studioName}, Spring rebrand`,
     hue: { from: "#FF8A8A", to: "#C2410C", ink: "#2A0E08" },
   },
   kai: {
@@ -71,7 +71,7 @@ export const PLAYGROUND_INQUIRY = {
   fromCompany: "Marquez & Co.",
   summary: "Brand identity refresh + landing page",
   preview:
-    "Hi — we're a 12-person consultancy and our brand is starting to feel dated. Looking for a 4-6 week engagement to refresh the wordmark and ship a new homepage.",
+    "Hi, we're a 12-person consultancy and our brand is starting to feel dated. Looking for a 4-6 week engagement to refresh the wordmark and ship a new homepage.",
 } as const;
 
 // Initial seed audit (3 rows). Times are offsets in ms behind "now"
@@ -105,6 +105,6 @@ export const PLAYGROUND_AUDIT_SEED: SeedAuditEntry[] = [
     offsetMs: 540_000,
     actor: PLAYGROUND_PERSONAS.nox.name,
     action: "approved leave request",
-    detail: `${PLAYGROUND_DELIVERABLE.designer} · May 12 – May 14`,
+    detail: `${PLAYGROUND_DELIVERABLE.designer} · May 12 to May 14`,
   },
 ];

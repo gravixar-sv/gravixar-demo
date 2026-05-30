@@ -52,13 +52,13 @@ export default function NorthbeamBrandAgent() {
             brand agent · for dtc teams · live sandbox
           </p>
           <h1 className="mt-3 text-3xl font-medium leading-tight tracking-[-0.02em] text-zinc-50 md:text-4xl">
-            A brand agent that drafts on-brand — and learns your rules.
+            A brand agent that drafts on-brand, and learns your rules.
           </h1>
           <p className="mt-3 text-base leading-relaxed text-zinc-400">
             Hand it a brief; it drafts the asset in your voice. Ask for something
             off-brand and it stops at the guardrail instead of shipping it. Every
-            time you approve or send one back, it learns a do or a don&apos;t —
-            watch the brand memory grow on the right.
+            time you approve or send one back, it learns a do or a don&apos;t.
+            Watch the brand memory grow on the right.
           </p>
         </div>
         <button
@@ -100,7 +100,12 @@ export default function NorthbeamBrandAgent() {
       </div>
 
       <AuditTrail feed={state.feed} />
-      <SceneCTA personaLabel="Brands & DTC" noun="brand agent" />
+      <SceneCTA
+        personaLabel="Brands & DTC"
+        noun="brand agent"
+        headline="Give your brand an agent that holds the line."
+        blurb="I build brand agents like this for DTC teams: on-brand drafts, a guardrail that blocks drift, and a memory that learns your rules from every approval. One call to scope it, no obligation."
+      />
     </div>
   );
 }
@@ -160,7 +165,7 @@ function RequestCard({
         </p>
       ) : req.status === "dropped" ? (
         <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
-          ✕ dropped — off-brand
+          ✕ dropped · off-brand
         </p>
       ) : (
         <button

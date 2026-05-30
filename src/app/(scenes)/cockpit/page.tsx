@@ -78,7 +78,7 @@ export default function FounderCockpit() {
       </header>
 
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
-        Your inbox, your day, and your money — triaged by AI overnight. Send
+        Your inbox, your day, and your money, triaged by AI overnight. Send
         what matters to Today, approve the drafts, chase the late invoice. You
         decide; the cockpit does the typing.{" "}
         {openTodos > 0 ? (
@@ -93,7 +93,12 @@ export default function FounderCockpit() {
       </div>
 
       <ActivityFeed feed={state.feed} />
-      <SceneCTA personaLabel="Founders & small teams" noun="business" />
+      <SceneCTA
+        personaLabel="Founders & small teams"
+        noun="business"
+        headline="Run the business from one screen."
+        blurb="This is the cockpit I build for solo founders and small teams: inbox triage, today's priorities, and the money in one view, with you approving every send. One call to scope it, no obligation."
+      />
     </div>
   );
 }

@@ -10,7 +10,7 @@ export function DemoBanner() {
         <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-mark)] text-[var(--color-mark)]" />
         <span>live demo</span>
         <span className="text-zinc-600">·</span>
-        <span>sample data — click anything, nothing&apos;s saved</span>
+        <span>sample data · click anything, nothing&apos;s saved</span>
         <span className="hidden sm:inline text-zinc-600">·</span>
         <span className="hidden sm:inline">resets every Sunday</span>
         <span className="hidden md:inline text-zinc-600">·</span>

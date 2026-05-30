@@ -57,7 +57,7 @@ export default function LatticeReviewLoop() {
           </h1>
           <p className="mt-3 text-base leading-relaxed text-zinc-400">
             The agency&apos;s work flows Editor → PM → Client and back. Act in
-            any column — approve, request a revision, push it back — and watch
+            any column. Approve, request a revision, or push it back, and watch
             the card hand off to the next person. Hover any thumbnail to preview.
           </p>
         </div>
@@ -120,7 +120,12 @@ export default function LatticeReviewLoop() {
 
       <ActivityFeed feed={state.feed} />
 
-      <SceneCTA personaLabel="Agencies" noun="agency" />
+      <SceneCTA
+        personaLabel="Agencies"
+        noun="agency"
+        headline="Run your agency on this."
+        blurb="This is the portal layer I build for agencies: the review states, the client view, the audit trail, scoped to how you actually deliver work. Most builds run 4 to 8 weeks. One call to scope it, no obligation."
+      />
     </div>
   );
 }

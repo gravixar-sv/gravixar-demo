@@ -4,7 +4,7 @@ import { SCENES, type Scene } from "@/lib/scenes";
 import { Topbar } from "@/components/demo/Topbar";
 
 export const metadata: Metadata = {
-  title: "Gravixar Demo — live software I built for clients",
+  title: "Gravixar Demo: live software I built for clients",
   description:
     "Real, working apps with sample data. Open one and use it. Not slides, not a signup.",
 };
@@ -29,18 +29,12 @@ export default function SceneIndex() {
             Live software I built
             <br className="hidden sm:block" />{" "}
             for clients.{" "}
-            <span
-              className="text-transparent bg-clip-text"
-              style={{
-                backgroundImage:
-                  "linear-gradient(90deg, #FF6B6B 0%, #FF2D95 55%, #00E1FF 100%)",
-              }}
-            >
+            <span style={{ color: "var(--color-scene-1, #FF6B6B)" }}>
               Open one and use it.
             </span>
           </h1>
           <p className="mt-5 max-w-xl text-base leading-relaxed text-zinc-400 md:text-lg">
-            Real, working apps with sample data — not slides, not a signup.
+            Real, working apps with sample data, not slides, not a signup.
             Click into one and try the actual workflow.
           </p>
         </header>

@@ -28,7 +28,7 @@ export const PERSONAS: Record<RoleKey, Persona> = {
     firstName: "Mira",
     role: "Client",
     initials: "MV",
-    contextLine: "Lattice Studio — Spring rebrand",
+    contextLine: "Lattice Studio: Spring rebrand",
     hue: { from: "#FF8A8A", to: "#C2410C", ink: "#2A0E08" },
   },
   pm: {
@@ -179,7 +179,7 @@ export function latticeReducer(
         state,
         event.id,
         { state: "shipped" },
-        { actor: PERSONAS.client.name, action: "approved — shipped", detail: d.title },
+        { actor: PERSONAS.client.name, action: "approved, shipped", detail: d.title },
       );
     }
     case "CLIENT_REVISE": {

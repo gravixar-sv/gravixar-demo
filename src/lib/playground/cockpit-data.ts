@@ -93,8 +93,8 @@ const SIGNALS_SEED: Signal[] = [
     from: "Tessa (Marlow & Co.)",
     subject: "Can we move the launch to the 14th?",
     urgency: "now",
-    aiNote: "Client on an active project. Wants a date change — needs your call.",
-    draft: "Hi Tessa — the 14th works on my side. I'll shift the timeline and resend the schedule today. — Remi",
+    aiNote: "Client on an active project. Wants a date change, needs your call.",
+    draft: "Hi Tessa, the 14th works on my side. I'll shift the timeline and resend the schedule today. Remi",
     todoLabel: "Reply to Tessa about the launch date",
   },
   {
@@ -104,7 +104,7 @@ const SIGNALS_SEED: Signal[] = [
     subject: "Your restock quote is ready",
     urgency: "today",
     aiNote: "Quote attached. You usually reorder this within the week.",
-    draft: "Thanks — approved. Please proceed with the standard quantity and send the invoice. — Remi",
+    draft: "Thanks, approved. Please proceed with the standard quantity and send the invoice. Remi",
     todoLabel: "Approve the restock reorder",
   },
   {
@@ -113,7 +113,7 @@ const SIGNALS_SEED: Signal[] = [
     from: "Indie Makers Weekly",
     subject: "5 packaging trends for 2026",
     urgency: "fyi",
-    aiNote: "Newsletter — auto-filed to Reading. Nothing for you to do.",
+    aiNote: "Newsletter, auto-filed to Reading. Nothing for you to do.",
     autoFiled: true,
     draft: "",
     todoLabel: "",
@@ -124,7 +124,7 @@ const TODOS_SEED: Todo[] = [
   {
     id: "t-standup",
     label: "Confirm Thursday call with the new lead",
-    draft: "Thursday 3pm works — sending a calendar invite now. Looking forward to it.",
+    draft: "Thursday 3pm works, sending a calendar invite now. Looking forward to it.",
     source: "inbox",
   },
 ];
@@ -139,7 +139,7 @@ const MONEY_SEED: MoneyItem[] = [
     amount: "£1,500",
     direction: "in",
     flag: "overdue",
-    draft: "Hi — just a friendly nudge that invoice #0042 (£1,500) is now 12 days past due. Could you confirm a payment date? Thanks! — Remi",
+    draft: "Hi, just a friendly nudge that invoice #0042 (£1,500) is now 12 days past due. Could you confirm a payment date? Thanks! Remi",
   },
   {
     id: "m-low",

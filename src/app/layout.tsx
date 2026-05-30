@@ -1,19 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
+import "@fontsource-variable/hubot-sans";
+import "@fontsource-variable/mona-sans";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { DemoBanner } from "@/components/demo/DemoBanner";
 import "@/styles/globals.css";
 
-// Geist + Geist Mono replace the previous Inter + Fraunces + JetBrains
-// Mono trio. Aligning with the marketing site's typography and dropping
-// the editorial-magazine feel (Fraunces) in favour of agency-tech.
-// Fewer faces loaded means faster TTFB on the demo subdomain too.
-const geistSans = Geist({
-  subsets: ["latin"],
-  variable: "--font-geist",
-  display: "swap",
-});
+// Display + body type is Hubot Sans + Mona Sans (GitHub's open variable
+// grotesks), self-hosted via @fontsource-variable, matching the marketing
+// site so the whole Gravixar fleet reads as one deliberate design system.
+// Mono stays Geist Mono (next/font) for labels, numerals, and status pills.
 const geistMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-geist-mono",
@@ -23,7 +20,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Gravixar Demo",
   description:
-    "demo.gravixar.com — capability showroom. Pick the context closest to yours and see what Gravixar builds.",
+    "demo.gravixar.com, the capability showroom. Pick the context closest to yours and see what Gravixar builds.",
   // Demo subdomain, discouraged from indexing so keyword juice stays on gravixar.com
   robots: { index: false, follow: false },
 };
@@ -42,7 +39,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable}`}
+      className={geistMono.variable}
     >
       <body className="bg-[#050508] text-[#f5f5f7]">
         <DemoBanner />

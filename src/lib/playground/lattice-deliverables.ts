@@ -60,6 +60,17 @@ export type DeliverableState =
   | "revision_requested"
   | "shipped";
 
+/** A rule the studio has learned from how the client reviews work. */
+export type RuleSpec = { text: string; kind: "do" | "dont" };
+export type Rule = RuleSpec & {
+  id: string;
+  /** True when from a client action; false for AI-seeded house rules. */
+  learned: boolean;
+  /** For-whom audience tag (shows next to the rule). */
+  audience: "editor" | "pm";
+  fresh?: boolean;
+};
+
 export type Deliverable = {
   id: string;
   title: string;
@@ -68,6 +79,10 @@ export type Deliverable = {
   version: number;
   /** Latest client revision note, when state === revision_requested / after a bounce. */
   revisionNote?: string;
+  /** Rule learned when the client approves this deliverable. */
+  approvalRule?: RuleSpec & { audience: Rule["audience"] };
+  /** Rule learned when the client requests a revision on this deliverable. */
+  revisionRule?: RuleSpec & { audience: Rule["audience"] };
   /** Just transitioned — drives the card's pop-in highlight. */
   fresh?: boolean;
 };
@@ -83,6 +98,7 @@ export type FeedEntry = {
 
 export type LatticeState = {
   deliverables: Deliverable[];
+  rules: Rule[];
   feed: FeedEntry[];
 };
 
@@ -96,9 +112,57 @@ export type LatticeEvent =
   | { type: "RESET" };
 
 const SEED_DELIVERABLES: Omit<Deliverable, "fresh">[] = [
-  { id: "d-hero", title: "Homepage hero, v2", kind: "web", state: "with_client", version: 2 },
-  { id: "d-carousel", title: "Launch carousel, slide 1", kind: "social", state: "in_pm_review", version: 1 },
-  { id: "d-email", title: "Welcome email banner", kind: "email", state: "editing", version: 1 },
+  {
+    id: "d-hero",
+    title: "Homepage hero, v2",
+    kind: "web",
+    state: "with_client",
+    version: 2,
+    approvalRule: {
+      text: "Sage's web heroes land on v2 — keep v1 → v2 as the default cadence",
+      kind: "do",
+      audience: "editor",
+    },
+    revisionRule: {
+      text: "Confirm hero copy direction with Mira before the first cut",
+      kind: "do",
+      audience: "pm",
+    },
+  },
+  {
+    id: "d-carousel",
+    title: "Launch carousel, slide 1",
+    kind: "social",
+    state: "in_pm_review",
+    version: 1,
+    approvalRule: {
+      text: "Sage's social carousels pass first try when slide 1 is the strongest frame",
+      kind: "do",
+      audience: "editor",
+    },
+    revisionRule: {
+      text: "Push slide 1 thumbnails past Mira before Kai approves",
+      kind: "do",
+      audience: "pm",
+    },
+  },
+  {
+    id: "d-email",
+    title: "Welcome email banner",
+    kind: "email",
+    state: "editing",
+    version: 1,
+    approvalRule: {
+      text: "Email banners that mirror the hero crop fly through review",
+      kind: "do",
+      audience: "editor",
+    },
+    revisionRule: {
+      text: "Hold email banners until the hero is locked",
+      kind: "dont",
+      audience: "pm",
+    },
+  },
 ];
 
 const FEED_SEED: Array<Omit<FeedEntry, "ts"> & { offsetMs: number }> = [
@@ -106,10 +170,28 @@ const FEED_SEED: Array<Omit<FeedEntry, "ts"> & { offsetMs: number }> = [
   { id: "lf-2", offsetMs: 60_000, actor: "Kai Render", action: "approved + sent to client", detail: "Homepage hero, v2" },
 ];
 
+const RULES_SEED: Rule[] = [
+  {
+    id: "lr-seed-revisions",
+    text: "Standard retainer = 2 revision rounds; flag 3+ for scope review",
+    kind: "do",
+    audience: "pm",
+    learned: false,
+  },
+  {
+    id: "lr-seed-watermark",
+    text: "Watermark every client preview · drop on shipped delivery",
+    kind: "do",
+    audience: "editor",
+    learned: false,
+  },
+];
+
 export function createInitialLatticeState(): LatticeState {
   const now = Date.now();
   return {
     deliverables: SEED_DELIVERABLES.map((d) => ({ ...d })),
+    rules: RULES_SEED.map((r) => ({ ...r })),
     feed: FEED_SEED.map((f) => ({
       id: f.id,
       ts: now - f.offsetMs,
@@ -124,8 +206,30 @@ function nextId(): string {
   return `lf-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
+function nextRuleId(): string {
+  return `lr-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
 function findKind(state: LatticeState, id: string): Deliverable | undefined {
   return state.deliverables.find((d) => d.id === id);
+}
+
+function learnRule(
+  rules: Rule[],
+  spec: (RuleSpec & { audience: Rule["audience"] }) | undefined,
+): Rule[] {
+  if (!spec) return rules;
+  return [
+    {
+      id: nextRuleId(),
+      text: spec.text,
+      kind: spec.kind,
+      audience: spec.audience,
+      learned: true,
+      fresh: true,
+    },
+    ...rules,
+  ];
 }
 
 function transition(
@@ -133,6 +237,7 @@ function transition(
   id: string,
   patch: Partial<Deliverable>,
   feed: { actor: string; action: string; detail?: string },
+  ruleSpec?: (RuleSpec & { audience: Rule["audience"] }) | undefined,
 ): LatticeState {
   const target = findKind(state, id);
   if (!target) return state;
@@ -140,6 +245,7 @@ function transition(
     deliverables: state.deliverables.map((d) =>
       d.id === id ? { ...d, ...patch, fresh: true } : d,
     ),
+    rules: learnRule(state.rules, ruleSpec),
     feed: [
       { id: nextId(), ts: Date.now(), fresh: true, ...feed },
       ...state.feed,
@@ -180,6 +286,7 @@ export function latticeReducer(
         event.id,
         { state: "shipped" },
         { actor: PERSONAS.client.name, action: "approved — shipped", detail: d.title },
+        d.approvalRule,
       );
     }
     case "CLIENT_REVISE": {
@@ -191,6 +298,7 @@ export function latticeReducer(
         event.id,
         { state: "revision_requested", revisionNote: note },
         { actor: PERSONAS.client.name, action: "requested a revision", detail: `${d.title} · “${note}”` },
+        d.revisionRule,
       );
     }
     case "PM_TO_EDITOR": {
@@ -207,6 +315,9 @@ export function latticeReducer(
       return {
         deliverables: state.deliverables.map((d) =>
           d.id === event.id ? { ...d, fresh: false } : d,
+        ),
+        rules: state.rules.map((r) =>
+          r.id === event.id && r.fresh ? { ...r, fresh: false } : r,
         ),
         feed: state.feed.map((f) =>
           f.id === event.id && f.fresh ? { ...f, fresh: false } : f,

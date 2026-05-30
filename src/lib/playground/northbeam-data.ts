@@ -1,209 +1,386 @@
-// Northbeam Goods — brand governance for a DTC/brand team. The
-// signature workflow research validated: locked self-serve templates
-// (non-designers edit copy, brand elements stay locked) → route for
-// approval with an AI tone/compliance/brand-alignment check → publish,
-// with an audit trail. Same "AI checks the 80%, human approves" grammar
-// as the other scenes, but the buyer + workflow are distinct.
+// Northbeam Goods — a real brand AGENT for a DTC team (not a passive
+// compliance scanner). The loop: a plain brief comes in → the agent drafts
+// it ON-BRAND (or BLOCKS it at the guardrail if it would break a locked
+// rule) → a human approves, requests a change, or overrides → and the agent
+// LEARNS a do/don't rule from that decision. The learned brand rules are the
+// star of the scene: you watch the brand memory grow as you approve.
+//
+// Same "AI does the work, a human gates anything that ships" grammar as the
+// other scenes, plus the missing beat — it learns from your approvals.
 
 import type { DeliverableKind } from "@/lib/playground/lattice-deliverables";
 
-export type Template = {
+export type RuleKind = "do" | "dont";
+
+export type BrandRule = {
   id: string;
-  name: string;
-  kind: DeliverableKind;
-  locked: string;
-  editable: string;
-  requestedBy: string;
-};
-
-export type AiCheck = { label: string; ok: boolean };
-
-export type AssetState = "in_review" | "changes_requested" | "published";
-
-export type BrandAsset = {
-  id: string;
-  title: string;
-  kind: DeliverableKind;
-  by: string;
-  state: AssetState;
-  checks: AiCheck[];
-  version: number;
+  kind: RuleKind;
+  text: string;
+  /** True for rules the agent learned from a human decision (vs. seeded). */
+  learned?: boolean;
   fresh?: boolean;
 };
 
-export type FeedEntry = { id: string; ts: number; text: string; fresh?: boolean };
+export type RequestStatus = "open" | "published" | "dropped";
+
+export type BrandRequest = {
+  id: string;
+  title: string;
+  kind: DeliverableKind;
+  brief: string;
+  by: string;
+  /** The deliberately off-brand request — the agent blocks it. */
+  offBrand?: boolean;
+  status: RequestStatus;
+};
+
+/** What the agent produces in the workspace: an on-brand draft or a drift block. */
+export type Draft = {
+  requestId: string;
+  title: string;
+  kind: DeliverableKind;
+  mode: "draft" | "drift";
+  /** Generated copy lines (draft) or the explanation (drift). */
+  lines: string[];
+  /** Brand rules the agent applied — surfaced as reasoning, not just a verdict. */
+  applied?: string[];
+  /** Rules the request violates — drift mode only. */
+  violations?: string[];
+};
+
+export type Gate = "idle" | "pending" | "approved" | "changed" | "blocked";
+
+export type AuditEntry = {
+  id: string;
+  ts: number;
+  actor: string;
+  action: string;
+  detail?: string;
+  fresh?: boolean;
+};
 
 export type NorthbeamState = {
-  templates: Template[];
-  assets: BrandAsset[];
-  feed: FeedEntry[];
+  requests: BrandRequest[];
+  current: string | null;
+  draft: Draft | null;
+  gate: Gate;
+  rules: BrandRule[];
+  feed: AuditEntry[];
 };
 
 export type NorthbeamEvent =
-  | { type: "USE_TEMPLATE"; id: string }
-  | { type: "APPROVE_PUBLISH"; id: string }
-  | { type: "REQUEST_CHANGE"; id: string }
-  | { type: "RESUBMIT"; id: string }
+  | { type: "GENERATE"; id: string }
+  | { type: "APPROVE" }
+  | { type: "REQUEST_CHANGE" }
+  | { type: "OVERRIDE" }
+  | { type: "DROP" }
   | { type: "DECAY_FRESH"; id: string }
   | { type: "RESET" };
 
-const TEMPLATES: Template[] = [
-  {
-    id: "tpl-promo",
-    name: "Instagram promo",
-    kind: "social",
-    locked: "logo, brand colours, safe-zone",
-    editable: "headline + offer copy",
-    requestedBy: "Jordan (social)",
+// --- the agent's per-request script (deterministic mock output) ---
+
+type Recipe = {
+  draft: { lines: string[]; applied: string[] };
+  learnsDo: string;
+  learnsDont: string;
+};
+
+const RECIPES: Record<string, Recipe> = {
+  "req-spring": {
+    draft: {
+      lines: [
+        "Headline — Brighter days, brighter routines.",
+        "Sub — Spring picks, 20% off through Sunday.",
+        "CTA — Refresh yours →",
+      ],
+      applied: [
+        "Benefit-led headline (offer moved to the subhead)",
+        "On-palette · wordmark safe-zone preserved",
+        "Confident tone, no hype words",
+      ],
+    },
+    learnsDo: "Lead seasonal promos with a benefit (“brighter routines”), not the %",
+    learnsDont: "Don’t open a promo on the discount number",
   },
-  {
-    id: "tpl-aplus",
-    name: "Amazon A+ module",
-    kind: "web",
-    locked: "layout grid + typography",
-    editable: "product claims + imagery",
-    requestedBy: "Priya (marketplace)",
+  "req-bundle": {
+    draft: {
+      lines: [
+        "Module H1 — The set that does the work for you.",
+        "Body — Three essentials, one routine. Bundled.",
+        "Badge — Best value · ships free",
+      ],
+      applied: [
+        "Claims match the approved product copy",
+        "Locked A+ layout grid + typography respected",
+        "Superlative tied to a real proof point (price)",
+      ],
+    },
+    learnsDo: "“Does the work for you” benefit angle fits the A+ voice",
+    learnsDont: "Don’t use a superlative without a proof point attached",
   },
-  {
-    id: "tpl-email",
-    name: "Campaign email header",
-    kind: "email",
-    locked: "wordmark + footer",
-    editable: "subject + hero line",
-    requestedBy: "Dana (lifecycle)",
+  "req-email": {
+    draft: {
+      lines: [
+        "Subject — Your spring lineup is here (and lighter).",
+        "Hero — Five minutes to a fresher routine.",
+        "Preheader — New picks, plus a little something off.",
+      ],
+      applied: [
+        "Subject under 45 characters",
+        "Benefit-led hero line",
+        "Wordmark + footer intact · soft-offer preheader",
+      ],
+    },
+    learnsDo: "A soft-offer preheader beats a “SALE” subject in this voice",
+    learnsDont: "Don’t shout the discount in the subject line",
   },
+};
+
+// The override path: a clean, compliant version of the off-brand flash request.
+const OVERRIDE_DRAFT: { lines: string[]; applied: string[] } = {
+  lines: [
+    "Headline — The spring edit, while it lasts.",
+    "Sub — Up to 60% off — ends Sunday.",
+    "CTA — See the edit →",
+  ],
+  applied: [
+    "Urgency kept, the all-caps shout dropped",
+    "Offer moved out of the headline",
+    "On-palette — no neon banner",
+  ],
+};
+
+const DRIFT_VIOLATIONS = [
+  "Discount % in the headline",
+  "ALL-CAPS hype / neon “SALE” banner",
 ];
 
-// Deterministic AI brand-check per template kind (mock).
-function checksFor(kind: DeliverableKind): AiCheck[] {
-  if (kind === "social")
-    return [
-      { label: "Logo safe-zone respected", ok: true },
-      { label: "On-palette", ok: true },
-      { label: "“guaranteed” may need a legal disclaimer", ok: false },
-    ];
-  if (kind === "web")
-    return [
-      { label: "Typography locked to brand", ok: true },
-      { label: "Claims match approved product copy", ok: true },
-      { label: "Tone on-brand (confident, not hypey)", ok: true },
-    ];
-  return [
-    { label: "Wordmark + footer intact", ok: true },
-    { label: "Subject within 45 chars", ok: true },
-    { label: "Reading level on target", ok: true },
-  ];
-}
+// --- seed ---
 
-const ASSETS_SEED: BrandAsset[] = [
+const REQUESTS_SEED: BrandRequest[] = [
   {
-    id: "a-spring",
+    id: "req-spring",
     title: "Spring sale — IG promo",
     kind: "social",
-    by: "Jordan (social)",
-    state: "in_review",
-    checks: checksFor("social"),
-    version: 1,
+    brief: "Promote the 20% spring sale. One Instagram promo.",
+    by: "Jordan · social",
+    status: "open",
   },
   {
-    id: "a-bundle",
+    id: "req-bundle",
     title: "Bundle launch — A+ module",
     kind: "web",
-    by: "Priya (marketplace)",
-    state: "published",
-    checks: checksFor("web"),
-    version: 2,
+    brief: "Launch the 3-pack bundle on the Amazon A+ module.",
+    by: "Priya · marketplace",
+    status: "open",
+  },
+  {
+    id: "req-email",
+    title: "May newsletter header",
+    kind: "email",
+    brief: "Subject line + hero for the May lifecycle email.",
+    by: "Dana · lifecycle",
+    status: "open",
+  },
+  {
+    id: "req-flash",
+    title: "Flash banner — “60% OFF”",
+    kind: "social",
+    brief: "Loud 60% OFF flash banner. ALL CAPS, neon. Make it scream.",
+    by: "Marketing · rush",
+    offBrand: true,
+    status: "open",
   },
 ];
 
-const FEED_SEED: Array<{ id: string; offsetMs: number; text: string }> = [
-  { id: "nf-1", offsetMs: 120_000, text: "Brand check ran on 'Bundle launch — A+ module' · 3/3 passed" },
-  { id: "nf-2", offsetMs: 300_000, text: "Published · Bundle launch — A+ module (v2)" },
+const RULES_SEED: BrandRule[] = [
+  { id: "r-do-benefit", kind: "do", text: "Lead with the product benefit, then the offer" },
+  { id: "r-do-safezone", kind: "do", text: "Wordmark top-left, 24px safe-zone" },
+  { id: "r-dont-pct", kind: "dont", text: "Discount % in the headline" },
+  { id: "r-dont-hype", kind: "dont", text: "ALL-CAPS hype or neon “SALE” banners" },
+];
+
+const FEED_SEED: Array<{ id: string; offsetMs: number; actor: string; action: string; detail?: string }> = [
+  { id: "nf-1", offsetMs: 300_000, actor: "Brand agent", action: "drafted + published", detail: "Bundle teaser — IG" },
+  { id: "nf-2", offsetMs: 180_000, actor: "You", action: "approved a draft", detail: "agent learned 1 rule" },
 ];
 
 export function createInitialNorthbeamState(): NorthbeamState {
   const now = Date.now();
   return {
-    templates: TEMPLATES.map((t) => ({ ...t })),
-    assets: ASSETS_SEED.map((a) => ({ ...a })),
-    feed: FEED_SEED.map((f) => ({ id: f.id, ts: now - f.offsetMs, text: f.text })),
+    requests: REQUESTS_SEED.map((r) => ({ ...r })),
+    current: null,
+    draft: null,
+    gate: "idle",
+    rules: RULES_SEED.map((r) => ({ ...r })),
+    feed: FEED_SEED.map((f) => ({
+      id: f.id,
+      ts: now - f.offsetMs,
+      actor: f.actor,
+      action: f.action,
+      detail: f.detail,
+    })),
   };
 }
 
-function nextId(): string {
-  return `nf-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+// --- helpers ---
+
+let seq = 0;
+function nextId(prefix: string): string {
+  seq += 1;
+  return `${prefix}-${Date.now().toString(36)}-${seq}`;
 }
-function log(feed: FeedEntry[], text: string): FeedEntry[] {
-  return [{ id: nextId(), ts: Date.now(), text, fresh: true }, ...feed];
+
+function log(
+  feed: AuditEntry[],
+  actor: string,
+  action: string,
+  detail?: string,
+): AuditEntry[] {
+  return [{ id: nextId("nf"), ts: Date.now(), actor, action, detail, fresh: true }, ...feed];
 }
+
+function learnRule(rules: BrandRule[], kind: RuleKind, text: string): BrandRule[] {
+  // No-op if we already know this rule (keeps repeated approvals honest).
+  if (rules.some((r) => r.text.toLowerCase() === text.toLowerCase())) return rules;
+  return [{ id: nextId("r"), kind, text, learned: true, fresh: true }, ...rules];
+}
+
+// --- reducer ---
 
 export function northbeamReducer(
   state: NorthbeamState,
   event: NorthbeamEvent,
 ): NorthbeamState {
   switch (event.type) {
-    case "USE_TEMPLATE": {
-      const tpl = state.templates.find((t) => t.id === event.id);
-      if (!tpl) return state;
-      const asset: BrandAsset = {
-        id: `asset-${tpl.id}-${Date.now().toString(36)}`,
-        title: `${tpl.name} draft`,
-        kind: tpl.kind,
-        by: tpl.requestedBy,
-        state: "in_review",
-        checks: checksFor(tpl.kind),
-        version: 1,
-        fresh: true,
+    case "GENERATE": {
+      const req = state.requests.find((r) => r.id === event.id);
+      if (!req || req.status !== "open") return state;
+
+      if (req.offBrand) {
+        const draft: Draft = {
+          requestId: req.id,
+          title: req.title,
+          kind: req.kind,
+          mode: "drift",
+          violations: DRIFT_VIOLATIONS,
+          lines: [
+            "The brief asks for “60% OFF” in all-caps neon.",
+            "That breaks two locked brand rules — I won’t publish it as-is.",
+            "I can draft a compliant version that still lands the urgency.",
+          ],
+        };
+        return {
+          ...state,
+          current: req.id,
+          draft,
+          gate: "blocked",
+          feed: log(state.feed, "Brand agent", "blocked an off-brand request", req.title),
+        };
+      }
+
+      const recipe = RECIPES[req.id];
+      if (!recipe) return state;
+      const draft: Draft = {
+        requestId: req.id,
+        title: req.title,
+        kind: req.kind,
+        mode: "draft",
+        lines: recipe.draft.lines,
+        applied: recipe.draft.applied,
       };
       return {
         ...state,
-        assets: [asset, ...state.assets],
-        feed: log(state.feed, `${tpl.requestedBy} submitted a ${tpl.name} for brand review`),
+        current: req.id,
+        draft,
+        gate: "pending",
+        feed: log(state.feed, "Brand agent", "drafted an on-brand variant", req.title),
       };
     }
-    case "APPROVE_PUBLISH": {
-      const a = state.assets.find((x) => x.id === event.id);
-      if (!a || a.state === "published") return state;
+
+    case "APPROVE": {
+      if (state.gate !== "pending" || !state.draft) return state;
+      const reqId = state.draft.requestId;
+      const recipe = RECIPES[reqId];
+      const rules = recipe ? learnRule(state.rules, "do", recipe.learnsDo) : state.rules;
       return {
         ...state,
-        assets: state.assets.map((x) =>
-          x.id === a.id ? { ...x, state: "published", fresh: true } : x,
+        gate: "approved",
+        requests: state.requests.map((r) =>
+          r.id === reqId ? { ...r, status: "published" } : r,
         ),
-        feed: log(state.feed, `Approved + published · ${a.title} (v${a.version})`),
+        rules,
+        feed: log(
+          state.feed,
+          "You",
+          "approved + published",
+          recipe ? "agent learned a do-rule" : state.draft.title,
+        ),
       };
     }
+
     case "REQUEST_CHANGE": {
-      const a = state.assets.find((x) => x.id === event.id);
-      if (!a || a.state !== "in_review") return state;
+      if (state.gate !== "pending" || !state.draft) return state;
+      const reqId = state.draft.requestId;
+      const recipe = RECIPES[reqId];
+      const rules = recipe ? learnRule(state.rules, "dont", recipe.learnsDont) : state.rules;
       return {
         ...state,
-        assets: state.assets.map((x) =>
-          x.id === a.id ? { ...x, state: "changes_requested", fresh: true } : x,
+        gate: "changed",
+        rules,
+        feed: log(
+          state.feed,
+          "You",
+          "requested a change",
+          recipe ? "agent learned a don’t-rule" : state.draft.title,
         ),
-        feed: log(state.feed, `Sent back for changes · ${a.title}`),
       };
     }
-    case "RESUBMIT": {
-      const a = state.assets.find((x) => x.id === event.id);
-      if (!a || a.state !== "changes_requested") return state;
+
+    case "OVERRIDE": {
+      // Human overrides the guardrail; the agent adapts into a compliant draft.
+      if (state.gate !== "blocked" || !state.draft) return state;
+      const draft: Draft = {
+        requestId: state.draft.requestId,
+        title: state.draft.title,
+        kind: state.draft.kind,
+        mode: "draft",
+        lines: OVERRIDE_DRAFT.lines,
+        applied: OVERRIDE_DRAFT.applied,
+      };
       return {
         ...state,
-        assets: state.assets.map((x) =>
-          x.id === a.id
-            ? { ...x, state: "in_review", version: x.version + 1, checks: checksFor(x.kind), fresh: true }
-            : x,
-        ),
-        feed: log(state.feed, `Resubmitted for review · ${a.title} (v${a.version + 1})`),
+        draft,
+        gate: "pending",
+        feed: log(state.feed, "You", "overrode the block", "agent drafted a compliant version"),
       };
     }
+
+    case "DROP": {
+      if (state.gate !== "blocked" || !state.draft) return state;
+      const reqId = state.draft.requestId;
+      return {
+        ...state,
+        current: null,
+        draft: null,
+        gate: "idle",
+        requests: state.requests.map((r) =>
+          r.id === reqId ? { ...r, status: "dropped" } : r,
+        ),
+        feed: log(state.feed, "You", "dropped the off-brand request", state.draft.title),
+      };
+    }
+
     case "DECAY_FRESH":
       return {
         ...state,
-        assets: state.assets.map((a) => (a.id === event.id ? { ...a, fresh: false } : a)),
+        rules: state.rules.map((r) => (r.id === event.id && r.fresh ? { ...r, fresh: false } : r)),
         feed: state.feed.map((f) => (f.id === event.id && f.fresh ? { ...f, fresh: false } : f)),
       };
+
     case "RESET":
       return createInitialNorthbeamState();
+
     default:
       return state;
   }

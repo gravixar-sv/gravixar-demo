@@ -1,26 +1,29 @@
 "use client";
 
-// Northbeam Goods — DTC brand governance as a 3-column workspace.
-// Templates (locked, self-serve) → Brand review (AI check + human
-// approve) → Published. Using a template submits an asset to review;
-// the AI brand-check runs; a brand manager approves & publishes or
-// sends it back. See src/lib/playground/northbeam-data.ts.
+// Northbeam Goods — a real brand AGENT, as a 3-column workspace.
+// Requests (plain briefs) → Brand agent (drafts on-brand, or BLOCKS drift at
+// the guardrail) → Brand memory (the do/don't rules it LEARNS from your
+// approvals). Approve a draft and watch a rule appear in column three; send
+// one back and it learns what to avoid. Audit trail underneath.
+// See src/lib/playground/northbeam-data.ts.
 
 import { useEffect, useReducer } from "react";
 import {
   createInitialNorthbeamState,
   northbeamReducer,
-  type BrandAsset,
-  type FeedEntry,
+  type AuditEntry,
+  type BrandRequest,
+  type BrandRule,
+  type Draft,
+  type Gate,
   type NorthbeamEvent,
-  type Template,
 } from "@/lib/playground/northbeam-data";
 import { MockupThumb } from "@/components/demo/DeliverableMockup";
 import { SceneCTA } from "@/components/demo/SceneCTA";
 
 const FRESH_DECAY_MS = 2200;
 
-export default function NorthbeamGovernance() {
+export default function NorthbeamBrandAgent() {
   const [state, dispatch] = useReducer(
     northbeamReducer,
     undefined,
@@ -29,7 +32,7 @@ export default function NorthbeamGovernance() {
 
   useEffect(() => {
     const ids = [
-      ...state.assets.filter((a) => a.fresh).map((a) => a.id),
+      ...state.rules.filter((r) => r.fresh).map((r) => r.id),
       ...state.feed.filter((f) => f.fresh).map((f) => f.id),
     ];
     if (ids.length === 0) return;
@@ -37,26 +40,25 @@ export default function NorthbeamGovernance() {
       window.setTimeout(() => dispatch({ type: "DECAY_FRESH", id }), FRESH_DECAY_MS),
     );
     return () => timers.forEach((t) => window.clearTimeout(t));
-  }, [state.assets, state.feed]);
+  }, [state.rules, state.feed]);
 
-  const inReview = state.assets.filter((a) => a.state === "in_review");
-  const changes = state.assets.filter((a) => a.state === "changes_requested");
-  const published = state.assets.filter((a) => a.state === "published");
+  const learnedCount = state.rules.filter((r) => r.learned).length;
 
   return (
     <div className="mx-auto max-w-7xl px-6 pb-20 pt-10 md:px-10 lg:px-12">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div className="max-w-2xl">
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--color-scene-1)]">
-            brand governance · for dtc teams · live sandbox
+            brand agent · for dtc teams · live sandbox
           </p>
           <h1 className="mt-3 text-3xl font-medium leading-tight tracking-[-0.02em] text-zinc-50 md:text-4xl">
-            On-brand, without the bottleneck.
+            A brand agent that drafts on-brand — and learns your rules.
           </h1>
           <p className="mt-3 text-base leading-relaxed text-zinc-400">
-            The team self-serves from locked templates, AI checks every asset
-            for brand + compliance, and a manager approves before anything
-            ships. Use a template, watch it route for review, then publish.
+            Hand it a brief; it drafts the asset in your voice. Ask for something
+            off-brand and it stops at the guardrail instead of shipping it. Every
+            time you approve or send one back, it learns a do or a don&apos;t —
+            watch the brand memory grow on the right.
           </p>
         </div>
         <button
@@ -68,38 +70,37 @@ export default function NorthbeamGovernance() {
         </button>
       </header>
 
-      <div className="mt-7 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:pb-0">
-        {/* Templates */}
-        <Col label="Templates" status="locked · team self-serves">
-          {state.templates.map((t) => (
-            <TemplateCard key={t.id} t={t} dispatch={dispatch} />
-          ))}
-          {changes.map((a) => (
-            <ChangesCard key={a.id} a={a} dispatch={dispatch} />
-          ))}
-        </Col>
-
-        {/* Brand review */}
-        <Col label="Brand review" status="ai-checked · you approve">
-          {inReview.length === 0 ? (
-            <Empty text="Nothing awaiting review." />
-          ) : null}
-          {inReview.map((a) => (
-            <ReviewCard key={a.id} a={a} dispatch={dispatch} />
+      <div className="mt-7 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-[0.95fr_1.2fr_0.95fr] lg:gap-5 lg:overflow-visible lg:pb-0">
+        {/* Requests */}
+        <Col label="Requests" status="plain briefs · from the team">
+          {state.requests.map((r) => (
+            <RequestCard
+              key={r.id}
+              req={r}
+              active={state.current === r.id}
+              dispatch={dispatch}
+            />
           ))}
         </Col>
 
-        {/* Published */}
-        <Col label="Published" status="live · audit trail">
-          {published.length === 0 ? <Empty text="Nothing published yet." /> : null}
-          {published.map((a) => (
-            <PublishedCard key={a.id} a={a} />
+        {/* Brand agent workspace */}
+        <Col label="Brand agent" status="drafts on-brand · you approve">
+          <Workspace draft={state.draft} gate={state.gate} dispatch={dispatch} />
+        </Col>
+
+        {/* Brand memory */}
+        <Col
+          label="Brand memory"
+          status={`${state.rules.length} rules · ${learnedCount} learned from you`}
+        >
+          {state.rules.map((r) => (
+            <RuleRow key={r.id} rule={r} />
           ))}
         </Col>
       </div>
 
-      <ActivityFeed feed={state.feed} />
-      <SceneCTA personaLabel="Brands & DTC" noun="brand" />
+      <AuditTrail feed={state.feed} />
+      <SceneCTA personaLabel="Brands & DTC" noun="brand agent" />
     </div>
   );
 }
@@ -122,155 +123,238 @@ function Col({
   );
 }
 
-function Empty({ text }: { text: string }) {
-  return (
-    <p className="rounded-lg border border-dashed border-white/10 px-3 py-6 text-center text-[11px] text-zinc-600">
-      {text}
-    </p>
-  );
-}
-
-function TemplateCard({
-  t,
+function RequestCard({
+  req,
+  active,
   dispatch,
 }: {
-  t: Template;
-  dispatch: React.Dispatch<NorthbeamEvent>;
-}) {
-  return (
-    <div className="rounded-xl border border-white/10 bg-black/20 p-3.5">
-      <div className="flex items-start gap-3">
-        <MockupThumb kind={t.kind} />
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-zinc-100">{t.name}</p>
-          <p className="mt-1 text-[10px] leading-relaxed text-zinc-500">
-            🔒 locked: {t.locked}
-          </p>
-          <p className="text-[10px] leading-relaxed text-zinc-500">
-            ✎ you edit: {t.editable}
-          </p>
-        </div>
-      </div>
-      <button
-        type="button"
-        onClick={() => dispatch({ type: "USE_TEMPLATE", id: t.id })}
-        className="mt-3 rounded-lg border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/10 px-3 py-1.5 text-xs font-medium text-lime-200 transition-colors hover:bg-[var(--color-scene-1)]/20"
-      >
-        Use template → submit
-      </button>
-    </div>
-  );
-}
-
-function ChangesCard({
-  a,
-  dispatch,
-}: {
-  a: BrandAsset;
+  req: BrandRequest;
+  active: boolean;
   dispatch: React.Dispatch<NorthbeamEvent>;
 }) {
   return (
     <div
       className={[
-        "rounded-xl border p-3.5",
-        a.fresh ? "pg-fresh border-amber-400/45" : "border-amber-400/25 bg-amber-400/[0.05]",
+        "rounded-xl border p-3.5 transition-colors",
+        active
+          ? "border-[var(--color-scene-1)]/50 bg-[var(--color-scene-1)]/[0.06]"
+          : "border-white/10 bg-black/20",
       ].join(" ")}
     >
       <div className="flex items-start gap-3">
-        <MockupThumb kind={a.kind} />
+        <MockupThumb kind={req.kind} />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-zinc-100">{a.title}</p>
-          <p className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.18em] text-amber-300/80">
-            changes requested · v{a.version}
+          <p className="text-sm font-medium text-zinc-100">{req.title}</p>
+          <p className="mt-1 text-[11px] italic leading-relaxed text-zinc-500">
+            &ldquo;{req.brief}&rdquo;
+          </p>
+          <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.16em] text-zinc-600">
+            {req.by}
           </p>
         </div>
       </div>
-      <button
-        type="button"
-        onClick={() => dispatch({ type: "RESUBMIT", id: a.id })}
-        className="mt-3 rounded-lg border border-sky-400/30 bg-sky-400/10 px-3 py-1.5 text-xs font-medium text-sky-200 transition-colors hover:bg-sky-400/20"
-      >
-        ↑ Resubmit for review
-      </button>
-    </div>
-  );
-}
 
-function ReviewCard({
-  a,
-  dispatch,
-}: {
-  a: BrandAsset;
-  dispatch: React.Dispatch<NorthbeamEvent>;
-}) {
-  return (
-    <div
-      className={[
-        "rounded-xl border p-3.5",
-        a.fresh ? "pg-fresh border-[var(--color-scene-1)]/45" : "border-white/10 bg-black/20",
-      ].join(" ")}
-    >
-      <div className="flex items-start gap-3">
-        <MockupThumb kind={a.kind} />
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-zinc-100">{a.title}</p>
-          <p className="mt-0.5 text-[10px] text-zinc-500">{a.by} · v{a.version}</p>
-        </div>
-      </div>
-      <ul className="mt-3 space-y-1">
-        {a.checks.map((c) => (
-          <li key={c.label} className="flex items-start gap-1.5 text-[11px] leading-relaxed">
-            <span className={c.ok ? "text-emerald-400" : "text-amber-400"}>
-              {c.ok ? "✓" : "⚠"}
-            </span>
-            <span className={c.ok ? "text-zinc-400" : "text-amber-200/90"}>{c.label}</span>
-          </li>
-        ))}
-      </ul>
-      <div className="mt-3 flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={() => dispatch({ type: "APPROVE_PUBLISH", id: a.id })}
-          className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-colors hover:bg-emerald-400/20"
-        >
-          Approve &amp; publish →
-        </button>
-        <button
-          type="button"
-          onClick={() => dispatch({ type: "REQUEST_CHANGE", id: a.id })}
-          className="rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-1.5 text-xs font-medium text-amber-200 transition-colors hover:bg-amber-400/20"
-        >
-          Request change
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function PublishedCard({ a }: { a: BrandAsset }) {
-  return (
-    <div
-      className={[
-        "flex items-center gap-3 rounded-xl border px-3.5 py-3",
-        a.fresh ? "pg-fresh border-emerald-400/40" : "border-white/10 bg-black/20",
-      ].join(" ")}
-    >
-      <MockupThumb kind={a.kind} />
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-zinc-200">{a.title}</p>
-        <p className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.18em] text-emerald-300/80">
-          ✓ live · v{a.version}
+      {req.status === "published" ? (
+        <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.18em] text-emerald-300/80">
+          ✓ approved + published
         </p>
+      ) : req.status === "dropped" ? (
+        <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+          ✕ dropped — off-brand
+        </p>
+      ) : (
+        <button
+          type="button"
+          onClick={() => dispatch({ type: "GENERATE", id: req.id })}
+          className={[
+            "mt-3 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors",
+            req.offBrand
+              ? "border-amber-400/35 bg-amber-400/10 text-amber-200 hover:bg-amber-400/20"
+              : "border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/10 text-lime-200 hover:bg-[var(--color-scene-1)]/20",
+          ].join(" ")}
+        >
+          {req.offBrand ? "▸ generate (watch the guardrail)" : "▸ generate on-brand"}
+        </button>
+      )}
+    </div>
+  );
+}
+
+function Workspace({
+  draft,
+  gate,
+  dispatch,
+}: {
+  draft: Draft | null;
+  gate: Gate;
+  dispatch: React.Dispatch<NorthbeamEvent>;
+}) {
+  if (!draft) {
+    return (
+      <p className="rounded-lg border border-dashed border-white/10 px-3 py-10 text-center text-[11px] leading-relaxed text-zinc-600">
+        Pick a request on the left.
+        <br />
+        The agent drafts it on-brand here.
+      </p>
+    );
+  }
+
+  const isDrift = draft.mode === "drift";
+
+  return (
+    <div
+      className={[
+        "rounded-xl border p-4",
+        isDrift ? "border-amber-400/40 bg-amber-400/[0.04]" : "border-white/10 bg-black/25",
+      ].join(" ")}
+    >
+      <div className="flex items-start gap-3">
+        <MockupThumb kind={draft.kind} />
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium text-zinc-100">{draft.title}</p>
+          <p
+            className={[
+              "mt-0.5 font-mono text-[9px] uppercase tracking-[0.18em]",
+              isDrift ? "text-amber-300/90" : "text-[var(--color-scene-1)]",
+            ].join(" ")}
+          >
+            {isDrift ? "⛔ off-brand · blocked at the guardrail" : "draft · ready for review"}
+          </p>
+        </div>
+      </div>
+
+      {/* Generated copy / explanation */}
+      <div className="mt-3 space-y-1.5 border-t border-white/5 pt-3">
+        {draft.lines.map((line, i) => (
+          <p key={i} className="font-mono text-[11px] leading-relaxed text-zinc-300">
+            {line}
+          </p>
+        ))}
+      </div>
+
+      {/* Reasoning: applied rules (draft) or violations (drift) */}
+      {draft.applied && draft.applied.length > 0 ? (
+        <div className="mt-3">
+          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-600">
+            brand rules applied
+          </p>
+          <ul className="mt-1.5 space-y-1">
+            {draft.applied.map((a) => (
+              <li key={a} className="flex items-start gap-1.5 text-[11px] leading-relaxed">
+                <span className="text-emerald-400">✓</span>
+                <span className="text-zinc-400">{a}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+      {draft.violations && draft.violations.length > 0 ? (
+        <div className="mt-3">
+          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-amber-300/80">
+            breaks these rules
+          </p>
+          <ul className="mt-1.5 space-y-1">
+            {draft.violations.map((v) => (
+              <li key={v} className="flex items-start gap-1.5 text-[11px] leading-relaxed">
+                <span className="text-amber-400">✗</span>
+                <span className="text-amber-200/90">{v}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {/* Gate */}
+      <div className="mt-4 border-t border-white/5 pt-3">
+        {gate === "pending" ? (
+          <>
+            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-amber-300/90">
+              ⏸ waiting on you · this would publish
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => dispatch({ type: "APPROVE" })}
+                className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-colors hover:bg-emerald-400/20"
+              >
+                Approve &amp; publish →
+              </button>
+              <button
+                type="button"
+                onClick={() => dispatch({ type: "REQUEST_CHANGE" })}
+                className="rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-1.5 text-xs font-medium text-amber-200 transition-colors hover:bg-amber-400/20"
+              >
+                Request change
+              </button>
+            </div>
+          </>
+        ) : gate === "blocked" ? (
+          <>
+            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-amber-300/90">
+              ⏸ won&apos;t ship as-is · your call
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => dispatch({ type: "OVERRIDE" })}
+                className="rounded-lg border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/10 px-3 py-1.5 text-xs font-medium text-lime-200 transition-colors hover:bg-[var(--color-scene-1)]/20"
+              >
+                Override → draft a clean version
+              </button>
+              <button
+                type="button"
+                onClick={() => dispatch({ type: "DROP" })}
+                className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-zinc-400 transition-colors hover:bg-white/[0.06]"
+              >
+                Drop request
+              </button>
+            </div>
+          </>
+        ) : gate === "approved" ? (
+          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-emerald-300/80">
+            ✓ approved + published · agent learned a rule →
+          </p>
+        ) : gate === "changed" ? (
+          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-amber-300/80">
+            ↩ sent back · agent learned a don&apos;t-rule →
+          </p>
+        ) : null}
       </div>
     </div>
   );
 }
 
-function ActivityFeed({ feed }: { feed: FeedEntry[] }) {
+function RuleRow({ rule }: { rule: BrandRule }) {
+  const isDo = rule.kind === "do";
+  return (
+    <div
+      className={[
+        "rounded-lg border px-3 py-2",
+        rule.fresh
+          ? "pg-fresh border-[var(--color-scene-1)]/45"
+          : "border-white/10 bg-white/[0.02]",
+      ].join(" ")}
+    >
+      <div className="flex items-start gap-2">
+        <span className={isDo ? "text-emerald-400" : "text-rose-400"}>{isDo ? "✓" : "✗"}</span>
+        <div className="min-w-0 flex-1">
+          <p className="text-[12px] leading-relaxed text-zinc-200">{rule.text}</p>
+          {rule.learned ? (
+            <p className="mt-0.5 font-mono text-[8px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
+              learned from your approval
+            </p>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AuditTrail({ feed }: { feed: AuditEntry[] }) {
   return (
     <section className="mt-5 scene-card rounded-2xl p-5">
       <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600">
-        audit trail · real-time
+        audit trail · every action logged
       </p>
       <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {feed.slice(0, 6).map((e) => (
@@ -286,7 +370,17 @@ function ActivityFeed({ feed }: { feed: FeedEntry[] }) {
             <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
               {formatRelative(e.ts)}
             </span>
-            <p className="mt-1">{e.text}</p>
+            <p className="mt-1">
+              <span className="font-mono font-medium text-zinc-200">{e.actor}</span>{" "}
+              <span className="text-zinc-400">{e.action}</span>
+              {e.detail ? (
+                <>
+                  {" "}
+                  <span className="text-zinc-600">·</span>{" "}
+                  <span className="text-zinc-400">{e.detail}</span>
+                </>
+              ) : null}
+            </p>
           </li>
         ))}
       </ul>

@@ -100,15 +100,15 @@ export const SCENES: Scene[] = [
   {
     slug: "northbeam",
     name: "Northbeam Goods",
-    tagline: "DTC brand admin, Amazon A+, motion review, brand system.",
+    tagline: "A brand agent that drafts on-brand, blocks drift, and learns your rules.",
     description:
-      "Brand-system browser, Amazon A+ workflow with side-by-side compare, motion graphics review queue. Showcases the Brand & Visuals service.",
+      "A brand agent for a DTC team: hand it a brief, it drafts the asset on-brand; ask for something off-brand and it stops at the guardrail; every approval teaches it a new do/don't. Showcases the Brand & Visuals service.",
     bucket: "brand",
     status: "live",
     persona: "brand",
     personaLabel: "brands & DTC",
-    whatItIs: "Brand governance for a DTC team",
-    tryLine: "Locked templates → AI brand check → approve & publish",
+    whatItIs: "A brand agent for a DTC team",
+    tryLine: "Brief → on-brand draft → you approve → it learns the rule",
     openLabel: "Open the workspace",
     problemStatement:
       "Everyone makes assets; staying on-brand is the bottleneck.",

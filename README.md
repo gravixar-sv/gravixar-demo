@@ -42,4 +42,4 @@ MVP launches with two scenes:
 
 ## Codebase relationship to bs-hub
 
-bs-hub at `C:\Users\zaigu\OneDrive\Desktop\Google Antigravity\bs-hub` is **recipe, not parent**. Patterns (auth shape, audit log writer, AI integrations, review state machine) are selectively copied into this codebase as fresh code. This app does not import bs-hub or share live code/DB with broomstickhub.com.
+bs-hub at `C:\dev\bs-hub` is **recipe, not parent**. Patterns (auth shape, audit log writer, AI integrations, review state machine) are selectively copied into this codebase as fresh code. This app does not import bs-hub or share live code/DB with broomstickhub.com.

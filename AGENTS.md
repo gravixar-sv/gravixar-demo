@@ -145,7 +145,7 @@ demos.
 
 ## Sister project relationship
 
-bs-hub at `C:\Users\zaigu\OneDrive\Desktop\Google Antigravity\bs-hub`
+bs-hub at `C:\dev\bs-hub`
 is **recipe, not parent**. Patterns (auth shape, audit log writer,
 review state machine, AI guardrail wrapper) are selectively copied
 into this repo as fresh code. **Never import from bs-hub or share

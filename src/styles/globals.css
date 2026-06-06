@@ -244,4 +244,107 @@
       0 8px 32px -8px rgba(0, 0, 0, 0.4);
     transform: translateY(-2px);
   }
+
+  /* Gallery entrance — a staggered rise on load (opacity + transform only,
+     GPU-friendly). Applied above-the-fold on the showroom index; delay is
+     set per-tile inline. Honours reduce-motion. */
+  @keyframes galleryRise {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .gallery-rise {
+    animation: galleryRise 560ms var(--ease-out) both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gallery-rise { animation: none; }
+  }
+
+  /* ── Constellation showroom ─────────────────────────────────────
+     Scenes as glowing nodes wired to a central core. Restrained cosmic
+     atmosphere (coral + violet, not rainbow) so it reads Gravixar, not
+     generic sci-fi. All motion is transform/opacity or cheap stroke work,
+     and every loop is disabled under reduce-motion. */
+
+  /* Deep brand-tuned backdrop: layered radial glows over near-black. */
+  .bg-cosmos {
+    background:
+      radial-gradient(38% 48% at 82% 16%, rgba(255, 45, 90, 0.16) 0%, transparent 60%),
+      radial-gradient(42% 55% at 10% 90%, rgba(124, 91, 239, 0.12) 0%, transparent 62%),
+      radial-gradient(50% 50% at 55% 48%, rgba(255, 107, 107, 0.05) 0%, transparent 72%),
+      #050508;
+  }
+  /* Vignette to pull focus to the centre of the field. */
+  .cosmos-vignette {
+    background: radial-gradient(75% 70% at 52% 46%, transparent 38%, rgba(5, 5, 8, 0.72) 100%);
+  }
+
+  /* Gentle node float. Uniform duration, per-node delay (set inline) for
+     desync, so the field breathes rather than pulsing in lockstep. */
+  @keyframes nodeFloat {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-9px); }
+  }
+  .node-float { animation: nodeFloat 7s ease-in-out infinite; }
+
+  /* Core halo pulse. */
+  @keyframes corePulse {
+    0%, 100% { transform: scale(1);    opacity: 0.5; }
+    50%      { transform: scale(1.14); opacity: 0.85; }
+  }
+  .core-pulse { animation: corePulse 4.5s ease-in-out infinite; }
+
+  /* Energy marching along a conduit (core → node). */
+  @keyframes conduitFlow {
+    to { stroke-dashoffset: -1000; }
+  }
+  .conduit-flow { animation: conduitFlow 16s linear infinite; }
+
+  /* A data pulse travelling a conduit; offset-path is set inline per path. */
+  @keyframes dotTravel {
+    0%   { offset-distance: 0%;   opacity: 0; }
+    12%  { opacity: 1; }
+    88%  { opacity: 1; }
+    100% { offset-distance: 100%; opacity: 0; }
+  }
+  .conduit-dot { animation: dotTravel 3.8s linear infinite; }
+
+  /* Twinkling stars — a subset of the field pulses on staggered, per-star
+     timing (set inline) so the sky shimmers asynchronously, not in lockstep. */
+  @keyframes twinkle {
+    0%, 100% { opacity: var(--o, 0.6); transform: scale(1); }
+    50%      { opacity: calc(var(--o, 0.6) * 0.22); transform: scale(0.65); }
+  }
+  .twinkle { animation: twinkle var(--dur, 4s) ease-in-out var(--delay, 0s) infinite; }
+
+  /* Shooting stars — a head + fading linear trail that streaks across on a
+     long, delayed loop, so it's a rare moment rather than constant motion.
+     The streak itself occupies only ~16% of the cycle; the rest is idle. */
+  @keyframes shoot {
+    0%   { opacity: 0; transform: rotate(var(--ang, 24deg)) translateX(0); }
+    4%   { opacity: 0; }
+    8%   { opacity: 1; }
+    18%  { opacity: 1; }
+    26%  { opacity: 0; transform: rotate(var(--ang, 24deg)) translateX(var(--dist, 320px)); }
+    100% { opacity: 0; transform: rotate(var(--ang, 24deg)) translateX(var(--dist, 320px)); }
+  }
+  .shooting-star {
+    position: absolute;
+    height: 2px;
+    width: var(--len, 130px);
+    border-radius: 9999px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.9) 100%);
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.55));
+    opacity: 0;
+    transform-origin: left center;
+    animation: shoot var(--dur, 15s) ease-in var(--delay, 0s) infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .node-float,
+    .core-pulse,
+    .conduit-flow,
+    .conduit-dot,
+    .twinkle { animation: none; }
+    .shooting-star { display: none; }
+  }
 }

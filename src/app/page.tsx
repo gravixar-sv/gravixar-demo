@@ -1,7 +1,11 @@
 import Link from "next/link";
+import Image from "next/image";
+import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import { SCENES, type Scene } from "@/lib/scenes";
 import { Topbar } from "@/components/demo/Topbar";
+import { ScenePreview } from "@/components/demo/ScenePreview";
+import { Starfield } from "@/components/demo/Starfield";
 
 export const metadata: Metadata = {
   title: "Gravixar Demo: live software I built for clients",
@@ -9,164 +13,221 @@ export const metadata: Metadata = {
     "Real, working apps with sample data. Open one and use it. Not slides, not a signup.",
 };
 
+// Constellation field is a 16:10 box; the Gravixar core sits at centre and the
+// scene nodes orbit it at the corners (% of the box). Conduits are drawn in the
+// same coordinate space (viewBox 1600×1000) so they stay locked to the nodes at
+// any size. Below lg the field collapses to a plain stacked grid.
+const VB_W = 1600;
+const VB_H = 1000;
+const CORE = { x: 50, y: 52 };
+
+type NodePlacement = { x: number; y: number; w: number; delay: string };
+
+const PLACEMENTS: NodePlacement[] = [
+  { x: 23, y: 27, w: 27, delay: "0s" }, // top-left
+  { x: 77, y: 27, w: 27, delay: "-1.8s" }, // top-right
+  { x: 77, y: 78, w: 27, delay: "-3.6s" }, // bottom-right
+  { x: 23, y: 78, w: 27, delay: "-5.4s" }, // bottom-left
+];
+
+function toVB(xPct: number, yPct: number): [number, number] {
+  return [(xPct / 100) * VB_W, (yPct / 100) * VB_H];
+}
+
+function conduitPath(p: NodePlacement): string {
+  const [x1, y1] = toVB(CORE.x, CORE.y);
+  const [x2, y2] = toVB(p.x, p.y);
+  const mx = (x1 + x2) / 2;
+  const my = (y1 + y2) / 2;
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  // Bow the control point perpendicular to the line for an organic arc.
+  const cx = mx - dy * 0.12;
+  const cy = my + dx * 0.12;
+  return `M ${x1.toFixed(0)} ${y1.toFixed(0)} Q ${cx.toFixed(0)} ${cy.toFixed(0)} ${x2.toFixed(0)} ${y2.toFixed(0)}`;
+}
+
 export default function SceneIndex() {
   const live = SCENES.filter((s) => s.status === "live");
-  // Show one "coming soon" placeholder (the brand/DTC scene) so the
-  // visitor knows the showcase is growing without cluttering the index.
-  const upcoming = SCENES.find((s) => s.status === "coming-online" && s.persona === "brand");
+  const upcoming = SCENES.find((s) => s.status === "coming-online");
+  const nodes: (NodePlacement & { scene: Scene; index: number })[] = [];
+  live.slice(0, 4).forEach((scene, i) => {
+    const p = PLACEMENTS[i];
+    if (p) nodes.push({ scene, ...p, index: i + 1 });
+  });
 
   return (
-    <div className="bg-gallery min-h-[calc(100dvh-40px)]">
+    <div className="bg-cosmos relative min-h-[calc(100dvh-40px)] overflow-hidden">
       <Topbar home />
-      <div className="mx-auto max-w-7xl px-6 pb-20 pt-10 md:px-10 lg:px-12">
+      <Starfield />
+      <div className="bg-dot-grid pointer-events-none absolute inset-0 opacity-[0.10]" />
+      <div className="cosmos-vignette pointer-events-none absolute inset-0" />
 
-        {/* ── Header: answers "what is this?" in the first 10 seconds ── */}
-        <header className="max-w-2xl">
-          <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--color-scene-1,#FF6B6B)]">
-            capability showroom
+      <div className="relative mx-auto max-w-6xl px-6 pb-24 pt-14 md:px-10 lg:px-12 lg:pt-16">
+
+        {/* ── Hero ──────────────────────────────────────────────── */}
+        <header className="gallery-rise relative z-10 max-w-2xl">
+          <p className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.3em] text-[var(--color-scene-1,#FF6B6B)]">
+            <span className="h-px w-10 bg-[var(--color-scene-1,#FF6B6B)]/50" />
+            Capability showroom
           </p>
-          <h1 className="mt-3 text-4xl font-medium leading-[1.05] tracking-[-0.03em] text-zinc-50 md:text-5xl lg:text-[3.5rem]">
-            Live software I built
-            <br className="hidden sm:block" />{" "}
-            for clients.{" "}
-            <span style={{ color: "var(--color-scene-1, #FF6B6B)" }}>
-              Open one and use it.
-            </span>
+          <h1 className="mt-7 text-[2.6rem] font-medium leading-[0.95] tracking-[-0.045em] text-zinc-50 sm:text-6xl lg:text-7xl">
+            Live software
+            <br className="hidden sm:block" /> I built for clients.
           </h1>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-zinc-400 md:text-lg">
-            Real, working apps with sample data, not slides, not a signup.
-            Click into one and try the actual workflow.
+          <p className="mt-7 max-w-xl text-lg leading-relaxed text-zinc-400 lg:text-xl">
+            Real, working apps with sample data. Open one and use it —
+            <span className="text-zinc-300"> not slides, not a signup.</span>
           </p>
+          <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+            <span className="flex items-center gap-1.5">
+              <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              {live.length} live scenes
+            </span>
+            <span className="text-zinc-700">·</span>
+            <span>sample data</span>
+            <span className="text-zinc-700">·</span>
+            <span>resets Sunday</span>
+            <span className="text-zinc-700">·</span>
+            <span>no sign-in</span>
+          </div>
         </header>
 
-        {/* ── Scene cards ─────────────────────────────────────────── */}
-        <div className="mt-12 grid gap-4 md:grid-cols-2">
-          {live.map((scene) => (
-            <SceneCard key={scene.slug} scene={scene} />
-          ))}
-        </div>
+        {/* ── Constellation field ───────────────────────────────────
+            Desktop: a wired star-map. Mobile: a clean 1/2-col stack. ── */}
+        <section className="relative mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:mt-8 lg:block lg:aspect-[16/10]">
 
-        {/* ── Coming soon ─────────────────────────────────────────── */}
+          {/* Conduits (desktop only) */}
+          <svg
+            viewBox={`0 0 ${VB_W} ${VB_H}`}
+            preserveAspectRatio="xMidYMid meet"
+            className="pointer-events-none absolute inset-0 hidden h-full w-full lg:block"
+            aria-hidden
+          >
+            <defs>
+              <filter id="conduitGlow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur stdDeviation="5" />
+              </filter>
+            </defs>
+            {nodes.map((n) => {
+              const d = conduitPath(n);
+              const accent = n.scene.swatches[1];
+              return (
+                <g key={n.scene.slug}>
+                  <path d={d} fill="none" stroke={accent} strokeWidth="3.5" opacity="0.3" filter="url(#conduitGlow)" />
+                  <path d={d} fill="none" stroke={accent} strokeWidth="1" opacity="0.4" />
+                  <path
+                    d={d}
+                    fill="none"
+                    stroke={accent}
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeDasharray="6 14"
+                    opacity="0.95"
+                    className="conduit-flow"
+                  />
+                </g>
+              );
+            })}
+          </svg>
+
+          {/* Core (desktop only) */}
+          <div
+            className="absolute left-1/2 top-[52%] z-10 hidden -translate-x-1/2 -translate-y-1/2 flex-col items-center lg:flex"
+            aria-hidden
+          >
+            <div className="relative">
+              <div
+                className="core-pulse absolute -inset-9 rounded-full"
+                style={{ background: "radial-gradient(circle, rgba(255,45,90,0.5) 0%, transparent 70%)" }}
+              />
+              <div className="relative flex h-20 w-20 items-center justify-center rounded-full border border-white/20 bg-black/60 shadow-[0_0_44px_-6px_rgba(255,45,90,0.7)] backdrop-blur">
+                <Image src="/brand/gravixar-avatar.png" alt="" width={48} height={48} className="rounded-full" />
+              </div>
+            </div>
+            <div className="mt-3 text-center">
+              <p className="font-mono text-[9px] uppercase tracking-[0.3em] text-zinc-300">
+                Gravixar core
+              </p>
+              <p className="mt-0.5 font-mono text-[8px] uppercase tracking-[0.2em] text-zinc-600">
+                showroom data exchange
+              </p>
+            </div>
+          </div>
+
+          {/* Scene nodes */}
+          {nodes.map((n) => {
+            const accent = n.scene.swatches[1];
+            return (
+              <Link
+                key={n.scene.slug}
+                href={`/${n.scene.slug}`}
+                className="group gallery-rise relative z-20 block lg:absolute lg:w-[var(--nw)] lg:left-[var(--nx)] lg:top-[var(--ny)] lg:-translate-x-1/2 lg:-translate-y-1/2"
+                style={
+                  {
+                    "--nx": `${n.x}%`,
+                    "--ny": `${n.y}%`,
+                    "--nw": `${n.w}%`,
+                    animationDelay: `${n.index * 70}ms`,
+                  } as CSSProperties
+                }
+              >
+                <div className="node-float" style={{ animationDelay: n.delay }}>
+                  <div className="relative">
+                    {/* accent halo */}
+                    <div
+                      aria-hidden
+                      className="pointer-events-none absolute -inset-5 rounded-[1.75rem] opacity-40 blur-2xl transition-opacity duration-500 group-hover:opacity-80"
+                      style={{ background: `radial-gradient(circle, ${accent}55 0%, transparent 70%)` }}
+                    />
+                    <div className="relative transition-transform duration-500 ease-out group-hover:scale-[1.03]">
+                      <ScenePreview scene={n.scene} sizes="(min-width: 1024px) 300px, (min-width: 640px) 45vw, 90vw" />
+                    </div>
+                  </div>
+
+                  <div className="mt-3.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-zinc-500">
+                        <span style={{ color: accent }}>●</span> node {n.index}
+                      </span>
+                      <span
+                        aria-hidden
+                        className="text-xs opacity-0 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100"
+                        style={{ color: accent }}
+                      >
+                        →
+                      </span>
+                    </div>
+                    <h2 className="mt-1.5 text-lg font-medium tracking-[-0.01em] text-zinc-50">
+                      {n.scene.name}
+                    </h2>
+                    <p className="mt-1 text-sm text-zinc-400">{n.scene.whatItIs}</p>
+                    <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.16em] text-zinc-600">
+                      for {n.scene.personaLabel}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </section>
+
+        {/* ── Coming online ─────────────────────────────────────── */}
         {upcoming ? (
-          <div className="mt-4">
-            <ComingSoonCard scene={upcoming} />
+          <div className="relative z-10 mt-16 flex flex-wrap items-center justify-between gap-3 border-t border-white/5 pt-6 lg:mt-12">
+            <div className="flex flex-wrap items-baseline gap-x-3">
+              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+                next
+              </span>
+              <h2 className="text-base font-medium text-zinc-300">{upcoming.name}</h2>
+              <span className="text-sm text-zinc-500">{upcoming.whatItIs}</span>
+            </div>
+            <span className="flex shrink-0 items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-zinc-600" />
+              coming online
+            </span>
           </div>
         ) : null}
-
-        {/* ── Sandbox reassurance ─────────────────────────────────── */}
-        <p className="mt-10 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
-          Sandbox · sample data · resets every Sunday · no sign-in
-        </p>
-      </div>
-    </div>
-  );
-}
-
-// ── Live scene card — strong information scent: branded name + plain
-//    subtitle + who-it's-for + one concrete thing to do + open button.
-function SceneCard({ scene }: { scene: Scene }) {
-  const accent = scene.swatches[1];
-
-  return (
-    <Link
-      href={`/${scene.slug}`}
-      className="group relative block overflow-hidden rounded-2xl"
-      style={{ minHeight: "260px" }}
-    >
-      {/* Scene's own background so each card feels like its portal */}
-      <div className={`absolute inset-0 ${scene.bgUtility}`} />
-      <div
-        aria-hidden
-        className="bg-dot-grid pointer-events-none absolute inset-0 opacity-20"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-        style={{
-          background: `radial-gradient(60% 60% at 100% 0%, ${accent}1f 0%, transparent 70%)`,
-        }}
-      />
-      {/* Border surface */}
-      <div
-        className="absolute inset-0 rounded-2xl"
-        style={{
-          boxShadow:
-            "inset 0 0 0 1px rgba(255,255,255,0.06), 0 1px 0 0 rgba(255,255,255,0.02)",
-        }}
-      />
-      <div
-        className="absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-        style={{ boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.14)" }}
-      />
-
-      <div className="relative flex h-full flex-col justify-between px-7 pb-7 pt-7">
-        {/* Top: branded name + plain subtitle, LIVE badge */}
-        <div>
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h2 className="text-2xl font-medium tracking-[-0.015em] text-zinc-50">
-                {scene.name}
-              </h2>
-              <p className="mt-1 text-sm text-zinc-300">{scene.whatItIs}</p>
-            </div>
-            <span className="mt-1 flex shrink-0 items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/90">
-              <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              live
-            </span>
-          </div>
-          <span
-            className="mt-4 inline-block rounded-full border px-2.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.18em]"
-            style={{ borderColor: `${accent}40`, color: accent }}
-          >
-            for {scene.personaLabel}
-          </span>
-        </div>
-
-        {/* Bottom: what you can do + open button */}
-        <div className="mt-6 border-t border-white/5 pt-5">
-          <p className="text-sm leading-relaxed text-zinc-400">
-            {scene.tryLine}
-          </p>
-          <span
-            className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium transition-colors group-hover:text-white"
-            style={{ color: accent }}
-          >
-            {scene.openLabel}
-            <span
-              aria-hidden
-              className="transition-transform group-hover:translate-x-1"
-            >
-              →
-            </span>
-          </span>
-        </div>
-      </div>
-    </Link>
-  );
-}
-
-// ── Coming-soon card — present but clearly not yet clickable.
-function ComingSoonCard({ scene }: { scene: Scene }) {
-  return (
-    <div className="scene-card relative overflow-hidden rounded-2xl px-7 py-6">
-      <div
-        aria-hidden
-        className="bg-dot-grid pointer-events-none absolute inset-0 opacity-10"
-      />
-      <div className="relative flex flex-wrap items-center justify-between gap-6">
-        <div>
-          <div className="flex items-baseline gap-3">
-            <h2 className="text-lg font-medium text-zinc-300">{scene.name}</h2>
-            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
-              for {scene.personaLabel}
-            </span>
-          </div>
-          <p className="mt-1 text-sm text-zinc-500">{scene.whatItIs}</p>
-        </div>
-        <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
-          <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-zinc-600" />
-          building now
-        </span>
       </div>
     </div>
   );

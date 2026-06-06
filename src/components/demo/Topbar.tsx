@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 // Shared top chrome for every demo page. Sits under the DemoBanner.
 // - home variant (entry / scene-index): brand mark + gravixar.com, no
@@ -26,10 +27,14 @@ export function Topbar({
         <div className="flex items-center gap-4">
           {home ? (
             <span className="flex items-center gap-2">
-              <span className="h-3.5 w-3.5 rounded-[3px] bg-[var(--color-mark)]" />
-              <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-200">
-                Gravixar
-              </span>
+              <Image
+                src="/brand/gravixar-wordmark.png"
+                alt="Gravixar"
+                width={65}
+                height={16}
+                priority
+                style={{ width: 65, height: 16 }}
+              />
               <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
                 · demo
               </span>

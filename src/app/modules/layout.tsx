@@ -24,8 +24,8 @@ export default function ModulesLayout({
         } as React.CSSProperties
       }
     >
-      <Topbar sceneName="Modules" showReset={false} />
-      {children}
+      <Topbar sceneName="Modules" />
+      <main>{children}</main>
     </div>
   );
 }

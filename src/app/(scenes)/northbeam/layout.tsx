@@ -26,7 +26,7 @@ export default function NorthbeamSceneLayout({
       }
     >
       <Topbar sceneName={SCENE.name} />
-      {children}
+      <main>{children}</main>
     </div>
   );
 }

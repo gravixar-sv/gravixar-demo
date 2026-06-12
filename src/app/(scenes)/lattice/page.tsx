@@ -19,6 +19,7 @@ import {
 import { Avatar } from "@/components/demo/Avatar";
 import { MockupThumb } from "@/components/demo/DeliverableMockup";
 import { SceneCTA } from "@/components/demo/SceneCTA";
+import { flowPulse } from "@/lib/flowPulse";
 
 const FRESH_DECAY_MS = 2200;
 
@@ -85,7 +86,7 @@ export default function LatticeReviewLoop() {
 
       <div className="scene-columns mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:pb-0">
         {/* ── Client ── */}
-        <Column persona={PERSONAS.client} status="your review">
+        <Column persona={PERSONAS.client} status="your review" flow="lat-client">
           {byState("with_client").map((d) => (
             <ClientCard key={d.id} d={d} dispatch={dispatch} />
           ))}
@@ -99,7 +100,7 @@ export default function LatticeReviewLoop() {
         </Column>
 
         {/* ── PM ── */}
-        <Column persona={PERSONAS.pm} status="queue">
+        <Column persona={PERSONAS.pm} status="queue" flow="lat-pm">
           {byState("in_pm_review").map((d) => (
             <PMReviewCard key={d.id} d={d} dispatch={dispatch} />
           ))}
@@ -113,7 +114,7 @@ export default function LatticeReviewLoop() {
         </Column>
 
         {/* ── Editor ── */}
-        <Column persona={PERSONAS.editor} status="in progress">
+        <Column persona={PERSONAS.editor} status="in progress" flow="lat-editor">
           {byState("editing").map((d) => (
             <EditorCard key={d.id} d={d} dispatch={dispatch} />
           ))}
@@ -142,14 +143,20 @@ export default function LatticeReviewLoop() {
 function Column({
   persona,
   status,
+  flow,
   children,
 }: {
   persona: Persona;
   status: string;
+  /** Name other columns target with flowPulse(). */
+  flow?: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className="scene-card min-w-[82%] shrink-0 snap-start rounded-2xl p-5 sm:min-w-[48%] lg:min-w-0">
+    <section
+      data-flow={flow}
+      className="scene-card min-w-[82%] shrink-0 snap-start rounded-2xl p-5 sm:min-w-[48%] lg:min-w-0"
+    >
       <header className="flex items-center gap-3 border-b border-white/5 pb-4">
         <Avatar initials={persona.initials} hue={persona.hue} size="md" />
         <div className="min-w-0">
@@ -235,7 +242,10 @@ function ClientCard({
           <div className="mt-2 flex gap-2">
             <button
               type="button"
-              onClick={() => dispatch({ type: "CLIENT_REVISE", id: d.id, note })}
+              onClick={(e) => {
+                flowPulse(e.currentTarget, "lat-pm");
+                dispatch({ type: "CLIENT_REVISE", id: d.id, note });
+              }}
               className="rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-1.5 text-xs font-medium text-amber-200 transition-colors hover:bg-amber-400/20"
             >
               Send revision →
@@ -253,7 +263,10 @@ function ClientCard({
         <div className="mt-3 flex flex-wrap gap-2">
           <button
             type="button"
-            onClick={() => dispatch({ type: "CLIENT_APPROVE", id: d.id })}
+            onClick={(e) => {
+              flowPulse(e.currentTarget, "lat-rules");
+              dispatch({ type: "CLIENT_APPROVE", id: d.id });
+            }}
             className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-colors hover:bg-emerald-400/20"
           >
             Approve →
@@ -287,7 +300,10 @@ function PMReviewCard({
       </p>
       <button
         type="button"
-        onClick={() => dispatch({ type: "PM_APPROVE", id: d.id })}
+        onClick={(e) => {
+          flowPulse(e.currentTarget, "lat-client");
+          dispatch({ type: "PM_APPROVE", id: d.id });
+        }}
         className="mt-2 rounded-lg border border-sky-400/30 bg-sky-400/10 px-3 py-1.5 text-xs font-medium text-sky-200 transition-colors hover:bg-sky-400/20"
       >
         Approve &amp; send to client →
@@ -313,7 +329,10 @@ function PMRevisionCard({
       </p>
       <button
         type="button"
-        onClick={() => dispatch({ type: "PM_TO_EDITOR", id: d.id })}
+        onClick={(e) => {
+          flowPulse(e.currentTarget, "lat-editor");
+          dispatch({ type: "PM_TO_EDITOR", id: d.id });
+        }}
         className="mt-2 rounded-lg border border-violet-400/30 bg-violet-400/10 px-3 py-1.5 text-xs font-medium text-violet-200 transition-colors hover:bg-violet-400/20"
       >
         Push to editor →
@@ -344,7 +363,10 @@ function EditorCard({
       )}
       <button
         type="button"
-        onClick={() => dispatch({ type: "EDITOR_SUBMIT", id: d.id })}
+        onClick={(e) => {
+          flowPulse(e.currentTarget, "lat-pm");
+          dispatch({ type: "EDITOR_SUBMIT", id: d.id });
+        }}
         className="mt-2 rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-colors hover:bg-emerald-400/20"
       >
         ↑ Submit for review
@@ -391,7 +413,7 @@ function LearnBeat({
   learnedCount: number;
 }) {
   return (
-    <section className="mt-5 scene-card rounded-2xl p-5">
+    <section data-flow="lat-rules" className="mt-5 scene-card rounded-2xl p-5">
       <div className="flex items-baseline justify-between gap-2">
         <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600">
           house rules · what every approval teaches

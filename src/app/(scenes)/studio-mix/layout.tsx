@@ -25,7 +25,7 @@ export default function StudioMixLayout({
       }
     >
       <Topbar sceneName={SCENE.name} />
-      {children}
+      <main>{children}</main>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 // Shared top chrome for every demo page. Sits under the DemoBanner.
@@ -25,11 +26,15 @@ export function Topbar({
       <div className="mx-auto flex h-12 max-w-7xl items-center justify-between gap-4 px-6">
         <div className="flex items-center gap-4">
           {home ? (
-            <span className="flex items-center gap-2">
-              <span className="h-3.5 w-3.5 rounded-[3px] bg-[var(--color-mark)]" />
-              <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-200">
-                Gravixar
-              </span>
+            <span className="flex items-center gap-2.5">
+              <Image
+                src="/brand/gravixar-wordmark.png"
+                alt="Gravixar"
+                width={130}
+                height={32}
+                priority
+                className="h-4 w-auto"
+              />
               <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
                 · demo
               </span>

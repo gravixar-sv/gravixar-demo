@@ -9,6 +9,9 @@
 
 export type StudioAgentKey = "echo" | "pulse" | "river" | "atlas";
 
+/** Rule shape the studio learns when a human approves or discards a draft. */
+export type StudioRuleSpec = { text: string; kind: "do" | "dont" };
+
 export type StudioAgent = {
   key: StudioAgentKey;
   name: string;
@@ -28,6 +31,10 @@ export type StudioAgent = {
   /** Writer agents (publish/act) wait behind a human approval; read-only
    *  agents (watch/classify/review) run autonomously. */
   gated?: boolean;
+  /** Rule the studio learns when a gated draft is approved. */
+  approvalRule?: StudioRuleSpec;
+  /** Rule the studio learns when a gated draft is discarded. */
+  discardRule?: StudioRuleSpec;
 };
 
 export const STUDIO_AGENTS: StudioAgent[] = [
@@ -49,6 +56,14 @@ export const STUDIO_AGENTS: StudioAgent[] = [
       "That word, almost, is where the real cost hides…",
       "920 words drafted · queued for human review",
     ],
+    approvalRule: {
+      text: "ECHO drafts in the “almost-working” voice, keep that frame on long-form",
+      kind: "do",
+    },
+    discardRule: {
+      text: "ECHO: 920-word longform overshoots ops audiences, try 500 next",
+      kind: "dont",
+    },
   },
   {
     key: "pulse",

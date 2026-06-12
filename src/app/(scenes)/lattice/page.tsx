@@ -14,6 +14,7 @@ import {
   type Deliverable,
   type FeedEntry,
   type Persona,
+  type Rule,
 } from "@/lib/playground/lattice-deliverables";
 import { Avatar } from "@/components/demo/Avatar";
 import { MockupThumb } from "@/components/demo/DeliverableMockup";
@@ -31,6 +32,7 @@ export default function LatticeReviewLoop() {
   useEffect(() => {
     const ids = [
       ...state.deliverables.filter((d) => d.fresh).map((d) => d.id),
+      ...state.rules.filter((r) => r.fresh).map((r) => r.id),
       ...state.feed.filter((f) => f.fresh).map((f) => f.id),
     ];
     if (ids.length === 0) return;
@@ -38,16 +40,18 @@ export default function LatticeReviewLoop() {
       window.setTimeout(() => dispatch({ type: "DECAY_FRESH", id }), FRESH_DECAY_MS),
     );
     return () => timers.forEach((t) => window.clearTimeout(t));
-  }, [state.deliverables, state.feed]);
+  }, [state.deliverables, state.rules, state.feed]);
 
   const byState = (...states: Deliverable["state"][]) =>
     state.deliverables.filter((d) => states.includes(d.state));
 
   const shipped = byState("shipped").length;
+  const learnedCount = state.rules.filter((r) => r.learned).length;
 
   return (
     <div className="mx-auto max-w-7xl px-6 pb-20 pt-10 md:px-10 lg:px-12">
-      <header className="flex flex-wrap items-end justify-between gap-4">
+      <div aria-hidden className="scene-conduit mb-7" />
+      <header className="scene-rise flex flex-wrap items-end justify-between gap-4">
         <div className="max-w-2xl">
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--color-scene-1)]">
             client portal · built for agencies · live sandbox
@@ -59,6 +63,8 @@ export default function LatticeReviewLoop() {
             The agency&apos;s work flows Editor → PM → Client and back. Act in
             any column. Approve, request a revision, or push it back, and watch
             the card hand off to the next person. Hover any thumbnail to preview.
+            Every client approval and revision <span className="text-zinc-300">teaches the studio
+            a house rule</span>. Watch them appear below.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -77,7 +83,7 @@ export default function LatticeReviewLoop() {
         </div>
       </header>
 
-      <div className="mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:pb-0">
+      <div className="scene-columns mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:pb-0">
         {/* ── Client ── */}
         <Column persona={PERSONAS.client} status="your review">
           {byState("with_client").map((d) => (
@@ -118,6 +124,7 @@ export default function LatticeReviewLoop() {
         </Column>
       </div>
 
+      <LearnBeat rules={state.rules} learnedCount={learnedCount} />
       <ActivityFeed feed={state.feed} />
 
       <SceneCTA
@@ -371,6 +378,85 @@ function DoneCard({
         </p>
       </div>
     </div>
+  );
+}
+
+// ─── Learn-beat ─────────────────────────────────────────────────────
+
+function LearnBeat({
+  rules,
+  learnedCount,
+}: {
+  rules: Rule[];
+  learnedCount: number;
+}) {
+  return (
+    <section className="mt-5 scene-card rounded-2xl p-5">
+      <div className="flex items-baseline justify-between gap-2">
+        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600">
+          house rules · what every approval teaches
+        </p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+          {rules.length} {rules.length === 1 ? "rule" : "rules"}
+          {learnedCount > 0 ? (
+            <>
+              {" "}
+              ·{" "}
+              <span className="text-[var(--color-scene-1)]">
+                {learnedCount} learned from {PERSONAS.client.firstName}
+              </span>
+            </>
+          ) : null}
+        </p>
+      </div>
+      {rules.length === 0 ? (
+        <p className="mt-3 rounded-lg border border-dashed border-white/10 px-3 py-4 text-center text-[11px] text-zinc-600">
+          Have {PERSONAS.client.firstName} approve or revise a deliverable and
+          the studio starts a house rulebook.
+        </p>
+      ) : (
+        <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {rules.map((rule) => (
+            <RuleRow key={rule.id} rule={rule} />
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+function RuleRow({ rule }: { rule: Rule }) {
+  const isDo = rule.kind === "do";
+  const audienceLabel =
+    rule.audience === "editor"
+      ? `for ${PERSONAS.editor.firstName}`
+      : `for ${PERSONAS.pm.firstName}`;
+  return (
+    <li
+      className={[
+        "rounded-lg border px-3 py-2",
+        rule.fresh
+          ? "pg-fresh border-[var(--color-scene-1)]/45"
+          : "border-white/10 bg-white/[0.02]",
+      ].join(" ")}
+    >
+      <div className="flex items-start gap-2">
+        <span className={isDo ? "text-emerald-400" : "text-rose-400"}>
+          {isDo ? "✓" : "✗"}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-[12px] leading-relaxed text-zinc-200">{rule.text}</p>
+          <p className="mt-0.5 flex items-center gap-2 font-mono text-[8px] uppercase tracking-[0.18em] text-zinc-500">
+            <span>{audienceLabel}</span>
+            {rule.learned ? (
+              <span className="text-[var(--color-scene-1)]">
+                · learned from {PERSONAS.client.firstName}
+              </span>
+            ) : null}
+          </p>
+        </div>
+      </div>
+    </li>
   );
 }
 

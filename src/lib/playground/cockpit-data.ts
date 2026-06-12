@@ -22,6 +22,16 @@ export const FOUNDER = {
 export type SignalKind = "email" | "task" | "calendar";
 export type Urgency = "now" | "today" | "fyi";
 
+/** A rule the cockpit has learned about how the founder works. */
+export type RuleSpec = { text: string; kind: "do" | "dont" };
+export type Rule = RuleSpec & {
+  id: string;
+  /** True when it came from a user approval; false for AI-seeded defaults. */
+  learned: boolean;
+  /** Just appeared — drives the pop-in highlight. */
+  fresh?: boolean;
+};
+
 export type Signal = {
   id: string;
   kind: SignalKind;
@@ -36,6 +46,8 @@ export type Signal = {
   /** The draft the AI prepares for the Today action this signal spawns. */
   draft: string;
   todoLabel: string;
+  /** Rule the cockpit learns the moment the spawned todo is approved. */
+  learnedRule?: RuleSpec;
   fresh?: boolean;
 };
 
@@ -46,6 +58,8 @@ export type Todo = {
   draft: string;
   source: "inbox" | "money";
   done?: boolean;
+  /** Rule the cockpit learns the moment this todo is approved. */
+  learnedRule?: RuleSpec;
   fresh?: boolean;
 };
 
@@ -61,6 +75,8 @@ export type MoneyItem = {
   /** Overdue invoices can be chased → spawns a Today action. */
   chased?: boolean;
   draft?: string;
+  /** Rule the cockpit learns when the spawned reminder is approved. */
+  learnedRule?: RuleSpec;
   fresh?: boolean;
 };
 
@@ -75,6 +91,7 @@ export type CockpitState = {
   signals: Signal[];
   todos: Todo[];
   money: MoneyItem[];
+  rules: Rule[];
   feed: FeedEntry[];
 };
 
@@ -96,6 +113,10 @@ const SIGNALS_SEED: Signal[] = [
     aiNote: "Client on an active project. Wants a date change, needs your call.",
     draft: "Hi Tessa, the 14th works on my side. I'll shift the timeline and resend the schedule today. Remi",
     todoLabel: "Reply to Tessa about the launch date",
+    learnedRule: {
+      text: "Accept active-client date moves same-day when the timeline absorbs it",
+      kind: "do",
+    },
   },
   {
     id: "s-supplier",
@@ -106,6 +127,10 @@ const SIGNALS_SEED: Signal[] = [
     aiNote: "Quote attached. You usually reorder this within the week.",
     draft: "Thanks, approved. Please proceed with the standard quantity and send the invoice. Remi",
     todoLabel: "Approve the restock reorder",
+    learnedRule: {
+      text: "Auto-approve standard supplier reorders within the week",
+      kind: "do",
+    },
   },
   {
     id: "s-news",
@@ -126,6 +151,10 @@ const TODOS_SEED: Todo[] = [
     label: "Confirm Thursday call with the new lead",
     draft: "Thursday 3pm works, sending a calendar invite now. Looking forward to it.",
     source: "inbox",
+    learnedRule: {
+      text: "Confirm first-call invites with new leads within the day",
+      kind: "do",
+    },
   },
 ];
 
@@ -140,6 +169,10 @@ const MONEY_SEED: MoneyItem[] = [
     direction: "in",
     flag: "overdue",
     draft: "Hi, just a friendly nudge that invoice #0042 (£1,500) is now 12 days past due. Could you confirm a payment date? Thanks! Remi",
+    learnedRule: {
+      text: "Chase overdue invoices at 12+ days past due",
+      kind: "do",
+    },
   },
   {
     id: "m-low",
@@ -149,6 +182,11 @@ const MONEY_SEED: MoneyItem[] = [
     direction: "out",
     flag: "low",
   },
+];
+
+const RULES_SEED: Rule[] = [
+  { id: "r-seed-news", text: "Auto-file indie-maker newsletters", kind: "do", learned: false },
+  { id: "r-seed-transactions", text: "Categorise transactions overnight", kind: "do", learned: false },
 ];
 
 const FEED_SEED: Array<{ id: string; offsetMs: number; text: string }> = [
@@ -162,6 +200,7 @@ export function createInitialCockpitState(): CockpitState {
     signals: SIGNALS_SEED.map((s) => ({ ...s })),
     todos: TODOS_SEED.map((t) => ({ ...t })),
     money: MONEY_SEED.map((m) => ({ ...m })),
+    rules: RULES_SEED.map((r) => ({ ...r })),
     feed: FEED_SEED.map((f) => ({ id: f.id, ts: now - f.offsetMs, text: f.text })),
   };
 }
@@ -170,8 +209,17 @@ function nextId(): string {
   return `cf-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 }
 
+function nextRuleId(): string {
+  return `r-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
 function log(feed: FeedEntry[], text: string): FeedEntry[] {
   return [{ id: nextId(), ts: Date.now(), text, fresh: true }, ...feed];
+}
+
+function learnRule(rules: Rule[], spec: RuleSpec | undefined): Rule[] {
+  if (!spec) return rules;
+  return [{ id: nextRuleId(), text: spec.text, kind: spec.kind, learned: true, fresh: true }, ...rules];
 }
 
 export function cockpitReducer(
@@ -188,7 +236,14 @@ export function cockpitReducer(
           s.id === sig.id ? { ...s, routed: true } : s,
         ),
         todos: [
-          { id: `todo-${sig.id}`, label: sig.todoLabel, draft: sig.draft, source: "inbox", fresh: true },
+          {
+            id: `todo-${sig.id}`,
+            label: sig.todoLabel,
+            draft: sig.draft,
+            source: "inbox",
+            learnedRule: sig.learnedRule,
+            fresh: true,
+          },
           ...state.todos,
         ],
         feed: log(state.feed, `Added to Today · ${sig.todoLabel}`),
@@ -203,7 +258,14 @@ export function cockpitReducer(
           x.id === m.id ? { ...x, chased: true } : x,
         ),
         todos: [
-          { id: `todo-${m.id}`, label: `Send payment reminder · ${m.label}`, draft: m.draft, source: "money", fresh: true },
+          {
+            id: `todo-${m.id}`,
+            label: `Send payment reminder · ${m.label}`,
+            draft: m.draft,
+            source: "money",
+            learnedRule: m.learnedRule,
+            fresh: true,
+          },
           ...state.todos,
         ],
         feed: log(state.feed, `Drafted a payment reminder · ${m.label}`),
@@ -212,12 +274,20 @@ export function cockpitReducer(
     case "APPROVE_TODO": {
       const t = state.todos.find((x) => x.id === event.id);
       if (!t || t.done) return state;
+      const learnedRules = learnRule(state.rules, t.learnedRule);
+      const learnedText = t.learnedRule?.text;
       return {
         ...state,
         todos: state.todos.map((x) =>
           x.id === t.id ? { ...x, done: true, fresh: true } : x,
         ),
-        feed: log(state.feed, `Approved + sent · ${t.label}`),
+        rules: learnedRules,
+        feed: log(
+          state.feed,
+          learnedText
+            ? `Approved + sent · ${t.label} · learned: ${learnedText}`
+            : `Approved + sent · ${t.label}`,
+        ),
       };
     }
     case "DISMISS_TODO": {
@@ -234,6 +304,7 @@ export function cockpitReducer(
         signals: state.signals.map((s) => (s.id === event.id ? { ...s, fresh: false } : s)),
         todos: state.todos.map((t) => (t.id === event.id ? { ...t, fresh: false } : t)),
         money: state.money.map((m) => (m.id === event.id ? { ...m, fresh: false } : m)),
+        rules: state.rules.map((r) => (r.id === event.id && r.fresh ? { ...r, fresh: false } : r)),
         feed: state.feed.map((f) => (f.id === event.id && f.fresh ? { ...f, fresh: false } : f)),
       };
     case "RESET":

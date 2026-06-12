@@ -83,7 +83,7 @@ export default function FounderCockpit() {
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
         Your inbox, your day, and your money, triaged by AI overnight. Send
         what matters to Today, approve the drafts, chase the late invoice. You
-        decide; the cockpit does the typing — <span className="text-zinc-300">and
+        decide; the cockpit does the typing, <span className="text-zinc-300">and
         learns from every approval below</span>.{" "}
         {openTodos > 0 ? (
           <span className="text-zinc-300">{openTodos} waiting on you.</span>
@@ -351,7 +351,7 @@ function LearnBeat({
       </div>
       {rules.length === 0 ? (
         <p className="mt-3 rounded-lg border border-dashed border-white/10 px-3 py-4 text-center text-[11px] text-zinc-600">
-          Approve a draft below — the cockpit starts learning your shape.
+          Approve a draft below and the cockpit starts learning your shape.
         </p>
       ) : (
         <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">

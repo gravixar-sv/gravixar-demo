@@ -64,7 +64,7 @@ export default function StudioMixPlayground() {
             into a client&apos;s ops. Read-only work runs on its own; anything
             that writes, spends, or publishes waits behind a human. Run one on
             the left, see its output in the middle, every action lands in the
-            audit log on the right. Never auto-publish — and the studio
+            audit log on the right. Never auto-publish, and the studio
             <span className="text-zinc-300"> learns from every approve / discard</span>.
           </p>
         </div>
@@ -137,7 +137,7 @@ function LearnBeat({
       </div>
       {rules.length === 0 ? (
         <p className="mt-3 rounded-lg border border-dashed border-white/10 px-3 py-4 text-center text-[11px] text-zinc-600">
-          Run ECHO + approve or discard the draft — the studio starts a policy book.
+          Run ECHO + approve or discard the draft and the studio starts a policy book.
         </p>
       ) : (
         <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">

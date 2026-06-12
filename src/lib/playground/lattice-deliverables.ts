@@ -119,7 +119,7 @@ const SEED_DELIVERABLES: Omit<Deliverable, "fresh">[] = [
     state: "with_client",
     version: 2,
     approvalRule: {
-      text: "Sage's web heroes land on v2 — keep v1 → v2 as the default cadence",
+      text: "Sage's web heroes land on v2, keep v1 → v2 as the default cadence",
       kind: "do",
       audience: "editor",
     },

@@ -47,7 +47,7 @@ export type StudioEvent =
 const RULES_SEED: Rule[] = [
   {
     id: "sr-seed-publish",
-    text: "Writer agents never auto-publish — every draft waits behind a human",
+    text: "Writer agents never auto-publish, every draft waits behind a human",
     kind: "do",
     learned: false,
   },

@@ -57,11 +57,11 @@ export const STUDIO_AGENTS: StudioAgent[] = [
       "920 words drafted · queued for human review",
     ],
     approvalRule: {
-      text: "ECHO drafts in the “almost-working” voice — keep that frame on long-form",
+      text: "ECHO drafts in the “almost-working” voice, keep that frame on long-form",
       kind: "do",
     },
     discardRule: {
-      text: "ECHO: 920-word longform overshoots ops audiences — try 500 next",
+      text: "ECHO: 920-word longform overshoots ops audiences, try 500 next",
       kind: "dont",
     },
   },

@@ -63,7 +63,7 @@ export default function LatticeReviewLoop() {
             any column. Approve, request a revision, or push it back, and watch
             the card hand off to the next person. Hover any thumbnail to preview.
             Every client approval and revision <span className="text-zinc-300">teaches the studio
-            a house rule</span> — watch them appear below.
+            a house rule</span>. Watch them appear below.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -410,8 +410,8 @@ function LearnBeat({
       </div>
       {rules.length === 0 ? (
         <p className="mt-3 rounded-lg border border-dashed border-white/10 px-3 py-4 text-center text-[11px] text-zinc-600">
-          Have {PERSONAS.client.firstName} approve or revise a deliverable — the
-          studio starts a house rulebook.
+          Have {PERSONAS.client.firstName} approve or revise a deliverable and
+          the studio starts a house rulebook.
         </p>
       ) : (
         <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">

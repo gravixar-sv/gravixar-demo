@@ -20,6 +20,7 @@ import {
 } from "@/lib/playground/northbeam-data";
 import { MockupThumb } from "@/components/demo/DeliverableMockup";
 import { SceneCTA } from "@/components/demo/SceneCTA";
+import { flowPulse } from "@/lib/flowPulse";
 
 const FRESH_DECAY_MS = 2200;
 
@@ -85,7 +86,7 @@ export default function NorthbeamBrandAgent() {
         </Col>
 
         {/* Brand agent workspace */}
-        <Col label="Brand agent" status="drafts on-brand · you approve">
+        <Col label="Brand agent" status="drafts on-brand · you approve" flow="nb-agent">
           <Workspace draft={state.draft} gate={state.gate} dispatch={dispatch} />
         </Col>
 
@@ -93,6 +94,7 @@ export default function NorthbeamBrandAgent() {
         <Col
           label="Brand memory"
           status={`${state.rules.length} rules · ${learnedCount} learned from you`}
+          flow="nb-memory"
         >
           {state.rules.map((r) => (
             <RuleRow key={r.id} rule={r} />
@@ -114,14 +116,20 @@ export default function NorthbeamBrandAgent() {
 function Col({
   label,
   status,
+  flow,
   children,
 }: {
   label: string;
   status: string;
+  /** Name other columns target with flowPulse(). */
+  flow?: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className="scene-card min-w-[82%] shrink-0 snap-start rounded-2xl p-5 sm:min-w-[48%] lg:min-w-0">
+    <section
+      data-flow={flow}
+      className="scene-card min-w-[82%] shrink-0 snap-start rounded-2xl p-5 sm:min-w-[48%] lg:min-w-0"
+    >
       <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-300">{label}</p>
       <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-600">{status}</p>
       <div className="mt-4 space-y-3">{children}</div>
@@ -148,7 +156,7 @@ function RequestCard({
       ].join(" ")}
     >
       <div className="flex items-start gap-3">
-        <MockupThumb kind={req.kind} />
+        <MockupThumb kind={req.kind} brand="northbeam" />
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-zinc-100">{req.title}</p>
           <p className="mt-1 text-[11px] italic leading-relaxed text-zinc-500">
@@ -171,7 +179,10 @@ function RequestCard({
       ) : (
         <button
           type="button"
-          onClick={() => dispatch({ type: "GENERATE", id: req.id })}
+          onClick={(e) => {
+            flowPulse(e.currentTarget, "nb-agent");
+            dispatch({ type: "GENERATE", id: req.id });
+          }}
           className={[
             "mt-3 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors",
             req.offBrand
@@ -197,11 +208,14 @@ function Workspace({
 }) {
   if (!draft) {
     return (
-      <p className="rounded-lg border border-dashed border-white/10 px-3 py-10 text-center text-[11px] leading-relaxed text-zinc-600">
-        Pick a request on the left.
-        <br />
-        The agent drafts it on-brand here.
-      </p>
+      <div className="flex flex-col items-center gap-4 rounded-lg border border-dashed border-white/10 px-3 py-10 text-center">
+        <span aria-hidden className="agent-orb" />
+        <p className="text-[11px] leading-relaxed text-zinc-600">
+          The agent is standing by.
+          <br />
+          Pick a request on the left and it drafts on-brand here.
+        </p>
+      </div>
     );
   }
 
@@ -215,7 +229,7 @@ function Workspace({
       ].join(" ")}
     >
       <div className="flex items-start gap-3">
-        <MockupThumb kind={draft.kind} />
+        <MockupThumb kind={draft.kind} brand="northbeam" />
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-zinc-100">{draft.title}</p>
           <p
@@ -229,8 +243,11 @@ function Workspace({
         </div>
       </div>
 
-      {/* Generated copy / explanation */}
-      <div className="mt-3 space-y-1.5 border-t border-white/5 pt-3">
+      {/* Generated copy / explanation, staged in like it's being written */}
+      <div
+        key={draft.title}
+        className="pg-stagger mt-3 space-y-1.5 border-t border-white/5 pt-3"
+      >
         {draft.lines.map((line, i) => (
           <p key={i} className="font-mono text-[11px] leading-relaxed text-zinc-300">
             {line}
@@ -280,14 +297,20 @@ function Workspace({
             <div className="mt-2 flex flex-wrap gap-2">
               <button
                 type="button"
-                onClick={() => dispatch({ type: "APPROVE" })}
+                onClick={(e) => {
+                  flowPulse(e.currentTarget, "nb-memory");
+                  dispatch({ type: "APPROVE" });
+                }}
                 className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-colors hover:bg-emerald-400/20"
               >
                 Approve &amp; publish →
               </button>
               <button
                 type="button"
-                onClick={() => dispatch({ type: "REQUEST_CHANGE" })}
+                onClick={(e) => {
+                  flowPulse(e.currentTarget, "nb-memory");
+                  dispatch({ type: "REQUEST_CHANGE" });
+                }}
                 className="rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-1.5 text-xs font-medium text-amber-200 transition-colors hover:bg-amber-400/20"
               >
                 Request change

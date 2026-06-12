@@ -57,13 +57,79 @@ function EmailArt() {
   );
 }
 
-function Art({ kind }: { kind: DeliverableKind }) {
+// ─── Northbeam Goods variants ───────────────────────────────────────
+// Same shapes, the DTC brand's own voice: sage green + cream on deep
+// green-black. Northbeam's attachments must read as NORTHBEAM work,
+// not Lattice's.
+
+function NorthbeamSocialArt() {
+  return (
+    <svg viewBox="0 0 180 180" className="h-full w-full" role="img" aria-label="Northbeam social post mockup">
+      <rect width="180" height="180" fill="#121a0e" />
+      <circle cx="140" cy="44" r="40" fill="#9DBE6E" opacity="0.22" />
+      <text x="20" y="38" fill="#F2DDC1" fontSize="7" fontFamily="monospace" letterSpacing="3">NORTHBEAM</text>
+      <text x="20" y="92" fill="#f5f5f7" fontSize="21" fontFamily="serif" fontWeight="700">The spring</text>
+      <text x="20" y="116" fill="#9DBE6E" fontSize="21" fontFamily="serif" fontWeight="700">drop is here.</text>
+      <rect x="20" y="134" width="56" height="3" fill="#9DBE6E" />
+      <text x="20" y="162" fill="#a1a1aa" fontSize="8" fontFamily="sans-serif">made to last, made by hand</text>
+    </svg>
+  );
+}
+
+function NorthbeamWebArt() {
+  return (
+    <svg viewBox="0 0 320 180" className="h-full w-full" role="img" aria-label="Northbeam landing module mockup">
+      <rect width="320" height="180" fill="#10160c" />
+      <circle cx="14" cy="11" r="3" fill="#9DBE6E" />
+      <text x="26" y="14" fill="#F2DDC1" fontSize="8" fontFamily="serif" letterSpacing="2">NORTHBEAM</text>
+      <text x="20" y="78" fill="#f5f5f7" fontSize="24" fontFamily="serif" fontWeight="600">Bundle up.</text>
+      <text x="20" y="104" fill="#9DBE6E" fontSize="13" fontFamily="serif">Three favourites, one box.</text>
+      <rect x="20" y="124" width="76" height="18" rx="9" fill="#9DBE6E" />
+      <text x="32" y="136" fill="#10160c" fontSize="8" fontFamily="sans-serif" fontWeight="700">Shop the set</text>
+      <rect x="206" y="38" width="96" height="112" rx="6" fill="#1c2614" />
+      <rect x="218" y="52" width="72" height="44" rx="3" fill="#F2DDC1" opacity="0.85" />
+      <rect x="218" y="106" width="72" height="6" rx="3" fill="#3a4a2e" />
+      <rect x="218" y="118" width="50" height="6" rx="3" fill="#3a4a2e" />
+    </svg>
+  );
+}
+
+function NorthbeamEmailArt() {
+  return (
+    <svg viewBox="0 0 320 180" className="h-full w-full" role="img" aria-label="Northbeam newsletter header mockup">
+      <rect width="320" height="180" fill="#10160c" />
+      <rect x="0" y="0" width="320" height="120" fill="#18220f" />
+      <text x="24" y="40" fill="#F2DDC1" fontSize="9" fontFamily="serif" letterSpacing="2">NORTHBEAM</text>
+      <text x="24" y="74" fill="#f5f5f7" fontSize="18" fontFamily="serif" fontWeight="600">May, in objects.</text>
+      <text x="24" y="94" fill="#a1a1aa" fontSize="8" fontFamily="sans-serif">What we made, mended, and shipped.</text>
+      <rect x="24" y="138" width="68" height="20" rx="10" fill="#9DBE6E" />
+      <text x="36" y="151" fill="#10160c" fontSize="8" fontFamily="sans-serif" fontWeight="700">Read on</text>
+      <text x="232" y="151" fill="#52525b" fontSize="7" fontFamily="monospace">unsubscribe</text>
+    </svg>
+  );
+}
+
+type MockupBrand = "lattice" | "northbeam";
+
+function Art({ kind, brand }: { kind: DeliverableKind; brand: MockupBrand }) {
+  if (brand === "northbeam") {
+    if (kind === "social") return <NorthbeamSocialArt />;
+    if (kind === "email") return <NorthbeamEmailArt />;
+    return <NorthbeamWebArt />;
+  }
   if (kind === "social") return <SocialArt />;
   if (kind === "email") return <EmailArt />;
   return <WebArt />;
 }
 
-export function MockupThumb({ kind }: { kind: DeliverableKind }) {
+export function MockupThumb({
+  kind,
+  brand = "lattice",
+}: {
+  kind: DeliverableKind;
+  /** Which fictional brand's voice the artwork carries. */
+  brand?: MockupBrand;
+}) {
   const ratio = kind === "social" ? "aspect-square w-20" : "aspect-[16/9] w-32";
   return (
     <span className="group/thumb relative inline-block" style={{ zIndex: 0 }}>
@@ -71,7 +137,7 @@ export function MockupThumb({ kind }: { kind: DeliverableKind }) {
         className={`block ${ratio} overflow-hidden rounded-md border border-white/10 shadow-sm transition-transform duration-200 ease-out group-hover/thumb:scale-[2.1] group-hover/thumb:shadow-2xl`}
         style={{ transformOrigin: "left center" }}
       >
-        <Art kind={kind} />
+        <Art kind={kind} brand={brand} />
       </span>
       {/* lift above siblings on hover so the popped preview isn't clipped */}
       <style>{`.group\\/thumb:hover{z-index:30}`}</style>

@@ -6,6 +6,7 @@
 // one next step.
 
 import { useRef } from "react";
+import Link from "next/link";
 import { useReveal } from "@/lib/useReveal";
 
 // Real production modules, straight from the fleet's module registry.
@@ -56,6 +57,15 @@ export function ProofStrip() {
                 </li>
               ))}
             </ul>
+            <p data-reveal className="mt-5">
+              <Link
+                href="/modules"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-[#ff6b6b] transition-colors hover:text-white"
+              >
+                Try the modules in isolation
+                <span aria-hidden>→</span>
+              </Link>
+            </p>
           </div>
 
           <div data-reveal className="flex flex-col justify-center rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent p-8 md:p-10">

@@ -21,6 +21,7 @@ import {
 } from "@/lib/playground/cockpit-data";
 import { Avatar } from "@/components/demo/Avatar";
 import { SceneCTA } from "@/components/demo/SceneCTA";
+import { flowPulse } from "@/lib/flowPulse";
 
 const FRESH_DECAY_MS = 2200;
 
@@ -114,14 +115,20 @@ export default function FounderCockpit() {
 function Col({
   label,
   status,
+  flow,
   children,
 }: {
   label: string;
   status: string;
+  /** Name other columns target with flowPulse(). */
+  flow?: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className="scene-card min-w-[82%] shrink-0 snap-start rounded-2xl p-5 sm:min-w-[48%] lg:min-w-0">
+    <section
+      data-flow={flow}
+      className="scene-card min-w-[82%] shrink-0 snap-start rounded-2xl p-5 sm:min-w-[48%] lg:min-w-0"
+    >
       <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-300">
         {label}
       </p>
@@ -177,7 +184,10 @@ function InboxColumn({
             ) : (
               <button
                 type="button"
-                onClick={() => dispatch({ type: "ROUTE_SIGNAL", id: s.id })}
+                onClick={(e) => {
+                  flowPulse(e.currentTarget, "cp-today");
+                  dispatch({ type: "ROUTE_SIGNAL", id: s.id });
+                }}
                 className="mt-2 rounded-lg border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/10 px-3 py-1.5 text-xs font-medium text-amber-200 transition-colors hover:bg-[var(--color-scene-1)]/20"
               >
                 → Add to Today
@@ -200,7 +210,7 @@ function TodayColumn({
   dispatch: React.Dispatch<CockpitEvent>;
 }) {
   return (
-    <Col label="Today · needs you" status="ai-drafted · you approve">
+    <Col label="Today · needs you" status="ai-drafted · you approve" flow="cp-today">
       {todos.length === 0 ? (
         <p className="rounded-lg border border-dashed border-white/10 px-3 py-6 text-center text-[11px] text-zinc-600">
           Clear. Route something from the inbox.
@@ -231,7 +241,10 @@ function TodayColumn({
               <div className="mt-2 flex gap-2">
                 <button
                   type="button"
-                  onClick={() => dispatch({ type: "APPROVE_TODO", id: t.id })}
+                  onClick={(e) => {
+                    flowPulse(e.currentTarget, "cp-rules");
+                    dispatch({ type: "APPROVE_TODO", id: t.id });
+                  }}
                   className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-colors hover:bg-emerald-400/20"
                 >
                   Approve &amp; send →
@@ -309,7 +322,10 @@ function MoneyColumn({
             ) : (
               <button
                 type="button"
-                onClick={() => dispatch({ type: "CHASE_INVOICE", id: m.id })}
+                onClick={(e) => {
+                  flowPulse(e.currentTarget, "cp-today");
+                  dispatch({ type: "CHASE_INVOICE", id: m.id });
+                }}
                 className="mt-2 rounded-lg border border-rose-400/30 bg-rose-400/10 px-3 py-1.5 text-xs font-medium text-rose-200 transition-colors hover:bg-rose-400/20"
               >
                 Chase it →
@@ -332,7 +348,7 @@ function LearnBeat({
   learnedCount: number;
 }) {
   return (
-    <section className="mt-5 scene-card rounded-2xl p-5">
+    <section data-flow="cp-rules" className="mt-5 scene-card rounded-2xl p-5">
       <div className="flex items-baseline justify-between gap-2">
         <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600">
           what it learned from you

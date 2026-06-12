@@ -28,7 +28,7 @@ export default function LatticeSceneLayout({
       }
     >
       <Topbar sceneName={SCENE.name} showReset={false} />
-      {children}
+      <main>{children}</main>
     </div>
   );
 }

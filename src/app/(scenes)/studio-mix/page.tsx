@@ -20,6 +20,7 @@ import {
 } from "@/lib/playground/studio-reducer";
 import type { AuditEntry } from "@/lib/playground/reducer";
 import { SceneCTA } from "@/components/demo/SceneCTA";
+import { flowPulse } from "@/lib/flowPulse";
 
 const FRESH_DECAY_MS = 2000;
 
@@ -184,14 +185,20 @@ function RuleRow({ rule }: { rule: Rule }) {
 function ColumnShell({
   label,
   status,
+  flow,
   children,
 }: {
   label: string;
   status: string;
+  /** Name other columns target with flowPulse(). */
+  flow?: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className="scene-card min-w-[82%] shrink-0 snap-start rounded-2xl p-5 sm:min-w-[48%] lg:min-w-0">
+    <section
+      data-flow={flow}
+      className="scene-card min-w-[82%] shrink-0 snap-start rounded-2xl p-5 sm:min-w-[48%] lg:min-w-0"
+    >
       <div className="flex items-center gap-2 border-b border-white/5 pb-3">
         <span className="flex gap-1.5">
           <span className="h-2 w-2 rounded-full bg-zinc-700" />
@@ -254,7 +261,10 @@ function AgentsColumn({
               <div className="mt-3 flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => onRun(agent.key)}
+                  onClick={(e) => {
+                    flowPulse(e.currentTarget, "studio-output");
+                    onRun(agent.key);
+                  }}
                   className="rounded-lg border px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.15em] transition-colors"
                   style={{
                     borderColor: `${agent.color}55`,
@@ -290,7 +300,11 @@ function OutputColumn({
   dispatch: React.Dispatch<StudioEvent>;
 }) {
   return (
-    <ColumnShell label="output" status={agent ? `${agent.name.toLowerCase()} · ${agent.outputTitle}` : "no run yet"}>
+    <ColumnShell
+      label="output"
+      status={agent ? `${agent.name.toLowerCase()} · ${agent.outputTitle}` : "no run yet"}
+      flow="studio-output"
+    >
       {agent ? (
         <div
           key={agent.key}
@@ -308,9 +322,13 @@ function OutputColumn({
               {agent.role}
             </span>
           </div>
-          <pre className="mt-3 whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-zinc-300">
-            {agent.outputLines.join("\n")}
-          </pre>
+          <div className="pg-stagger mt-3 space-y-1.5 font-mono text-[11px] leading-relaxed text-zinc-300">
+            {agent.outputLines.map((line, i) => (
+              <p key={`${agent.key}-${i}`} className="whitespace-pre-wrap">
+                {line}
+              </p>
+            ))}
+          </div>
 
           {/* Approval gate — writer agents wait for a human; read-only run autonomously */}
           {agent.gated ? (
@@ -322,14 +340,20 @@ function OutputColumn({
                 <div className="mt-2 flex gap-2">
                   <button
                     type="button"
-                    onClick={() => dispatch({ type: "APPROVE" })}
+                    onClick={(e) => {
+                      flowPulse(e.currentTarget, "studio-feed");
+                      dispatch({ type: "APPROVE" });
+                    }}
                     className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-colors hover:bg-emerald-400/20"
                   >
                     Approve &amp; publish →
                   </button>
                   <button
                     type="button"
-                    onClick={() => dispatch({ type: "DISCARD" })}
+                    onClick={(e) => {
+                      flowPulse(e.currentTarget, "studio-feed");
+                      dispatch({ type: "DISCARD" });
+                    }}
                     className="rounded-lg px-2 py-1.5 text-xs text-zinc-500 hover:text-zinc-300"
                   >
                     Discard
@@ -352,11 +376,12 @@ function OutputColumn({
           )}
         </div>
       ) : (
-        <div className="mt-3 flex min-h-[180px] items-center justify-center rounded-xl border border-dashed border-white/10 px-6 text-center">
+        <div className="mt-3 flex min-h-[180px] flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-white/10 px-6 text-center">
+          <span aria-hidden className="agent-orb" />
           <p className="text-xs leading-relaxed text-zinc-500">
-            Run an agent on the left.
+            Agents standing by.
             <br />
-            Its output streams in here.
+            Run one on the left and its output streams in here.
           </p>
         </div>
       )}
@@ -368,7 +393,7 @@ function OutputColumn({
 
 function FeedColumn({ feed }: { feed: AuditEntry[] }) {
   return (
-    <ColumnShell label="audit log" status="every action logged · real-time">
+    <ColumnShell label="audit log" status="every action logged · real-time" flow="studio-feed">
       <ul className="mt-3 space-y-2">
         {feed.map((entry) => (
           <li

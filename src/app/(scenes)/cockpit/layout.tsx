@@ -27,7 +27,7 @@ export default function CockpitSceneLayout({
       }
     >
       <Topbar sceneName={SCENE.name} />
-      {children}
+      <main>{children}</main>
     </div>
   );
 }

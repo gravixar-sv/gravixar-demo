@@ -46,7 +46,8 @@ export default function NorthbeamBrandAgent() {
 
   return (
     <div className="mx-auto max-w-7xl px-6 pb-20 pt-10 md:px-10 lg:px-12">
-      <header className="flex flex-wrap items-end justify-between gap-4">
+      <div aria-hidden className="scene-conduit mb-7" />
+      <header className="scene-rise flex flex-wrap items-end justify-between gap-4">
         <div className="max-w-2xl">
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--color-scene-1)]">
             brand agent · for dtc teams · live sandbox
@@ -70,7 +71,7 @@ export default function NorthbeamBrandAgent() {
         </button>
       </header>
 
-      <div className="mt-7 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-[0.95fr_1.2fr_0.95fr] lg:gap-5 lg:overflow-visible lg:pb-0">
+      <div className="scene-columns mt-7 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-[0.95fr_1.2fr_0.95fr] lg:gap-5 lg:overflow-visible lg:pb-0">
         {/* Requests */}
         <Col label="Requests" status="plain briefs · from the team">
           {state.requests.map((r) => (

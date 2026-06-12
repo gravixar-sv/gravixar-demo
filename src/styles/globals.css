@@ -215,6 +215,63 @@
     animation: pgCueIn 1.6s ease-out both;
   }
 
+  /* ── Index hero: the approval-gate hairline ────────────────────── */
+
+  /* The gate the particle field flows through. A quiet vertical line
+     with a slow breathing glow; the canvas does the real talking. */
+  @keyframes gateBreathe {
+    0%, 100% { opacity: 0.5; }
+    50%      { opacity: 0.95; }
+  }
+  .gate-hairline {
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(255, 107, 107, 0.55) 18%,
+      rgba(255, 107, 107, 0.85) 50%,
+      rgba(255, 107, 107, 0.55) 82%,
+      transparent 100%
+    );
+    box-shadow: 0 0 24px 1px rgba(255, 107, 107, 0.25);
+    animation: gateBreathe 5.5s var(--ease-in-out) infinite;
+  }
+
+  /* ── Scene entrance choreography (shared by all 4 scenes) ──────── */
+
+  /* Header, columns, and below-grid strips rise in on mount. Pure CSS
+     so scene bundles stay light; delays are set per slot. */
+  @keyframes sceneRise {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .scene-rise { animation: sceneRise 640ms var(--ease-out) both; }
+
+  /* Columns stagger left to right; everything below the grid (learn
+     strip, feed, CTA) rises last as one block. */
+  .scene-columns > * { animation: sceneRise 640ms var(--ease-out) both; }
+  .scene-columns > *:nth-child(1) { animation-delay: 70ms; }
+  .scene-columns > *:nth-child(2) { animation-delay: 140ms; }
+  .scene-columns > *:nth-child(3) { animation-delay: 210ms; }
+  .scene-columns ~ * { animation: sceneRise 640ms var(--ease-out) 280ms both; }
+
+  /* Scene conduit: a thin scene-accent thread that draws across the
+     top of the workspace on entry. The index's gate line, echoed. */
+  @keyframes conduitDraw {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+  }
+  .scene-conduit {
+    height: 1px;
+    transform-origin: left center;
+    background: linear-gradient(
+      90deg,
+      var(--color-scene-1) 0%,
+      color-mix(in oklab, var(--color-scene-1) 35%, transparent) 60%,
+      transparent 100%
+    );
+    animation: conduitDraw 900ms var(--ease-out) 120ms both;
+  }
+
   /* Honour system reduce-motion. The tour still works, just skips the
      entrance fade and the pulse animation. */
   @media (prefers-reduced-motion: reduce) {
@@ -222,6 +279,13 @@
     .tour-fresh-pulse { animation: none; background-color: rgba(255, 107, 107, 0.06); }
     .pg-fresh { animation: none; }
     .pg-cue { animation: none; }
+    .gate-hairline { animation: none; opacity: 0.6; }
+    .scene-rise,
+    .scene-columns > *,
+    .scene-columns ~ * {
+      animation: none;
+    }
+    .scene-conduit { animation: none; }
   }
 
   /* Agency-style card surface, matches the marketing site's

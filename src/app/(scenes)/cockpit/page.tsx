@@ -56,7 +56,8 @@ export default function FounderCockpit() {
 
   return (
     <div className="mx-auto max-w-7xl px-6 pb-20 pt-10 md:px-10 lg:px-12">
-      <header className="flex flex-wrap items-end justify-between gap-4">
+      <div aria-hidden className="scene-conduit mb-7" />
+      <header className="scene-rise flex flex-wrap items-end justify-between gap-4">
         <div className="flex items-center gap-3">
           <Avatar initials={FOUNDER.initials} hue={FOUNDER.hue} size="lg" />
           <div>
@@ -80,7 +81,7 @@ export default function FounderCockpit() {
         </button>
       </header>
 
-      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
+      <p className="scene-rise mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">
         Your inbox, your day, and your money, triaged by AI overnight. Send
         what matters to Today, approve the drafts, chase the late invoice. You
         decide; the cockpit does the typing, <span className="text-zinc-300">and
@@ -90,7 +91,7 @@ export default function FounderCockpit() {
         ) : null}
       </p>
 
-      <div className="mt-7 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:pb-0">
+      <div className="scene-columns mt-7 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:pb-0">
         <InboxColumn signals={state.signals} dispatch={dispatch} />
         <TodayColumn todos={state.todos} dispatch={dispatch} />
         <MoneyColumn money={state.money} dispatch={dispatch} />

@@ -49,8 +49,9 @@ export default function StudioMixPlayground() {
 
   return (
     <div className="mx-auto max-w-7xl px-6 pb-20 pt-10 md:px-10 lg:px-12">
+      <div aria-hidden className="scene-conduit mb-7" />
       {/* ── Orientation ─────────────────────────────────────────── */}
-      <header className="flex flex-wrap items-end justify-between gap-4">
+      <header className="scene-rise flex flex-wrap items-end justify-between gap-4">
         <div className="max-w-2xl">
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--color-scene-1)]">
             supervised agent console · for ops &amp; technical teams · live sandbox
@@ -85,7 +86,7 @@ export default function StudioMixPlayground() {
       </header>
 
       {/* ── 3 columns ───────────────────────────────────────────── */}
-      <div className="mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-[0.9fr_1.2fr_1fr] lg:gap-5 lg:overflow-visible lg:pb-0">
+      <div className="scene-columns mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-[0.9fr_1.2fr_1fr] lg:gap-5 lg:overflow-visible lg:pb-0">
         <AgentsColumn
           currentKey={state.current}
           ran={state.ran}

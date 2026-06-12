@@ -156,7 +156,7 @@ function RequestCard({
       ].join(" ")}
     >
       <div className="flex items-start gap-3">
-        <MockupThumb kind={req.kind} />
+        <MockupThumb kind={req.kind} brand="northbeam" />
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-zinc-100">{req.title}</p>
           <p className="mt-1 text-[11px] italic leading-relaxed text-zinc-500">
@@ -229,7 +229,7 @@ function Workspace({
       ].join(" ")}
     >
       <div className="flex items-start gap-3">
-        <MockupThumb kind={draft.kind} />
+        <MockupThumb kind={draft.kind} brand="northbeam" />
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-zinc-100">{draft.title}</p>
           <p

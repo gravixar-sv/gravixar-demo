@@ -9,28 +9,11 @@ import { useRef } from "react";
 import Link from "next/link";
 import { SCENES, type Scene } from "@/lib/scenes";
 import { ScenePreview } from "@/components/demo/ScenePreview";
-import { gsap, useGSAP } from "@/lib/gsap";
+import { useReveal } from "@/lib/useReveal";
 
 export function SceneGallery() {
   const scope = useRef<HTMLElement>(null);
-
-  useGSAP(
-    () => {
-      const mm = gsap.matchMedia();
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap.utils.toArray<HTMLElement>(".gallery-reveal").forEach((el) => {
-          gsap.from(el, {
-            opacity: 0,
-            y: 44,
-            duration: 0.9,
-            ease: "power3.out",
-            scrollTrigger: { trigger: el, start: "top 88%" },
-          });
-        });
-      });
-    },
-    { scope },
-  );
+  useReveal(scope);
 
   const live = SCENES.filter((s) => s.status === "live");
   const upcoming = SCENES.find((s) => s.status === "coming-online");
@@ -43,7 +26,7 @@ export function SceneGallery() {
       aria-labelledby="scenes-heading"
     >
       <div className="mx-auto max-w-7xl px-6 py-24 md:px-10 md:py-32 lg:px-12">
-        <header className="gallery-reveal flex flex-wrap items-end justify-between gap-6">
+        <header data-reveal className="flex flex-wrap items-end justify-between gap-6">
           <div className="max-w-2xl">
             <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#ff6b6b]">
               the scenes
@@ -71,7 +54,7 @@ export function SceneGallery() {
         </div>
 
         {upcoming ? (
-          <p className="gallery-reveal mt-12 flex flex-wrap items-center gap-3 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+          <p data-reveal className="mt-12 flex flex-wrap items-center gap-3 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-zinc-600" aria-hidden />
             next to come online: {upcoming.name}, {upcoming.whatItIs.toLowerCase()}
           </p>
@@ -95,8 +78,9 @@ function SceneCard({
   return (
     <Link
       href={`/${scene.slug}`}
-      className={`gallery-reveal group block rounded-2xl p-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff6b6b] ${
-        offset ? "md:translate-y-8" : ""
+      data-reveal
+      className={`group block rounded-2xl p-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff6b6b] ${
+        offset ? "md:mt-8" : ""
       }`}
     >
       <ScenePreview scene={scene} priority={priority} sizes="(min-width: 768px) 50vw, 100vw" />

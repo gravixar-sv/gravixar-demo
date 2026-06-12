@@ -6,7 +6,7 @@
 // one next step.
 
 import { useRef } from "react";
-import { gsap, useGSAP } from "@/lib/gsap";
+import { useReveal } from "@/lib/useReveal";
 
 // Real production modules, straight from the fleet's module registry.
 const MODULES = [
@@ -20,23 +20,7 @@ const MODULES = [
 
 export function ProofStrip() {
   const scope = useRef<HTMLElement>(null);
-
-  useGSAP(
-    () => {
-      const mm = gsap.matchMedia();
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap.from(".proof-reveal", {
-          opacity: 0,
-          y: 32,
-          duration: 0.8,
-          stagger: 0.08,
-          ease: "power3.out",
-          scrollTrigger: { trigger: scope.current, start: "top 80%" },
-        });
-      });
-    },
-    { scope },
-  );
+  useReveal(scope);
 
   return (
     <section
@@ -47,22 +31,22 @@ export function ProofStrip() {
       <div className="mx-auto max-w-7xl px-6 py-24 md:px-10 md:py-28 lg:px-12">
         <div className="grid gap-12 lg:grid-cols-[1.2fr_1fr] lg:gap-20">
           <div>
-            <p className="proof-reveal font-mono text-[10px] uppercase tracking-[0.24em] text-[#ff6b6b]">
+            <p data-reveal className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#ff6b6b]">
               not a concept reel
             </p>
             <h2
               id="proof-heading"
-              className="proof-reveal mt-4 text-3xl font-medium leading-[1.08] tracking-[-0.03em] text-zinc-50 md:text-4xl"
+              data-reveal className="mt-4 text-3xl font-medium leading-[1.08] tracking-[-0.03em] text-zinc-50 md:text-4xl"
             >
               The same loop runs Gravixar&apos;s own ops.
             </h2>
-            <p className="proof-reveal mt-5 max-w-xl text-base leading-relaxed text-zinc-400">
+            <p data-reveal className="mt-5 max-w-xl text-base leading-relaxed text-zinc-400">
               The scenes borrow their spine from production systems: agency
               portals, finance cockpits, and brand agents shipped for real
               clients, plus the platform Gravixar runs itself on. Same gates,
               same audit trail, same rulebook.
             </p>
-            <ul className="proof-reveal mt-7 flex flex-wrap gap-2.5">
+            <ul data-reveal className="mt-7 flex flex-wrap gap-2.5">
               {MODULES.map((m) => (
                 <li
                   key={m}
@@ -74,7 +58,7 @@ export function ProofStrip() {
             </ul>
           </div>
 
-          <div className="proof-reveal flex flex-col justify-center rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent p-8 md:p-10">
+          <div data-reveal className="flex flex-col justify-center rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent p-8 md:p-10">
             <h3 className="text-2xl font-medium tracking-[-0.02em] text-zinc-50">
               Want this loop on{" "}
               <span className="text-[#ff6b6b]">your ops?</span>
@@ -103,7 +87,7 @@ export function ProofStrip() {
           </div>
         </div>
 
-        <p className="proof-reveal mt-16 border-t border-white/5 pt-8 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+        <p data-reveal className="mt-16 border-t border-white/5 pt-8 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
           sandbox · sample data · resets every Sunday · no sign-in · nothing
           you press here leaves the page
         </p>

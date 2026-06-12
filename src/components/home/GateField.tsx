@@ -67,8 +67,11 @@ const VERT = /* glsl */ `
       mix(chaoticZ, 0.0, order)
     );
 
-    // Gate proximity drives the accent flash and a size bump.
-    float g = exp(-x * x * 1.35);
+    // Gate proximity drives the accent flash and a size bump. The
+    // flash band scales with the visible width so narrow screens keep
+    // a crisp gate instead of a wide coral wash.
+    float band = max(halfW * 0.085, 0.55);
+    float g = exp(-(x * x) / (band * band));
     vGlow = g;
 
     float edgeFade = smoothstep(halfW * 1.04, halfW * 0.82, abs(x));

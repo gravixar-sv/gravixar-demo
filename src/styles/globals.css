@@ -215,6 +215,42 @@
     animation: pgCueIn 1.6s ease-out both;
   }
 
+  /* ── Viewport reveals (CSS-first, IO adds .is-in) ──────────────── */
+
+  /* The hidden state only exists so the enter transition has
+     somewhere to come from; if JS never runs the observer, scripting
+     is off, or reduced motion is set, content renders visible. */
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 700ms var(--ease-out),
+      transform 700ms var(--ease-out);
+  }
+  [data-reveal].is-in {
+    opacity: 1;
+    transform: none;
+  }
+  @media (scripting: none) {
+    [data-reveal] { opacity: 1; transform: none; }
+  }
+
+  /* ── Index hero: masked line rise + soft elements ──────────────── */
+
+  @keyframes heroLineRise {
+    from { transform: translateY(118%); }
+    to   { transform: none; }
+  }
+  .hero-line   { animation: heroLineRise 950ms var(--ease-out) 150ms both; }
+  .hero-line-2 { animation-delay: 260ms; }
+  .hero-line-3 { animation-delay: 370ms; }
+
+  @keyframes heroSoftIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .hero-soft { animation: heroSoftIn 700ms var(--ease-out) 760ms both; }
+
   /* ── Index hero: the approval-gate hairline ────────────────────── */
 
   /* The gate the particle field flows through. A quiet vertical line
@@ -286,6 +322,8 @@
       animation: none;
     }
     .scene-conduit { animation: none; }
+    [data-reveal] { opacity: 1; transform: none; transition: none; }
+    .hero-line, .hero-line-2, .hero-line-3, .hero-soft { animation: none; }
   }
 
   /* Agency-style card surface, matches the marketing site's

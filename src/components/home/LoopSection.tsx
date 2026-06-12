@@ -4,11 +4,14 @@
 // loop, told as a scroll-driven story. The beats scroll on the left;
 // a console panel stays pinned on the right (CSS sticky, bulletproof
 // across viewports) and morphs its contents as each beat activates.
-// Activation is driven by GSAP ScrollTrigger per beat; under reduced
-// motion or on small screens each beat simply carries its own panel.
+// Activation is GSAP ScrollTrigger (scroll math is where it earns its
+// place); the visible motion itself is CSS, so nothing is stranded
+// invisible if a ticker never runs. Small screens give each beat its
+// own inline panel.
 
 import { useRef, useState } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { useReveal } from "@/lib/useReveal";
 
 type Beat = {
   key: string;
@@ -53,33 +56,20 @@ export function LoopSection() {
   const scope = useRef<HTMLElement>(null);
   const [active, setActive] = useState(0);
 
+  useReveal(scope);
   useGSAP(
     () => {
       const mm = gsap.matchMedia();
-      mm.add(
-        "(min-width: 1024px) and (prefers-reduced-motion: no-preference)",
-        () => {
-          const triggers = BEATS.map((beat, i) =>
-            ScrollTrigger.create({
-              trigger: `[data-beat="${beat.key}"]`,
-              start: "top 55%",
-              end: "bottom 55%",
-              onToggle: (self) => self.isActive && setActive(i),
-            }),
-          );
-          return () => triggers.forEach((t) => t.kill());
-        },
-      );
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap.utils.toArray<HTMLElement>(".loop-reveal").forEach((el) => {
-          gsap.from(el, {
-            opacity: 0,
-            y: 32,
-            duration: 0.8,
-            ease: "power3.out",
-            scrollTrigger: { trigger: el, start: "top 85%" },
-          });
-        });
+      mm.add("(min-width: 1024px)", () => {
+        const triggers = BEATS.map((beat, i) =>
+          ScrollTrigger.create({
+            trigger: `[data-beat="${beat.key}"]`,
+            start: "top 55%",
+            end: "bottom 55%",
+            onToggle: (self) => self.isActive && setActive(i),
+          }),
+        );
+        return () => triggers.forEach((t) => t.kill());
       });
     },
     { scope },
@@ -93,7 +83,7 @@ export function LoopSection() {
       aria-labelledby="loop-heading"
     >
       <div className="mx-auto max-w-7xl px-6 py-24 md:px-10 md:py-32 lg:px-12">
-        <header className="loop-reveal max-w-2xl">
+        <header data-reveal className="max-w-2xl">
           <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#ff6b6b]">
             the loop
           </p>
@@ -121,7 +111,7 @@ export function LoopSection() {
               <li
                 key={beat.key}
                 data-beat={beat.key}
-                className="loop-reveal relative py-8 first:pt-0 lg:py-14 lg:pl-12"
+                data-reveal className="relative py-8 first:pt-0 lg:py-14 lg:pl-12"
               >
                 <span
                   aria-hidden

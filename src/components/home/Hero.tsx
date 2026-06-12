@@ -2,12 +2,11 @@
 
 // Index hero. The headline states the loop in three beats; behind it
 // the GateField draws the same loop as a living particle system. The
-// entrance is a masked line-rise (GSAP), skipped cleanly under
-// prefers-reduced-motion.
+// entrance is a masked line-rise in pure CSS (compositor-driven, so
+// it survives rAF-throttled contexts) and reduced motion simply
+// renders the resting state.
 
-import { useRef } from "react";
 import dynamic from "next/dynamic";
-import { gsap, useGSAP } from "@/lib/gsap";
 
 const GateField = dynamic(
   () => import("@/components/home/GateField").then((m) => m.GateField),
@@ -21,35 +20,8 @@ const LINES = [
 ];
 
 export function Hero() {
-  const scope = useRef<HTMLElement>(null);
-
-  useGSAP(
-    () => {
-      const mm = gsap.matchMedia();
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        gsap
-          .timeline({ defaults: { ease: "power4.out" } })
-          .from(".hero-line", {
-            yPercent: 112,
-            duration: 1.0,
-            stagger: 0.1,
-            delay: 0.15,
-          })
-          .from(
-            ".hero-soft",
-            { opacity: 0, y: 14, duration: 0.7, stagger: 0.08 },
-            "-=0.45",
-          );
-      });
-    },
-    { scope },
-  );
-
   return (
-    <section
-      ref={scope}
-      className="relative flex min-h-[calc(100dvh-6.5rem)] flex-col overflow-hidden"
-    >
+    <section className="relative flex min-h-[calc(100dvh-6.5rem)] flex-col overflow-hidden">
       {/* Living backdrop: chaos in, gate, order out */}
       <GateField className="absolute inset-0" />
       {/* The gate itself: one quiet hairline at centre */}
@@ -73,10 +45,10 @@ export function Hero() {
         </p>
 
         <h1 className="mt-5 text-[2.6rem] font-medium leading-[1.02] tracking-[-0.035em] text-zinc-50 sm:text-6xl md:text-7xl lg:text-[5.4rem]">
-          {LINES.map((line) => (
+          {LINES.map((line, i) => (
             <span key={line.text} className="block overflow-hidden pb-[0.08em]">
               <span
-                className={`hero-line block will-change-transform ${
+                className={`hero-line ${i > 0 ? `hero-line-${i + 1}` : ""} block will-change-transform ${
                   line.accent ? "text-[#ff6b6b]" : ""
                 }`}
               >

@@ -49,7 +49,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@gravixar-sv/core": "^0.1.0",
+    "@gravixar-sv/core": "^0.4.0",
     "@tailwindcss/postcss": "^4.0.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^22.10.0",

@@ -8,11 +8,11 @@ import { ProofStrip } from "@/components/home/ProofStrip";
 export const metadata: Metadata = {
   title: "Gravixar Demo: AI does the work, you hold the gate",
   description:
-    "Four working apps with sample data. AI drafts, a human approves, the agent learns your rules. Open a scene and run the loop yourself. No signup.",
+    "Five working apps with sample data. AI drafts, a human approves, the agent learns your rules. Open a scene and run the loop yourself. No signup.",
 };
 
 // The index is a story in four sections: the thesis drawn live (hero
-// over the gate field), the loop told beat by beat, the four scene
+// over the gate field), the loop told beat by beat, the scene
 // portals, and the production-proof close.
 export default function HomePage() {
   return (

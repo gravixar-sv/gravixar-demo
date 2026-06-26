@@ -1,8 +1,8 @@
 "use client";
 
-// The four scene portals. Real captured screenshots in neutral window
+// The scene portals. Real captured screenshots in neutral window
 // frames (the product does the talking), one buyer per card, one
-// concrete promise per card. Desktop is a 2x2 grid with a broken
+// concrete promise per card. Desktop is a two-column grid with a broken
 // vertical rhythm; cards rise in on scroll.
 
 import { useRef } from "react";
@@ -89,6 +89,11 @@ function SceneCard({
         <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
           <h3 className="text-xl font-medium tracking-[-0.015em] text-zinc-50 md:text-2xl">
             {scene.name}
+            {scene.codename ? (
+              <span className="ml-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+                · {scene.codename}
+              </span>
+            ) : null}
             <span className="ml-3 text-sm font-normal tracking-normal text-zinc-500">
               {scene.whatItIs}
             </span>

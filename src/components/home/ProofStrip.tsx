@@ -14,6 +14,8 @@ const MODULES = [
   "append-only audit trail",
   "human approval gates",
   "passkey + TOTP step-up",
+  "provider credentialing",
+  "HIPAA-aware AI guardrail",
   "lead-inbox ingestion",
   "LLM eval harness",
   "per-project QA scorecard",
@@ -43,9 +45,10 @@ export function ProofStrip() {
             </h2>
             <p data-reveal className="mt-5 max-w-xl text-base leading-relaxed text-zinc-400">
               The scenes borrow their spine from production systems: agency
-              portals, finance cockpits, and brand agents shipped for real
-              clients, plus the platform Gravixar runs itself on. Same gates,
-              same audit trail, same rulebook.
+              portals, finance cockpits, brand agents, and a HIPAA-conscious
+              medical-billing portal shipped for real clients, plus the platform
+              Gravixar runs itself on. Same gates, same audit trail, same
+              rulebook.
             </p>
             <ul data-reveal className="mt-7 flex flex-wrap gap-2.5">
               {MODULES.map((m) => (

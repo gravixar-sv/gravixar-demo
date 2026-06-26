@@ -5,14 +5,17 @@
 // per the NN/g information-scent + "link is a promise" findings.
 
 export type SceneStatus = "live" | "coming-online";
-export type ScenePersona = "agency" | "founders" | "brand";
+export type ScenePersona = "agency" | "founders" | "brand" | "healthcare";
 
 export type Scene = {
   slug: string;
   name: string;
+  /** Original codename, kept as a small secondary tag for brand flavour
+   *  (e.g. "Agency OS · Lattice"). The descriptive `name` is primary. */
+  codename?: string;
   tagline: string;
   description: string;
-  bucket: "operations" | "ai" | "brand";
+  bucket: "operations" | "ai" | "brand" | "healthcare";
   status: SceneStatus;
   /** The audience persona this scene is built for. */
   persona: ScenePersona;
@@ -40,19 +43,20 @@ export type Scene = {
 export const SCENES: Scene[] = [
   {
     slug: "lattice",
-    name: "Lattice Studio",
-    tagline: "A creative studio's client portal, built by Gravixar.",
+    name: "Agency OS",
+    codename: "Lattice",
+    tagline: "The operating system a real agency runs on, end to end.",
     description:
-      "Editorial-magazine portal for an agency. Client view, PM view, admin view, designer view. Real review state machine, real audit log, real chat.",
+      "The full operating system behind a working agency: scoped projects, a deliverable review loop, invoicing and payment requests, partner commissions, leave and WFH, and AI-assisted feedback triage. Every state change is gated and audited.",
     bucket: "operations",
     status: "live",
     persona: "agency",
     personaLabel: "agencies",
-    whatItIs: "A client portal for a creative agency",
-    tryLine: "Approvals, briefs, and delivery in one place",
-    openLabel: "Open the portal",
+    whatItIs: "The operating system a real agency runs on",
+    tryLine: "Deliverable review, invoicing, commissions and leave, all gated",
+    openLabel: "Open the OS",
     problemStatement:
-      "Your clients live in Slack threads and shared spreadsheets.",
+      "Your agency runs on five tools and a dozen spreadsheets.",
     paletteClass: "scene-lattice",
     bgUtility: "bg-lattice",
     displayFont: "fraunces",
@@ -60,16 +64,17 @@ export const SCENES: Scene[] = [
   },
   {
     slug: "studio-mix",
-    name: "Studio Mix",
-    tagline: "Live AI agents, content, anomaly, classifier, review.",
+    name: "Agent Console",
+    codename: "Studio Mix",
+    tagline: "The supervised AI layer we ship, on the Claude API, behind a human gate.",
     description:
-      "Operator-console sandbox. Four agents you can poke: ECHO drafts content, PULSE flags anomalies, RIVER classifies inbound, ATLAS reviews drafts.",
+      "The real AI layer we put into a client's ops: content drafting, candidate and inbound assessment, feedback triage, anomaly watch. Built on the Claude API. Read-only agents run on their own; anything that writes, spends, or publishes waits behind a human.",
     bucket: "ai",
     status: "live",
     persona: "founders",
     personaLabel: "ops & technical teams",
-    whatItIs: "A supervised AI-agents console",
-    tryLine: "Drafters, watchers & classifiers under a human approval queue",
+    whatItIs: "A supervised AI-agent console on the Claude API",
+    tryLine: "Drafting, screening and triage, every write behind a human gate",
     openLabel: "Open the console",
     problemStatement:
       "Your AI tooling is impressive in demos, invisible in production.",
@@ -80,15 +85,16 @@ export const SCENES: Scene[] = [
   },
   {
     slug: "cockpit",
-    name: "Driftwood",
+    name: "Founder Cockpit",
+    codename: "Driftwood",
     tagline: "A solo founder's run-the-business cockpit.",
     description:
-      "The morning brief for a one-person business: AI triages the inbox, surfaces what needs you today, and watches the money, you just approve.",
+      "The daily-ops cockpit for a one-person business: AI triages the inbox overnight, surfaces what needs you today, and watches the money. You just approve. Inbox → Today → Money, in one view.",
     bucket: "operations",
     status: "live",
     persona: "founders",
     personaLabel: "founders & small teams",
-    whatItIs: "A run-my-business cockpit for a solo founder",
+    whatItIs: "A run-the-business cockpit for a solo founder",
     tryLine: "Inbox triage → today's priorities → cash flow, in one view",
     openLabel: "Open the cockpit",
     problemStatement: "You're CEO, support, and bookkeeper before lunch.",
@@ -99,7 +105,8 @@ export const SCENES: Scene[] = [
   },
   {
     slug: "northbeam",
-    name: "Northbeam Goods",
+    name: "Brand Guardian",
+    codename: "Northbeam",
     tagline: "A brand agent that drafts on-brand, blocks drift, and learns your rules.",
     description:
       "A brand agent for a DTC team: hand it a brief, it drafts the asset on-brand; ask for something off-brand and it stops at the guardrail; every approval teaches it a new do/don't. Showcases the Brand & Visuals service.",
@@ -116,6 +123,27 @@ export const SCENES: Scene[] = [
     bgUtility: "bg-northbeam",
     displayFont: "fraunces",
     swatches: ["#1a2614", "#9DBE6E", "#F2DDC1"],
+  },
+  {
+    slug: "care-ledger",
+    name: "Billing & Credentialing",
+    codename: "Care Ledger",
+    tagline: "A HIPAA-conscious medical-billing portal, with PHI kept out by design.",
+    description:
+      "A medical-billing and credentialing portal for a clinic network: provider credentialing intake (NPI, license, DEA, CAQH) with a Zoom intake call, finance and claims behind an approval gate, and a clinic sales pipeline. No PHI in the portal, isolated by design. Every action is gated and audited.",
+    bucket: "healthcare",
+    status: "live",
+    persona: "healthcare",
+    personaLabel: "healthcare & billing",
+    whatItIs: "A medical billing & credentialing portal",
+    tryLine: "Credential a provider → enable billing → close the clinic deal",
+    openLabel: "Open the portal",
+    problemStatement:
+      "Credentialing, claims, and new clinics live in three disconnected tools.",
+    paletteClass: "scene-care-ledger",
+    bgUtility: "bg-care-ledger",
+    displayFont: "inter",
+    swatches: ["#06141a", "#2DD4BF", "#7DD3FC"],
   },
   {
     slug: "verus",

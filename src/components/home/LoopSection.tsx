@@ -27,28 +27,28 @@ const BEATS: Beat[] = [
     index: "01",
     title: "Work arrives",
     body: "An inbox, a brief, a request queue. The unsorted pile every team wakes up to.",
-    sceneTags: ["Driftwood inbox", "Northbeam briefs", "Lattice handoffs"],
+    sceneTags: ["Founder Cockpit inbox", "Care Ledger intake", "Agency OS handoffs"],
   },
   {
     key: "draft",
     index: "02",
     title: "AI drafts the 80%",
     body: "Triage, first cuts, classifications, replies. The agent does the typing, in your tone, against your data.",
-    sceneTags: ["Studio Mix agents", "Driftwood drafts"],
+    sceneTags: ["Agent Console agents", "Founder Cockpit drafts"],
   },
   {
     key: "gate",
     index: "03",
     title: "You hold the gate",
     body: "Nothing publishes, ships, or spends without a human approve. The gate is the product, not a checkbox.",
-    sceneTags: ["Studio Mix approval queue", "Lattice review loop"],
+    sceneTags: ["Agent Console queue", "Care Ledger claims gate", "Agency OS review loop"],
   },
   {
     key: "learn",
     index: "04",
     title: "It learns your rules",
     body: "Every approve and send-back becomes a house rule. The agent gets more yours every week, and the rulebook is yours to read.",
-    sceneTags: ["Northbeam brand memory", "Every scene's rulebook"],
+    sceneTags: ["Brand Guardian memory", "Every scene's rulebook"],
   },
 ];
 

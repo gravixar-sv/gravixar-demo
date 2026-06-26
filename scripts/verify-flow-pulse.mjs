@@ -14,6 +14,7 @@ const CASES = [
   { scene: "cockpit", includes: "add to today" },
   { scene: "studio-mix", includes: "run" },
   { scene: "northbeam", includes: "generate on-brand" },
+  { scene: "care-ledger", includes: "approve" },
 ];
 
 const browser = await puppeteer.launch({ executablePath, headless: true });
@@ -60,7 +61,7 @@ if (results.some((r) => r.flew !== "flew")) {
   console.error("flow pulse missing in some scenes");
   process.exit(1);
 }
-console.log("flow pulse flew in all 4 scenes");
+console.log(`flow pulse flew in all ${results.length} scenes`);
 
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));

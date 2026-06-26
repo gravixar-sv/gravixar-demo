@@ -21,6 +21,7 @@ import {
 } from "@/lib/playground/cockpit-data";
 import { Avatar } from "@/components/demo/Avatar";
 import { SceneCTA } from "@/components/demo/SceneCTA";
+import { OutcomePanel } from "@/components/demo/OutcomePanel";
 import { flowPulse } from "@/lib/flowPulse";
 
 const FRESH_DECAY_MS = 2200;
@@ -63,7 +64,7 @@ export default function FounderCockpit() {
           <Avatar initials={FOUNDER.initials} hue={FOUNDER.hue} size="lg" />
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--color-scene-1)]">
-              run-my-business cockpit · live sandbox
+              run-the-business cockpit · a real daily ops view · live sandbox
             </p>
             <h1 className="mt-1 text-2xl font-medium tracking-[-0.02em] text-zinc-50 md:text-3xl">
               Good morning, {FOUNDER.name.split(" ")[0]}.
@@ -99,6 +100,15 @@ export default function FounderCockpit() {
       </div>
 
       <LearnBeat rules={state.rules} learnedCount={learnedCount} />
+      <OutcomePanel
+        stats={[
+          { value: "312", label: "emails triaged", sub: "this month" },
+          { value: "1,940", label: "transactions categorised", sub: "overnight" },
+          { value: "£18.6k", label: "invoices chased & paid", sub: "9 reminders sent" },
+          { value: "47", label: "drafts approved", sub: "you held the gate" },
+        ]}
+        liveProductLabel="the cockpit we run our own days on"
+      />
       <ActivityFeed feed={state.feed} />
       <SceneCTA
         personaLabel="Founders & small teams"

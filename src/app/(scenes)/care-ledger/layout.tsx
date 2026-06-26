@@ -2,27 +2,27 @@ import type { Metadata } from "next";
 import { Topbar } from "@/components/demo/Topbar";
 import { findScene } from "@/lib/scenes";
 
-const SCENE = findScene("cockpit")!;
+const SCENE = findScene("care-ledger")!;
 
 export const metadata: Metadata = {
   title: `${SCENE.name}, Gravixar demo`,
 };
 
-// Founder Cockpit — a self-contained client-side playground. Scene
-// chrome + warm amber background.
-export default function CockpitSceneLayout({
+// Care Ledger — a self-contained client-side playground. Scene chrome +
+// clinical teal background. No PHI, no backend, no auth (stateless).
+export default function CareLedgerSceneLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
     <div
-      className="bg-cockpit min-h-[calc(100dvh-40px)]"
+      className="bg-care-ledger min-h-[calc(100dvh-40px)]"
       style={
         {
-          "--color-scene-1": "#FBBF24",
-          "--color-scene-2": "#FB923C",
-          "--color-scene-glow": "rgba(251, 191, 36, 0.35)",
+          "--color-scene-1": "#2DD4BF",
+          "--color-scene-2": "#7DD3FC",
+          "--color-scene-glow": "rgba(45, 212, 191, 0.35)",
         } as React.CSSProperties
       }
     >

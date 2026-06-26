@@ -20,6 +20,7 @@ import {
 } from "@/lib/playground/northbeam-data";
 import { MockupThumb } from "@/components/demo/DeliverableMockup";
 import { SceneCTA } from "@/components/demo/SceneCTA";
+import { OutcomePanel } from "@/components/demo/OutcomePanel";
 import { flowPulse } from "@/lib/flowPulse";
 
 const FRESH_DECAY_MS = 2200;
@@ -102,6 +103,15 @@ export default function NorthbeamBrandAgent() {
         </Col>
       </div>
 
+      <OutcomePanel
+        stats={[
+          { value: "2,460", label: "assets drafted on-brand", sub: "last 90 days" },
+          { value: "187", label: "off-brand requests blocked", sub: "at the guardrail" },
+          { value: "94", label: "brand rules learned", sub: "from your approvals" },
+          { value: "100%", label: "published assets gated", sub: "by a human" },
+        ]}
+        liveProductLabel="the brand agent we ship"
+      />
       <AuditTrail feed={state.feed} />
       <SceneCTA
         personaLabel="Brands & DTC"

@@ -21,6 +21,9 @@ prisma/.env
 ## vercel
 .vercel
 
+## capture/review output (real gallery shots live in public/scenes/)
+shots/
+
 ## misc
 .DS_Store
 Thumbs.db

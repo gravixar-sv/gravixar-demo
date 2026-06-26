@@ -29,6 +29,10 @@ const CASES = [
     scene: "northbeam",
     clicks: [{ includes: "generate on-brand" }, { includes: "approve" }],
   },
+  {
+    scene: "care-ledger",
+    clicks: [{ includes: "approve" }],
+  },
 ];
 
 const browser = await puppeteer.launch({ executablePath, headless: true });
@@ -61,7 +65,7 @@ if (failures.length > 0) {
   console.error("learn-beat did not grow in:", failures.map((f) => f.scene).join(", "));
   process.exit(1);
 }
-console.log("learn-beat grew in all 4 scenes");
+console.log(`learn-beat grew in all ${results.length} scenes`);
 
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));

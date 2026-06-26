@@ -24,7 +24,7 @@ export default function StudioMixLayout({
         } as React.CSSProperties
       }
     >
-      <Topbar sceneName={SCENE.name} />
+      <Topbar sceneName={SCENE.name} personaLabel={SCENE.codename} />
       <main>{children}</main>
     </div>
   );

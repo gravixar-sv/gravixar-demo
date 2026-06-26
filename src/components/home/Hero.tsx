@@ -41,7 +41,7 @@ export function Hero() {
 
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col justify-end px-6 pb-16 pt-24 md:px-10 md:pb-20 lg:px-12">
         <p className="hero-soft font-mono text-[10px] uppercase tracking-[0.24em] text-zinc-500">
-          live demo · four working scenes · no sign-in
+          live demo · five working scenes · no sign-in
         </p>
 
         <h1 className="mt-5 text-[2.6rem] font-medium leading-[1.02] tracking-[-0.035em] text-zinc-50 sm:text-6xl md:text-7xl lg:text-[5.4rem]">
@@ -59,7 +59,7 @@ export function Hero() {
         </h1>
 
         <p className="hero-soft mt-6 max-w-xl text-base leading-relaxed text-zinc-400 md:text-lg">
-          Four working apps with sample data. Not slides, not a video, not a
+          Five working apps with sample data. Not slides, not a video, not a
           signup. Open a scene and run the loop yourself.
         </p>
 

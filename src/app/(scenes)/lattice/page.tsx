@@ -19,6 +19,7 @@ import {
 import { Avatar } from "@/components/demo/Avatar";
 import { MockupThumb } from "@/components/demo/DeliverableMockup";
 import { SceneCTA } from "@/components/demo/SceneCTA";
+import { OutcomePanel } from "@/components/demo/OutcomePanel";
 import { flowPulse } from "@/lib/flowPulse";
 
 const FRESH_DECAY_MS = 2200;
@@ -55,17 +56,19 @@ export default function LatticeReviewLoop() {
       <header className="scene-rise flex flex-wrap items-end justify-between gap-4">
         <div className="max-w-2xl">
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--color-scene-1)]">
-            client portal · built for agencies · live sandbox
+            agency OS · a real, in-use system · live sandbox
           </p>
           <h1 className="mt-3 text-3xl font-medium leading-tight tracking-[-0.02em] text-zinc-50 md:text-4xl">
             Watch a deliverable move.
           </h1>
           <p className="mt-3 text-base leading-relaxed text-zinc-400">
-            The agency&apos;s work flows Editor → PM → Client and back. Act in
-            any column. Approve, request a revision, or push it back, and watch
-            the card hand off to the next person. Hover any thumbnail to preview.
-            Every client approval and revision <span className="text-zinc-300">teaches the studio
-            a house rule</span>. Watch them appear below.
+            This is the deliverable review loop from an agency operating system
+            we run in production. Work flows Editor → PM → Client and back. Act
+            in any column. Approve, request a revision, or push it back, and
+            watch the card hand off to the next person. Hover any thumbnail to
+            preview. Every client approval and revision <span className="text-zinc-300">teaches the studio
+            a house rule</span>. The same OS also runs projects, invoicing,
+            commissions, and leave, sampled below.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -126,13 +129,23 @@ export default function LatticeReviewLoop() {
       </div>
 
       <LearnBeat rules={state.rules} learnedCount={learnedCount} />
+      <CapabilityStrip />
+      <OutcomePanel
+        stats={[
+          { value: "1,284", label: "deliverables approved", sub: "last 90 days" },
+          { value: "£412k", label: "invoices issued", sub: "12 active retainers" },
+          { value: "£38k", label: "partner commissions paid", sub: "6 partners, auto-split" },
+          { value: "318", label: "leave & WFH requests", sub: "gated + audited" },
+        ]}
+        liveProductLabel="the agency OS we run"
+      />
       <ActivityFeed feed={state.feed} />
 
       <SceneCTA
         personaLabel="Agencies"
         noun="agency"
         headline="Run your agency on this."
-        blurb="This is the portal layer I build for agencies: the review states, the client view, the audit trail, scoped to how you actually deliver work. Most builds run 4 to 8 weeks. One call to scope it, no obligation."
+        blurb="This is the operating system I build for agencies: scoped projects, the review loop, invoicing and payment requests, partner commissions, leave and WFH, all gated and audited. Most builds run 4 to 8 weeks. One call to scope it, no obligation."
       />
     </div>
   );
@@ -479,6 +492,75 @@ function RuleRow({ rule }: { rule: Rule }) {
         </div>
       </div>
     </li>
+  );
+}
+
+// ─── The rest of the OS ─────────────────────────────────────────────
+// The review loop above is one surface. This strip names the rest of
+// the operating system running alongside it, so the scene reads as
+// production software, not a single-trick demo. Illustrative state.
+
+const OS_MODULES: { name: string; desc: string; stat: string }[] = [
+  {
+    name: "Scoped projects",
+    desc: "Retainers and one-off scopes with budgets and burn.",
+    stat: "12 active",
+  },
+  {
+    name: "Invoicing & payment requests",
+    desc: "Raise an invoice or a payment request, approve, send.",
+    stat: "£412k issued",
+  },
+  {
+    name: "Partner & referral commissions",
+    desc: "Referral splits tracked and paid out per partner.",
+    stat: "6 partners",
+  },
+  {
+    name: "Leave & WFH",
+    desc: "Office / WFH / field check-ins and leave balances.",
+    stat: "3 office · 2 WFH",
+  },
+  {
+    name: "AI feedback triage",
+    desc: "Inbound notes drafted and routed to the right lead.",
+    stat: "behind a gate",
+  },
+];
+
+function CapabilityStrip() {
+  return (
+    <section className="mt-5 scene-card rounded-2xl p-5" aria-labelledby="os-heading">
+      <div className="flex items-baseline justify-between gap-2">
+        <p
+          id="os-heading"
+          className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600"
+        >
+          the rest of the OS · running alongside this loop
+        </p>
+        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-600">
+          one system
+        </p>
+      </div>
+      <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        {OS_MODULES.map((m) => (
+          <li
+            key={m.name}
+            className="rounded-lg border border-white/10 bg-white/[0.02] px-3 py-2.5"
+          >
+            <div className="flex items-baseline justify-between gap-2">
+              <p className="text-[13px] font-medium leading-tight text-zinc-100">
+                {m.name}
+              </p>
+              <span className="shrink-0 font-mono text-[8px] uppercase tracking-[0.16em] text-[var(--color-scene-1)]">
+                {m.stat}
+              </span>
+            </div>
+            <p className="mt-1 text-[11px] leading-relaxed text-zinc-500">{m.desc}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 

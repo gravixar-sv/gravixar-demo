@@ -122,6 +122,16 @@
       linear-gradient(180deg, #14110a 0%, #16120c 55%, #07060f 100%);
   }
 
+  /* Care Ledger (Billing & Credentialing) scene — clinical teal + sky
+     wash on a deep slate base. Distinct from Studio Mix (electric cyan):
+     calmer, more medical, less neon. */
+  .bg-care-ledger {
+    background:
+      radial-gradient(60% 55% at 100% 0%, rgba(45, 212, 191, 0.12) 0%, transparent 58%),
+      radial-gradient(50% 70% at 0% 100%, rgba(125, 211, 252, 0.08) 0%, transparent 60%),
+      linear-gradient(180deg, #06141a 0%, #07161c 55%, #05080f 100%);
+  }
+
   /* Gallery landing, mixed palette. Toned to match the new scene
      gradients, less fluorescent, more gradient agency-poster. */
   .bg-gallery {

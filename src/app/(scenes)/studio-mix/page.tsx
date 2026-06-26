@@ -20,6 +20,7 @@ import {
 } from "@/lib/playground/studio-reducer";
 import type { AuditEntry } from "@/lib/playground/reducer";
 import { SceneCTA } from "@/components/demo/SceneCTA";
+import { OutcomePanel } from "@/components/demo/OutcomePanel";
 import { flowPulse } from "@/lib/flowPulse";
 
 const FRESH_DECAY_MS = 2000;
@@ -55,18 +56,19 @@ export default function StudioMixPlayground() {
       <header className="scene-rise flex flex-wrap items-end justify-between gap-4">
         <div className="max-w-2xl">
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--color-scene-1)]">
-            supervised agent console · for ops &amp; technical teams · live sandbox
+            supervised agent console · Claude API · live sandbox
           </p>
           <h1 className="mt-3 font-display-mono text-3xl font-medium leading-tight tracking-tight text-zinc-50 md:text-4xl">
             <span className="text-[var(--color-scene-1)]">$</span> agents that
             ask before they act.
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-zinc-400">
-            A drafter, a watcher, a classifier and a reviewer, the kind I wire
-            into a client&apos;s ops. Read-only work runs on its own; anything
-            that writes, spends, or publishes waits behind a human. Run one on
-            the left, see its output in the middle, every action lands in the
-            audit log on the right. Never auto-publish, and the studio
+            The real AI layer we ship into a team&apos;s ops, on the Claude API:
+            content drafting, candidate and inbound assessment, feedback triage,
+            anomaly watch. Read-only work runs on its own; anything that writes,
+            spends, or publishes waits behind a human. Run one on the left, see
+            its output in the middle, every action lands in the audit log on the
+            right. Never auto-publish, and the studio
             <span className="text-zinc-300"> learns from every approve / discard</span>.
           </p>
         </div>
@@ -98,6 +100,15 @@ export default function StudioMixPlayground() {
       </div>
 
       <LearnBeat rules={state.rules} learnedCount={learnedCount} />
+      <OutcomePanel
+        stats={[
+          { value: "9,640", label: "drafts generated", sub: "all gated" },
+          { value: "94%", label: "approved as-is", sub: "after a human read" },
+          { value: "1,120", label: "candidates assessed", sub: "human decides" },
+          { value: "0", label: "auto-publishes", sub: "by design" },
+        ]}
+        liveProductLabel="the AI layer we ship"
+      />
 
       <SceneCTA
         personaLabel="Ops & technical teams"

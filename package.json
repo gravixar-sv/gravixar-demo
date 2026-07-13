@@ -63,7 +63,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@gravixar-sv/core": "^0.5.0",
+    "@gravixar-sv/core": "^0.7.0",
     "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^24.13.2",
     "@types/pg": "^8.20.0",

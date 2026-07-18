@@ -26,8 +26,11 @@ export function SceneCTA({
       <div
         className="relative px-7 py-8 md:px-10 md:py-10"
         style={{
+          // Scene-tinted wash: same 6%/4% weights as the old coral→cyan
+          // hard-code, but drawn from the scene tokens so the closing CTA
+          // stays on-palette in every scene.
           background:
-            "linear-gradient(135deg, rgba(255,107,107,0.06) 0%, rgba(0,225,255,0.04) 100%)",
+            "linear-gradient(135deg, color-mix(in oklab, var(--color-scene-1, #FF6B6B) 6%, transparent) 0%, color-mix(in oklab, var(--color-scene-2, #00E1FF) 4%, transparent) 100%)",
           boxShadow:
             "inset 0 0 0 1px rgba(255,255,255,0.08), 0 1px 0 0 rgba(255,255,255,0.02)",
         }}

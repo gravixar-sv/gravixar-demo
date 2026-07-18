@@ -21,7 +21,7 @@ export function ScenePreview({
       <WindowBar
         title={scene.name}
         trailing={
-          <span className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+          <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400/90" />
             live
           </span>

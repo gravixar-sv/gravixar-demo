@@ -83,7 +83,7 @@ export default function CareLedgerPortal() {
           <button
             type="button"
             onClick={() => dispatch({ type: "RESET" })}
-            className="rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-300 transition-colors hover:border-white/20 hover:bg-white/[0.06] hover:text-zinc-50"
+            className="inline-flex min-h-10 items-center justify-center rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-300 transition-all hover:border-white/20 hover:bg-white/[0.06] hover:text-zinc-50 active:scale-[0.98] lg:min-h-0"
           >
             ↻ reset
           </button>
@@ -107,8 +107,8 @@ export default function CareLedgerPortal() {
               <FinanceCard key={f.id} tile={f} />
             ))}
           </div>
-          <p className="mt-1 flex items-start gap-1.5 text-[10px] leading-relaxed text-zinc-600">
-            <span className="text-[var(--color-scene-1)]">◆</span>
+          <p className="mt-1 flex items-start gap-1.5 text-[11px] leading-relaxed text-zinc-300">
+            <span aria-hidden className="text-[var(--color-scene-1)]">◆</span>
             <span>Codes and amounts only. No patient records here.</span>
           </p>
           {state.billing.map((b) => (
@@ -190,7 +190,7 @@ function Col({
       className="scene-card min-w-[82%] shrink-0 snap-start rounded-2xl p-5 sm:min-w-[48%] lg:min-w-0"
     >
       <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-300">{label}</p>
-      <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-600">{status}</p>
+      <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">{status}</p>
       <div className="mt-4 space-y-3">{children}</div>
     </section>
   );
@@ -221,9 +221,9 @@ function ProviderCard({
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="truncate text-sm font-medium text-zinc-100">{p.name}</p>
-          <p className="text-[11px] text-zinc-500">{p.specialty}</p>
+          <p className="text-[11px] text-zinc-400">{p.specialty}</p>
         </div>
-        <span className="shrink-0 font-mono text-[8px] uppercase tracking-[0.16em] text-zinc-600">
+        <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-400">
           {credentialed ? "credentialed" : "in intake"}
         </span>
       </div>
@@ -235,7 +235,7 @@ function ProviderCard({
             <span
               key={c.kind}
               className={[
-                "rounded-md border px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em]",
+                "rounded-md border px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em]",
                 ok
                   ? "border-[var(--color-scene-1)]/40 text-[var(--color-scene-1)]"
                   : "border-amber-400/35 text-amber-300/90",
@@ -247,15 +247,15 @@ function ProviderCard({
         })}
       </div>
 
-      <p className="mt-2.5 flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.16em]">
-        <span className="text-zinc-600">zoom intake</span>
+      <p className="mt-2.5 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em]">
+        <span className="text-zinc-500">zoom intake</span>
         <span className={intakeDone ? "text-[var(--color-scene-1)]" : "text-amber-300/90"}>
-          {intakeDone ? "✓ done" : "scheduled"}
+          {intakeDone ? "✓ done" : "○ scheduled"}
         </span>
       </p>
 
       {credentialed ? (
-        <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.18em] text-emerald-300/80">
+        <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80">
           ✓ credentialed · billing enabled →
         </p>
       ) : intakeDone ? (
@@ -265,7 +265,7 @@ function ProviderCard({
             flowPulse(e.currentTarget, "cl-billing");
             dispatch({ type: "CREDENTIAL", id: p.id });
           }}
-          className="mt-3 rounded-lg border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/10 px-3 py-1.5 text-xs font-medium text-teal-100 transition-colors hover:bg-[var(--color-scene-1)]/20"
+          className="mt-3 inline-flex min-h-10 items-center justify-center rounded-lg border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/10 px-3 py-1.5 text-xs font-medium text-[var(--color-scene-1)] transition-all hover:bg-[var(--color-scene-1)]/20 active:scale-[0.98] lg:min-h-0"
         >
           Verify &amp; credential →
         </button>
@@ -273,7 +273,7 @@ function ProviderCard({
         <button
           type="button"
           onClick={() => dispatch({ type: "COMPLETE_INTAKE", id: p.id })}
-          className="mt-3 rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-1.5 text-xs font-medium text-amber-200 transition-colors hover:bg-amber-400/20"
+          className="mt-3 inline-flex min-h-10 items-center justify-center rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-1.5 text-xs font-medium text-amber-200 transition-all hover:bg-amber-400/20 active:scale-[0.98] lg:min-h-0"
         >
           ▸ Complete Zoom intake
         </button>
@@ -287,9 +287,9 @@ function ProviderCard({
 function FinanceCard({ tile }: { tile: FinanceTile }) {
   return (
     <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-      <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-zinc-500">{tile.label}</p>
-      <p className="mt-1 text-lg font-medium text-[var(--color-scene-1)]">{tile.value}</p>
-      <p className="mt-0.5 text-[10px] leading-tight text-zinc-600">{tile.sub}</p>
+      <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-400">{tile.label}</p>
+      <p className="mt-1 text-lg font-medium tabular-nums text-[var(--color-scene-1)]">{tile.value}</p>
+      <p className="mt-0.5 text-[10px] leading-tight text-zinc-500">{tile.sub}</p>
     </div>
   );
 }
@@ -319,14 +319,14 @@ function BillingCard({
           <span className="shrink-0 font-mono text-[11px] text-[var(--color-scene-1)]">{item.amount}</span>
         ) : null}
       </div>
-      <p className="mt-1 text-[11px] leading-relaxed text-zinc-500">{item.detail}</p>
+      <p className="mt-1 text-[11px] leading-relaxed text-zinc-400">{item.detail}</p>
       {approved ? (
-        <p className="mt-2.5 font-mono text-[9px] uppercase tracking-[0.18em] text-emerald-300/80">
+        <p className="mt-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80">
           ✓ approved + submitted
         </p>
       ) : (
         <div className="mt-2.5">
-          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-amber-300/90">
+          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-amber-300/90">
             ⏸ waiting on you · gated
           </p>
           <button
@@ -335,7 +335,7 @@ function BillingCard({
               flowPulse(e.currentTarget, "cl-rules");
               dispatch({ type: "APPROVE_BILLING", id: item.id });
             }}
-            className="mt-2 rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-colors hover:bg-emerald-400/20"
+            className="mt-2 inline-flex min-h-10 items-center justify-center rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-all hover:bg-emerald-400/20 active:scale-[0.98] lg:min-h-0"
           >
             {item.source === "claims" ? "Approve & submit →" : "Approve billing →"}
           </button>
@@ -348,7 +348,7 @@ function BillingCard({
 // ─── Sales pipeline ─────────────────────────────────────────────────
 
 const STAGE_TONE: Record<Deal["stage"], string> = {
-  discovery: "border-zinc-600 text-zinc-400",
+  discovery: "border-white/15 text-zinc-300",
   demo: "border-sky-400/40 text-sky-300",
   contract: "border-[var(--color-scene-1)]/45 text-[var(--color-scene-1)]",
   live: "border-emerald-400/40 text-emerald-300",
@@ -372,24 +372,24 @@ function DealCard({
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="truncate text-sm font-medium text-zinc-100">{deal.clinic}</p>
-          <p className="text-[11px] text-zinc-500">{deal.seats}</p>
+          <p className="text-[11px] text-zinc-400">{deal.seats}</p>
         </div>
         <span
-          className={`shrink-0 rounded-full border px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] ${STAGE_TONE[deal.stage]}`}
+          className={`shrink-0 rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] ${STAGE_TONE[deal.stage]}`}
         >
           {STAGE_LABEL[deal.stage]}
         </span>
       </div>
 
-      <p className="mt-2 flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.16em]">
-        <span className="text-zinc-600">zoom discovery</span>
+      <p className="mt-2 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em]">
+        <span className="text-zinc-500">zoom discovery</span>
         <span className={deal.zoom === "done" ? "text-[var(--color-scene-1)]" : "text-amber-300/90"}>
-          {deal.zoom === "done" ? "✓ done" : "scheduled"}
+          {deal.zoom === "done" ? "✓ done" : "○ scheduled"}
         </span>
       </p>
 
       {live ? (
-        <p className="mt-2.5 font-mono text-[9px] uppercase tracking-[0.18em] text-emerald-300/80">
+        <p className="mt-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80">
           ✓ live · billing on this clinic
         </p>
       ) : (
@@ -399,7 +399,7 @@ function DealCard({
             flowPulse(e.currentTarget, "cl-cred");
             dispatch({ type: "ADVANCE_DEAL", id: deal.id });
           }}
-          className="mt-2.5 rounded-lg border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/10 px-3 py-1.5 text-xs font-medium text-teal-100 transition-colors hover:bg-[var(--color-scene-1)]/20"
+          className="mt-2.5 inline-flex min-h-10 items-center justify-center rounded-lg border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/10 px-3 py-1.5 text-xs font-medium text-[var(--color-scene-1)] transition-all hover:bg-[var(--color-scene-1)]/20 active:scale-[0.98] lg:min-h-0"
         >
           Advance stage →
         </button>
@@ -414,10 +414,10 @@ function LearnBeat({ rules, learnedCount }: { rules: Rule[]; learnedCount: numbe
   return (
     <section data-flow="cl-rules" className="mt-5 scene-card rounded-2xl p-5">
       <div className="flex items-baseline justify-between gap-2">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600">
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
           portal policy · what every approval teaches
         </p>
-        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
           {rules.length} {rules.length === 1 ? "rule" : "rules"}
           {learnedCount > 0 ? (
             <>
@@ -431,7 +431,7 @@ function LearnBeat({ rules, learnedCount }: { rules: Rule[]; learnedCount: numbe
         </p>
       </div>
       {rules.length === 0 ? (
-        <p className="mt-3 rounded-lg border border-dashed border-white/10 px-3 py-4 text-center text-[11px] text-zinc-600">
+        <p className="mt-3 rounded-lg border border-dashed border-white/10 px-3 py-4 text-center text-[11px] text-zinc-500">
           Credential a provider or approve a claim batch and the portal starts a policy book.
         </p>
       ) : (
@@ -459,7 +459,7 @@ function RuleRow({ rule }: { rule: Rule }) {
         <div className="min-w-0 flex-1">
           <p className="text-[12px] leading-relaxed text-zinc-200">{rule.text}</p>
           {rule.learned ? (
-            <p className="mt-0.5 font-mono text-[8px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
+            <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
               learned from your approval
             </p>
           ) : null}
@@ -474,7 +474,7 @@ function RuleRow({ rule }: { rule: Rule }) {
 function AuditTrail({ feed }: { feed: AuditEntry[] }) {
   return (
     <section className="mt-5 scene-card rounded-2xl p-5">
-      <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600">
+      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
         audit trail · every action logged
       </p>
       <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -488,7 +488,7 @@ function AuditTrail({ feed }: { feed: AuditEntry[] }) {
                 : "border-white/10 bg-white/[0.02] text-zinc-300",
             ].join(" ")}
           >
-            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
               {formatRelative(e.ts)}
             </span>
             <p className="mt-1">

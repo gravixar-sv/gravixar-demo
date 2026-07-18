@@ -6,7 +6,7 @@
 export function DemoBanner() {
   return (
     <div className="border-b border-white/5 bg-black/40 backdrop-blur">
-      <div className="mx-auto flex max-w-7xl items-center justify-center gap-2 px-6 py-2 text-[11px] font-mono uppercase tracking-widest text-zinc-300 md:text-xs">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-2 gap-y-0.5 px-6 py-2 text-[11px] font-mono uppercase tracking-widest text-zinc-300 md:text-xs">
         <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-mark)] text-[var(--color-mark)]" />
         <span>live demo</span>
         <span className="text-zinc-600">·</span>

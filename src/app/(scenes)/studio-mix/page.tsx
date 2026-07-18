@@ -74,14 +74,14 @@ export default function StudioMixPlayground() {
         </div>
         <div className="flex items-center gap-3">
           {state.ran.length > 0 ? (
-            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] tabular-nums text-zinc-500">
               {state.ran.length}/4 agents run
             </span>
           ) : null}
           <button
             type="button"
             onClick={() => dispatch({ type: "RESET" })}
-            className="rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-300 transition-colors hover:border-white/20 hover:bg-white/[0.06] hover:text-zinc-50"
+            className="inline-flex min-h-10 items-center justify-center rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-300 transition-all hover:border-white/20 hover:bg-white/[0.06] hover:text-zinc-50 active:scale-[0.98] lg:min-h-0"
           >
             ↻ reset
           </button>
@@ -132,10 +132,10 @@ function LearnBeat({
   return (
     <section className="mt-5 scene-card rounded-2xl p-5">
       <div className="flex items-baseline justify-between gap-2">
-        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400">
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
           studio policy · what every approval teaches
         </p>
-        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
           {rules.length} {rules.length === 1 ? "rule" : "rules"}
           {learnedCount > 0 ? (
             <>
@@ -149,7 +149,7 @@ function LearnBeat({
         </p>
       </div>
       {rules.length === 0 ? (
-        <p className="mt-3 rounded-lg border border-dashed border-white/10 px-3 py-4 text-center text-[11px] text-zinc-600">
+        <p className="mt-3 rounded-lg border border-dashed border-white/10 px-3 py-4 text-center text-[11px] text-zinc-500">
           Run ECHO + approve or discard the draft and the studio starts a policy book.
         </p>
       ) : (
@@ -181,7 +181,7 @@ function RuleRow({ rule }: { rule: Rule }) {
         <div className="min-w-0 flex-1">
           <p className="text-[12px] leading-relaxed text-zinc-200">{rule.text}</p>
           {rule.learned ? (
-            <p className="mt-0.5 font-mono text-[8px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
+            <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
               learned from your call
             </p>
           ) : null}
@@ -216,14 +216,14 @@ function ColumnShell({
           <span className="h-2 w-2 rounded-full bg-zinc-700" />
           <span className="h-2 w-2 rounded-full bg-zinc-700" />
         </span>
-        <span className="ml-1 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-400">
+        <span className="ml-1 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-300">
           {label}
         </span>
       </div>
-      <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600">
+      <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
         {status}
       </p>
-      {children}
+      <div className="mt-4 space-y-3">{children}</div>
     </section>
   );
 }
@@ -241,7 +241,7 @@ function AgentsColumn({
 }) {
   return (
     <ColumnShell label="agents" status="4 registered · click run">
-      <ul className="mt-3 space-y-2.5">
+      <ul className="space-y-2.5">
         {STUDIO_AGENTS.map((agent) => {
           const isCurrent = currentKey === agent.key;
           const hasRun = ran.includes(agent.key);
@@ -262,7 +262,7 @@ function AgentsColumn({
                 >
                   {agent.name}
                 </span>
-                <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
                   {agent.role}
                 </span>
               </div>
@@ -276,17 +276,13 @@ function AgentsColumn({
                     flowPulse(e.currentTarget, "studio-output");
                     onRun(agent.key);
                   }}
-                  className="rounded-lg border px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.15em] transition-colors"
-                  style={{
-                    borderColor: `${agent.color}55`,
-                    backgroundColor: `${agent.color}1a`,
-                    color: agent.color,
-                  }}
+                  className="inline-flex min-h-10 items-center justify-center rounded-lg border border-[var(--agent)]/35 bg-[var(--agent)]/10 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.15em] text-[var(--agent)] transition-all hover:bg-[var(--agent)]/20 active:scale-[0.98] lg:min-h-0"
+                  style={{ "--agent": agent.color } as React.CSSProperties}
                 >
                   ▸ run{hasRun ? " again" : ""}
                 </button>
                 {hasRun ? (
-                  <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-emerald-300/80">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80">
                     ✓ ran
                   </span>
                 ) : null}
@@ -319,7 +315,7 @@ function OutputColumn({
       {agent ? (
         <div
           key={agent.key}
-          className="pg-fresh mt-3 rounded-xl border p-4"
+          className="pg-fresh rounded-xl border p-4"
           style={{ borderColor: `${agent.color}40` }}
         >
           <div className="flex items-center gap-2 border-b border-white/5 pb-2">
@@ -329,7 +325,7 @@ function OutputColumn({
             >
               {agent.name}
             </span>
-            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
               {agent.role}
             </span>
           </div>
@@ -345,7 +341,7 @@ function OutputColumn({
           {agent.gated ? (
             gate === "pending" ? (
               <div className="mt-3 border-t border-white/5 pt-3">
-                <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-amber-300/90">
+                <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-amber-300/90">
                   ⏸ waiting on you · this would publish
                 </p>
                 <div className="mt-2 flex gap-2">
@@ -355,7 +351,7 @@ function OutputColumn({
                       flowPulse(e.currentTarget, "studio-feed");
                       dispatch({ type: "APPROVE" });
                     }}
-                    className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-colors hover:bg-emerald-400/20"
+                    className="inline-flex min-h-10 items-center justify-center rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-all hover:bg-emerald-400/20 active:scale-[0.98] lg:min-h-0"
                   >
                     Approve &amp; publish →
                   </button>
@@ -365,29 +361,29 @@ function OutputColumn({
                       flowPulse(e.currentTarget, "studio-feed");
                       dispatch({ type: "DISCARD" });
                     }}
-                    className="rounded-lg px-2 py-1.5 text-xs text-zinc-500 hover:text-zinc-300"
+                    className="inline-flex min-h-10 items-center justify-center rounded-lg px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:text-zinc-200 lg:min-h-0"
                   >
                     Discard
                   </button>
                 </div>
               </div>
             ) : gate === "approved" ? (
-              <p className="mt-3 border-t border-white/5 pt-3 font-mono text-[9px] uppercase tracking-[0.18em] text-emerald-300/80">
+              <p className="mt-3 border-t border-white/5 pt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80">
                 ✓ approved + published
               </p>
             ) : gate === "discarded" ? (
-              <p className="mt-3 border-t border-white/5 pt-3 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+              <p className="mt-3 border-t border-white/5 pt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
                 ✕ draft discarded
               </p>
             ) : null
           ) : (
-            <p className="mt-3 border-t border-white/5 pt-3 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-600">
+            <p className="mt-3 border-t border-white/5 pt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
               ✓ ran autonomously · read-only, nothing to approve
             </p>
           )}
         </div>
       ) : (
-        <div className="mt-3 flex min-h-[180px] flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-white/10 px-6 text-center">
+        <div className="flex min-h-[180px] flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-white/10 px-6 text-center">
           <span aria-hidden className="agent-orb" />
           <p className="text-xs leading-relaxed text-zinc-500">
             Agents standing by.
@@ -405,7 +401,7 @@ function OutputColumn({
 function FeedColumn({ feed }: { feed: AuditEntry[] }) {
   return (
     <ColumnShell label="audit log" status="every action logged · real-time" flow="studio-feed">
-      <ul className="mt-3 space-y-2">
+      <ul className="space-y-2">
         {feed.map((entry) => (
           <li
             key={entry.id}
@@ -417,11 +413,11 @@ function FeedColumn({ feed }: { feed: AuditEntry[] }) {
             ].join(" ")}
           >
             <div className="flex items-baseline justify-between gap-2">
-              <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
                 {formatRelative(entry.ts)}
               </span>
               {entry.fresh ? (
-                <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
+                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
                   new
                 </span>
               ) : null}

@@ -39,11 +39,11 @@ export function OutcomePanel({
       <div className="flex items-baseline justify-between gap-2">
         <p
           id="outcome-heading"
-          className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600"
+          className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500"
         >
           outcomes · what this loop ships
         </p>
-        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-600">
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
           illustrative sample data
         </p>
       </div>
@@ -54,14 +54,14 @@ export function OutcomePanel({
             key={s.label}
             className="rounded-xl border border-white/10 bg-black/20 p-3.5"
           >
-            <dd className="text-2xl font-medium tracking-[-0.02em] text-[var(--color-scene-1)]">
+            <dd className="text-2xl font-medium tabular-nums tracking-[-0.02em] text-[var(--color-scene-1)]">
               {s.value}
             </dd>
             <dt className="mt-1 text-[12px] leading-tight text-zinc-300">
               {s.label}
             </dt>
             {s.sub ? (
-              <p className="mt-0.5 text-[10px] leading-tight text-zinc-600">
+              <p className="mt-0.5 text-[10px] leading-tight text-zinc-500">
                 {s.sub}
               </p>
             ) : null}
@@ -90,7 +90,7 @@ export function OutcomePanel({
         </a>
       </div>
 
-      <p className="mt-3 text-[10px] leading-relaxed text-zinc-600">
+      <p className="mt-3 text-[10px] leading-relaxed text-zinc-500">
         Sample numbers for the sandbox, not a real company&apos;s metrics.
       </p>
     </section>

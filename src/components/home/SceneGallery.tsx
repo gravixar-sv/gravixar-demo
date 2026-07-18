@@ -28,7 +28,7 @@ export function SceneGallery() {
       <div className="mx-auto max-w-7xl px-6 py-24 md:px-10 md:py-32 lg:px-12">
         <header data-reveal className="flex flex-wrap items-end justify-between gap-6">
           <div className="max-w-2xl">
-            <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#ff6b6b]">
+            <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--color-scene-1)]">
               the scenes
             </p>
             <h2
@@ -42,7 +42,7 @@ export function SceneGallery() {
               buttons, watch the loop run.
             </p>
           </div>
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
             sandbox · resets every Sunday
           </p>
         </header>
@@ -54,7 +54,7 @@ export function SceneGallery() {
         </div>
 
         {upcoming ? (
-          <p data-reveal className="mt-12 flex flex-wrap items-center gap-3 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+          <p data-reveal className="mt-12 flex flex-wrap items-center gap-3 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-zinc-600" aria-hidden />
             next to come online: {upcoming.name}, {upcoming.whatItIs.toLowerCase()}
           </p>
@@ -79,7 +79,7 @@ function SceneCard({
     <Link
       href={`/${scene.slug}`}
       data-reveal
-      className={`group block rounded-2xl p-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff6b6b] ${
+      className={`group block rounded-2xl p-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-scene-1)] ${
         offset ? "md:mt-8" : ""
       }`}
     >
@@ -90,7 +90,7 @@ function SceneCard({
           <h3 className="text-xl font-medium tracking-[-0.015em] text-zinc-50 md:text-2xl">
             {scene.name}
             {scene.codename ? (
-              <span className="ml-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+              <span className="ml-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
                 · {scene.codename}
               </span>
             ) : null}
@@ -99,7 +99,7 @@ function SceneCard({
             </span>
           </h3>
           <span
-            className="rounded-full border px-2.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.18em]"
+            className="rounded-full border px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em]"
             style={{ borderColor: `${accent}40`, color: accent }}
           >
             for {scene.personaLabel}

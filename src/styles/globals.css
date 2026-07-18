@@ -339,6 +339,36 @@
   .pg-stagger > *:nth-child(6) { animation-delay: 540ms; }
   .pg-stagger > *:nth-child(7) { animation-delay: 640ms; }
   .pg-stagger > *:nth-child(8) { animation-delay: 740ms; }
+  /* Anything past the 8th shares the last beat, so a long draft never
+     animates a late line in AHEAD of the lines above it. */
+  .pg-stagger > *:nth-child(n+9) { animation-delay: 800ms; }
+
+  /* The attachment thumb lifts above its siblings while popped so the
+     scaled preview isn't clipped by the next card. */
+  .thumb-pop:hover,
+  .thumb-pop:focus-visible,
+  .thumb-pop[data-popped="true"] {
+    z-index: 30;
+  }
+
+  /* The pop itself. Driven from CSS rather than conditional utilities so
+     hover, keyboard focus, and tap all share one rule. Note the zoom is
+     the CONTENT (it's how you read the attachment), so reduced motion
+     drops the animation, not the preview. */
+  .thumb-art {
+    transform-origin: left center;
+  }
+  .thumb-pop:hover .thumb-art,
+  .thumb-pop:focus-visible .thumb-art,
+  .thumb-pop[data-popped="true"] .thumb-art {
+    transform: scale(2.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.65);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .thumb-art {
+      transition: transform 200ms var(--ease-out);
+    }
+  }
 
   /* Scene conduit: a thin scene-accent thread that draws across the
      top of the workspace on entry. The index's gate line, echoed. */

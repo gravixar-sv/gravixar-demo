@@ -115,36 +115,36 @@ export function ReviewStateMachine() {
                 onClick={() => transition(t)}
                 className={
                   t.variant === "primary"
-                    ? "rounded-md border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/15 px-3 py-1.5 text-xs text-[var(--color-scene-1)] transition-colors hover:bg-[var(--color-scene-1)]/25"
-                    : "rounded-md border border-white/10 bg-transparent px-3 py-1.5 text-xs text-zinc-300 transition-colors hover:border-white/30"
+                    ? "inline-flex min-h-10 items-center justify-center rounded-md border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/15 px-3 py-1.5 text-xs text-[var(--color-scene-1)] transition-all hover:bg-[var(--color-scene-1)]/25 active:scale-[0.98] lg:min-h-0"
+                    : "inline-flex min-h-10 items-center justify-center rounded-md border border-white/10 bg-transparent px-3 py-1.5 text-xs text-zinc-300 transition-all hover:border-white/30 active:scale-[0.98] lg:min-h-0"
                 }
               >
-                {t.label} →
+                {t.label} <span aria-hidden>→</span>
               </button>
             ))
           )}
         </div>
 
         <div className="mt-5 flex items-center justify-between border-t border-white/5 pt-4">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
             visible-to · {actorFor(state)}
           </p>
           <button
             type="button"
             onClick={reset}
             disabled={state === "DRAFT" && audit.length === 0}
-            className="rounded-md border border-white/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400 transition-colors hover:border-white/30 hover:text-zinc-200 disabled:opacity-40"
+            className="inline-flex min-h-10 items-center justify-center rounded-md border border-white/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400 transition-all hover:border-white/30 hover:text-zinc-200 active:scale-[0.98] disabled:opacity-40 lg:min-h-0"
           >
-            ↻ reset
+            <span aria-hidden>↻</span> reset
           </button>
         </div>
       </div>
 
       {/* Audit log */}
       <div>
-        <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
+        <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
           audit log, this session
-        </p>
+        </h2>
         {audit.length === 0 ? (
           <p className="mt-3 rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-sm text-zinc-500">
             No transitions yet. Click a transition above and watch a row land
@@ -164,14 +164,14 @@ export function ReviewStateMachine() {
                       transition
                     </span>{" "}
                     <span className="text-zinc-100">{row.from}</span>
-                    <span className="text-zinc-600"> → </span>
+                    <span aria-hidden className="text-zinc-600"> → </span>
                     <span className="text-[var(--color-scene-1)]">{row.to}</span>
                   </p>
                   <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
                     {row.actor} · {timeAgo(row.at)}
                   </p>
                 </div>
-                <span className="rounded-sm border border-zinc-700 bg-zinc-900/60 px-2 py-0.5 font-mono text-[9px] text-zinc-500">
+                <span className="rounded-sm border border-white/15 bg-zinc-900/60 px-2 py-0.5 font-mono text-[10px] text-zinc-400">
                   contract 7y
                 </span>
               </li>

@@ -48,7 +48,7 @@ export function Topbar({
                 <span aria-hidden>←</span>
                 <span>All scenes</span>
               </Link>
-              <span className="hidden text-zinc-700 sm:inline">·</span>
+              <span aria-hidden className="hidden text-zinc-700 sm:inline">·</span>
               <div className="hidden items-center gap-3 sm:flex">
                 <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
                   scene
@@ -56,7 +56,7 @@ export function Topbar({
                 <span className="text-sm text-zinc-100">{sceneName}</span>
                 {personaLabel ? (
                   <>
-                    <span className="text-zinc-700">·</span>
+                    <span aria-hidden className="text-zinc-700">·</span>
                     <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
                       {personaLabel}
                     </span>

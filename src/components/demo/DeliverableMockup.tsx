@@ -1,11 +1,17 @@
+"use client";
+
 // Inline-SVG design mockups for the Lattice review-loop deliverables.
 // CSP-safe (no external image host), zero-cost, and good-looking enough
 // to read as real agency work. Swappable for AI-generated images later
 // (drop an <img src="/lattice/<kind>.webp"> in place of <Art/>).
 //
 // MockupThumb renders the art small and "pops" it (scales up with a
-// ring + shadow) on hover — the attachment-preview interaction.
+// ring + shadow) — the attachment-preview interaction. It is a real
+// button: pointer users hover, keyboard users focus, touch users tap
+// (hover alone made this feature nonexistent on the mobile layout, which
+// is the layout the scene columns are actually built for).
 
+import { useState } from "react";
 import type { DeliverableKind } from "@/lib/playground/lattice-deliverables";
 
 function WebArt() {
@@ -122,6 +128,12 @@ function Art({ kind, brand }: { kind: DeliverableKind; brand: MockupBrand }) {
   return <WebArt />;
 }
 
+const KIND_LABEL: Record<DeliverableKind, string> = {
+  web: "web page",
+  social: "social post",
+  email: "email",
+};
+
 export function MockupThumb({
   kind,
   brand = "lattice",
@@ -130,17 +142,26 @@ export function MockupThumb({
   /** Which fictional brand's voice the artwork carries. */
   brand?: MockupBrand;
 }) {
-  const ratio = kind === "social" ? "aspect-square w-20" : "aspect-[16/9] w-32";
+  const [popped, setPopped] = useState(false);
+  // Narrower on the smallest screens: at 375px the 128px thumb left the
+  // card's title column ~95px.
+  const ratio =
+    kind === "social" ? "aspect-square w-16 sm:w-20" : "aspect-[16/9] w-24 sm:w-32";
   return (
-    <span className="group/thumb relative inline-block" style={{ zIndex: 0 }}>
+    <button
+      type="button"
+      aria-expanded={popped}
+      aria-label={`${popped ? "Hide" : "Preview"} ${KIND_LABEL[kind]} attachment`}
+      onClick={() => setPopped((p) => !p)}
+      onBlur={() => setPopped(false)}
+      data-popped={popped}
+      className="thumb-pop relative inline-block shrink-0 rounded-md"
+    >
       <span
-        className={`block ${ratio} overflow-hidden rounded-md border border-white/10 shadow-sm transition-transform duration-200 ease-out group-hover/thumb:scale-[2.1] group-hover/thumb:shadow-2xl`}
-        style={{ transformOrigin: "left center" }}
+        className={`thumb-art block ${ratio} overflow-hidden rounded-md border border-white/10 shadow-sm`}
       >
         <Art kind={kind} brand={brand} />
       </span>
-      {/* lift above siblings on hover so the popped preview isn't clipped */}
-      <style>{`.group\\/thumb:hover{z-index:30}`}</style>
-    </span>
+    </button>
   );
 }

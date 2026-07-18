@@ -83,9 +83,9 @@ export default async function ModulePage(
         {/* Sidebar */}
         <aside className="lg:col-span-4 space-y-8">
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
+            <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
               running in
-            </p>
+            </h2>
             <ul className="mt-3 space-y-2 text-sm">
               {m.runningIn.map((r) => (
                 <li key={r} className="text-zinc-200">
@@ -97,9 +97,9 @@ export default async function ModulePage(
 
           {m.stack.length > 0 ? (
             <div>
-              <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
+              <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
                 stack
-              </p>
+              </h2>
               <ul className="mt-3 flex flex-wrap gap-1.5">
                 {m.stack.map((s) => (
                   <li
@@ -114,9 +114,9 @@ export default async function ModulePage(
           ) : null}
 
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
+            <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
               read more
-            </p>
+            </h2>
             <Link
               href={`https://gravixar.com/modules/${m.slug}`}
               className="mt-3 block text-sm text-zinc-300 underline-offset-4 hover:underline"

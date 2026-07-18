@@ -99,9 +99,9 @@ export function AuditLogRestore() {
           <button
             type="button"
             onClick={resetAll}
-            className="rounded-md border border-white/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400 transition-colors hover:border-white/30 hover:text-zinc-200"
+            className="inline-flex min-h-10 items-center justify-center rounded-md border border-white/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400 transition-all hover:border-white/30 hover:text-zinc-200 active:scale-[0.98] lg:min-h-0"
           >
-            ↻ reset everything
+            <span aria-hidden>↻</span> reset everything
           </button>
         </div>
 
@@ -119,7 +119,7 @@ export function AuditLogRestore() {
         </div>
 
         <div className="mt-5 flex items-center justify-between border-t border-white/5 pt-4">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
             allowlist · name, tagline · status enums and money would never live
             here
           </p>
@@ -127,7 +127,7 @@ export function AuditLogRestore() {
             type="button"
             onClick={save}
             disabled={!dirty}
-            className="rounded-md border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/15 px-4 py-1.5 text-xs text-[var(--color-scene-1)] transition-colors hover:bg-[var(--color-scene-1)]/25 disabled:opacity-40"
+            className="inline-flex min-h-10 items-center justify-center rounded-md border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/15 px-4 py-1.5 text-xs text-[var(--color-scene-1)] transition-all hover:bg-[var(--color-scene-1)]/25 active:scale-[0.98] disabled:opacity-40 lg:min-h-0"
           >
             save changes
           </button>
@@ -136,9 +136,9 @@ export function AuditLogRestore() {
 
       {/* Audit log */}
       <div>
-        <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
+        <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
           audit log, this session
-        </p>
+        </h2>
         {audit.length === 0 ? (
           <p className="mt-3 rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-sm text-zinc-500">
             No edits yet. Change a field above and click save.
@@ -165,7 +165,7 @@ export function AuditLogRestore() {
                       <span className="text-zinc-400 line-through">
                         {row.before}
                       </span>{" "}
-                      <span className="text-zinc-600">→</span>{" "}
+                      <span aria-hidden className="text-zinc-600">→</span>{" "}
                       <span className="text-[var(--color-scene-1)]">
                         {row.after}
                       </span>
@@ -178,12 +178,12 @@ export function AuditLogRestore() {
                     <button
                       type="button"
                       onClick={() => restore(row)}
-                      className="shrink-0 rounded-md border border-white/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-300 transition-colors hover:border-white/30 hover:text-white"
+                      className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-md border border-white/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-300 transition-all hover:border-white/30 hover:text-white active:scale-[0.98] lg:min-h-0"
                     >
-                      ↺ restore
+                      <span aria-hidden>↺</span> restore
                     </button>
                   ) : (
-                    <span className="shrink-0 rounded-sm border border-zinc-700 bg-zinc-900/60 px-2 py-0.5 font-mono text-[9px] text-zinc-500">
+                    <span className="shrink-0 rounded-sm border border-white/15 bg-zinc-900/60 px-2 py-0.5 font-mono text-[10px] text-zinc-400">
                       {isRestore ? "restored" : "not restorable"}
                     </span>
                   )}
@@ -215,7 +215,7 @@ function Field({
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-1 w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm text-zinc-100 outline-none transition-colors focus:border-[var(--color-scene-1)]/60"
+        className="mt-1 min-h-11 w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm text-zinc-100 outline-none transition-colors focus:border-[var(--color-scene-1)]/60 focus:ring-2 focus:ring-[var(--color-scene-1)]/35"
       />
     </label>
   );

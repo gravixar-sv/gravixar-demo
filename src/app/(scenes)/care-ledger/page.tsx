@@ -20,12 +20,13 @@ import {
   type Deal,
   type FinanceTile,
   type Provider,
-  type Rule,
   type AuditEntry,
 } from "@/lib/playground/care-ledger-data";
 import { SceneCTA } from "@/components/demo/SceneCTA";
 import { OutcomePanel } from "@/components/demo/OutcomePanel";
+import { LearnBeat } from "@/components/demo/LearnBeat";
 import { flowPulse } from "@/lib/flowPulse";
+import { formatRelative } from "@/lib/formatRelative";
 
 const FRESH_DECAY_MS = 2200;
 
@@ -85,7 +86,7 @@ export default function CareLedgerPortal() {
             onClick={() => dispatch({ type: "RESET" })}
             className="inline-flex min-h-10 items-center justify-center rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-300 transition-all hover:border-white/20 hover:bg-white/[0.06] hover:text-zinc-50 active:scale-[0.98] lg:min-h-0"
           >
-            ↻ reset
+            <span aria-hidden>↻</span> reset
           </button>
         </div>
       </header>
@@ -98,6 +99,10 @@ export default function CareLedgerPortal() {
           {state.providers.map((p) => (
             <ProviderCard key={p.id} p={p} dispatch={dispatch} />
           ))}
+          <EmptyIf
+            show={state.providers.length === 0}
+            text="No providers in intake right now."
+          />
         </Col>
 
         {/* Finance / billing */}
@@ -114,6 +119,10 @@ export default function CareLedgerPortal() {
           {state.billing.map((b) => (
             <BillingCard key={b.id} item={b} dispatch={dispatch} />
           ))}
+          <EmptyIf
+            show={state.billing.length === 0}
+            text="Nothing waiting on your approval."
+          />
         </Col>
 
         {/* Sales pipeline */}
@@ -121,10 +130,22 @@ export default function CareLedgerPortal() {
           {state.deals.map((d) => (
             <DealCard key={d.id} deal={d} dispatch={dispatch} />
           ))}
+          <EmptyIf
+            show={state.deals.length === 0}
+            text="No clinics in the pipeline."
+          />
         </Col>
       </div>
 
-      <LearnBeat rules={state.rules} learnedCount={learnedCount} />
+      <LearnBeat
+        rules={state.rules}
+        learnedCount={learnedCount}
+        flow="cl-rules"
+        headingId="care-ledger-rules-heading"
+        heading="portal policy · what every approval teaches"
+        learnedNote="learned from your approval"
+        emptyText="Credential a provider or approve a claim batch and the portal starts a policy book."
+      />
       <OutcomePanel
         stats={[
           { value: "1,420", label: "providers credentialed", sub: "across the network" },
@@ -184,15 +205,34 @@ function Col({
   flow?: string;
   children: React.ReactNode;
 }) {
+  const headingId = `care-ledger-col-${label
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")}-heading`;
   return (
     <section
       data-flow={flow}
+      aria-labelledby={headingId}
       className="scene-card min-w-[82%] shrink-0 snap-start rounded-2xl p-5 sm:min-w-[48%] lg:min-w-0"
     >
-      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-300">{label}</p>
+      <h2
+        id={headingId}
+        className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-300"
+      >
+        {label}
+      </h2>
       <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">{status}</p>
       <div className="mt-4 space-y-3">{children}</div>
     </section>
+  );
+}
+
+/** Zero-state row, matching Lattice's EmptyIf idiom exactly. */
+function EmptyIf({ show, text }: { show: boolean; text: string }) {
+  if (!show) return null;
+  return (
+    <p className="rounded-lg border border-dashed border-white/10 px-3 py-4 text-center text-[11px] text-zinc-500">
+      {text}
+    </p>
   );
 }
 
@@ -241,7 +281,9 @@ function ProviderCard({
                   : "border-amber-400/35 text-amber-300/90",
               ].join(" ")}
             >
-              {ok ? "✓" : "○"} {c.kind}
+              <span aria-hidden>{ok ? "✓" : "○"}</span>
+              <span className="sr-only">{ok ? "verified" : "pending"}</span>{" "}
+              {c.kind}
             </span>
           );
         })}
@@ -250,13 +292,15 @@ function ProviderCard({
       <p className="mt-2.5 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em]">
         <span className="text-zinc-500">zoom intake</span>
         <span className={intakeDone ? "text-[var(--color-scene-1)]" : "text-amber-300/90"}>
-          {intakeDone ? "✓ done" : "○ scheduled"}
+          <span aria-hidden>{intakeDone ? "✓" : "○"}</span>{" "}
+          {intakeDone ? "done" : "scheduled"}
         </span>
       </p>
 
       {credentialed ? (
         <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80">
-          ✓ credentialed · billing enabled →
+          <span aria-hidden>✓</span> credentialed · billing enabled{" "}
+          <span aria-hidden>→</span>
         </p>
       ) : intakeDone ? (
         <button
@@ -267,7 +311,7 @@ function ProviderCard({
           }}
           className="mt-3 inline-flex min-h-10 items-center justify-center rounded-lg border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/10 px-3 py-1.5 text-xs font-medium text-[var(--color-scene-1)] transition-all hover:bg-[var(--color-scene-1)]/20 active:scale-[0.98] lg:min-h-0"
         >
-          Verify &amp; credential →
+          Verify &amp; credential <span aria-hidden>→</span>
         </button>
       ) : (
         <button
@@ -275,7 +319,7 @@ function ProviderCard({
           onClick={() => dispatch({ type: "COMPLETE_INTAKE", id: p.id })}
           className="mt-3 inline-flex min-h-10 items-center justify-center rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-1.5 text-xs font-medium text-amber-200 transition-all hover:bg-amber-400/20 active:scale-[0.98] lg:min-h-0"
         >
-          ▸ Complete Zoom intake
+          <span aria-hidden>▸</span> Complete Zoom intake
         </button>
       )}
     </div>
@@ -320,27 +364,31 @@ function BillingCard({
         ) : null}
       </div>
       <p className="mt-1 text-[11px] leading-relaxed text-zinc-400">{item.detail}</p>
-      {approved ? (
-        <p className="mt-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80">
-          ✓ approved + submitted
-        </p>
-      ) : (
-        <div className="mt-2.5">
-          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-amber-300/90">
-            ⏸ waiting on you · gated
+      {/* The gate flips waiting → approved in place, so announce it. */}
+      <div aria-live="polite">
+        {approved ? (
+          <p className="mt-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80">
+            <span aria-hidden>✓</span> approved + submitted
           </p>
-          <button
-            type="button"
-            onClick={(e) => {
-              flowPulse(e.currentTarget, "cl-rules");
-              dispatch({ type: "APPROVE_BILLING", id: item.id });
-            }}
-            className="mt-2 inline-flex min-h-10 items-center justify-center rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-all hover:bg-emerald-400/20 active:scale-[0.98] lg:min-h-0"
-          >
-            {item.source === "claims" ? "Approve & submit →" : "Approve billing →"}
-          </button>
-        </div>
-      )}
+        ) : (
+          <div className="mt-2.5">
+            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-amber-300/90">
+              <span aria-hidden>⏸</span> waiting on you · gated
+            </p>
+            <button
+              type="button"
+              onClick={(e) => {
+                flowPulse(e.currentTarget, "cl-rules");
+                dispatch({ type: "APPROVE_BILLING", id: item.id });
+              }}
+              className="mt-2 inline-flex min-h-10 items-center justify-center rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-all hover:bg-emerald-400/20 active:scale-[0.98] lg:min-h-0"
+            >
+              {item.source === "claims" ? "Approve & submit" : "Approve billing"}{" "}
+              <span aria-hidden>→</span>
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -384,13 +432,14 @@ function DealCard({
       <p className="mt-2 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em]">
         <span className="text-zinc-500">zoom discovery</span>
         <span className={deal.zoom === "done" ? "text-[var(--color-scene-1)]" : "text-amber-300/90"}>
-          {deal.zoom === "done" ? "✓ done" : "○ scheduled"}
+          <span aria-hidden>{deal.zoom === "done" ? "✓" : "○"}</span>{" "}
+          {deal.zoom === "done" ? "done" : "scheduled"}
         </span>
       </p>
 
       {live ? (
         <p className="mt-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80">
-          ✓ live · billing on this clinic
+          <span aria-hidden>✓</span> live · billing on this clinic
         </p>
       ) : (
         <button
@@ -401,71 +450,10 @@ function DealCard({
           }}
           className="mt-2.5 inline-flex min-h-10 items-center justify-center rounded-lg border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/10 px-3 py-1.5 text-xs font-medium text-[var(--color-scene-1)] transition-all hover:bg-[var(--color-scene-1)]/20 active:scale-[0.98] lg:min-h-0"
         >
-          Advance stage →
+          Advance stage <span aria-hidden>→</span>
         </button>
       )}
     </div>
-  );
-}
-
-// ─── Learn beat ─────────────────────────────────────────────────────
-
-function LearnBeat({ rules, learnedCount }: { rules: Rule[]; learnedCount: number }) {
-  return (
-    <section data-flow="cl-rules" className="mt-5 scene-card rounded-2xl p-5">
-      <div className="flex items-baseline justify-between gap-2">
-        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
-          portal policy · what every approval teaches
-        </p>
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-          {rules.length} {rules.length === 1 ? "rule" : "rules"}
-          {learnedCount > 0 ? (
-            <>
-              {" "}
-              ·{" "}
-              <span className="text-[var(--color-scene-1)]">
-                {learnedCount} learned from you
-              </span>
-            </>
-          ) : null}
-        </p>
-      </div>
-      {rules.length === 0 ? (
-        <p className="mt-3 rounded-lg border border-dashed border-white/10 px-3 py-4 text-center text-[11px] text-zinc-500">
-          Credential a provider or approve a claim batch and the portal starts a policy book.
-        </p>
-      ) : (
-        <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {rules.map((rule) => (
-            <RuleRow key={rule.id} rule={rule} />
-          ))}
-        </ul>
-      )}
-    </section>
-  );
-}
-
-function RuleRow({ rule }: { rule: Rule }) {
-  const isDo = rule.kind === "do";
-  return (
-    <li
-      className={[
-        "rounded-lg border px-3 py-2",
-        rule.fresh ? "pg-fresh border-[var(--color-scene-1)]/45" : "border-white/10 bg-white/[0.02]",
-      ].join(" ")}
-    >
-      <div className="flex items-start gap-2">
-        <span className={isDo ? "text-emerald-400" : "text-rose-400"}>{isDo ? "✓" : "✗"}</span>
-        <div className="min-w-0 flex-1">
-          <p className="text-[12px] leading-relaxed text-zinc-200">{rule.text}</p>
-          {rule.learned ? (
-            <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
-              learned from your approval
-            </p>
-          ) : null}
-        </div>
-      </div>
-    </li>
   );
 }
 
@@ -473,11 +461,20 @@ function RuleRow({ rule }: { rule: Rule }) {
 
 function AuditTrail({ feed }: { feed: AuditEntry[] }) {
   return (
-    <section className="mt-5 scene-card rounded-2xl p-5">
-      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
+    <section
+      className="mt-5 scene-card rounded-2xl p-5"
+      aria-labelledby="care-ledger-audit-heading"
+    >
+      <h2
+        id="care-ledger-audit-heading"
+        className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500"
+      >
         audit trail · every action logged
-      </p>
-      <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      </h2>
+      <ul
+        aria-live="polite"
+        className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3"
+      >
         {feed.slice(0, 6).map((e) => (
           <li
             key={e.id}
@@ -507,13 +504,4 @@ function AuditTrail({ feed }: { feed: AuditEntry[] }) {
       </ul>
     </section>
   );
-}
-
-function formatRelative(ts: number): string {
-  const deltaSec = Math.max(0, Math.round((Date.now() - ts) / 1000));
-  if (deltaSec < 30) return "just now";
-  if (deltaSec < 90) return "1 min ago";
-  if (deltaSec < 3600) return `${Math.round(deltaSec / 60)} min ago`;
-  if (deltaSec < 7200) return "1 hr ago";
-  return `${Math.round(deltaSec / 3600)} hr ago`;
 }

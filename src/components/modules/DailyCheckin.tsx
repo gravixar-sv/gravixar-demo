@@ -86,9 +86,9 @@ export function DailyCheckin() {
             <button
               type="button"
               onClick={() => setMe(null)}
-              className="rounded-md border border-white/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400 transition-colors hover:border-white/30 hover:text-zinc-200"
+              className="inline-flex min-h-10 items-center justify-center rounded-md border border-white/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400 transition-all hover:border-white/30 hover:text-zinc-200 active:scale-[0.98] lg:min-h-0"
             >
-              ↻ reset
+              <span aria-hidden>↻</span> reset
             </button>
           </div>
         ) : null}
@@ -96,9 +96,9 @@ export function DailyCheckin() {
 
       {/* Team grid */}
       <div>
-        <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
+        <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
           team status, today
-        </p>
+        </h2>
 
         <div className="mt-4 grid gap-2 sm:grid-cols-3">
           {counts.map((s) => (
@@ -109,7 +109,7 @@ export function DailyCheckin() {
               <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
                 {s.value.toLowerCase()}
               </p>
-              <p className="mt-1 text-2xl font-medium text-zinc-100">
+              <p className="mt-1 text-2xl font-medium tabular-nums text-zinc-100">
                 {s.total}
               </p>
             </div>
@@ -155,7 +155,7 @@ function Row({
         </p>
       </div>
       <span
-        className={`rounded-full border px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.18em] ${tone}`}
+        className={`rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em] ${tone}`}
       >
         {status.toLowerCase()}
       </span>

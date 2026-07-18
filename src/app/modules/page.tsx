@@ -45,10 +45,13 @@ export default function ModulesIndex() {
       {/* Modules by category */}
       <div className="mt-14 space-y-12">
         {Object.entries(groups).map(([category, items]) => (
-          <section key={category}>
-            <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-[var(--color-scene-1)]">
+          <section key={category} aria-labelledby={`modules-${category}`}>
+            <h2
+              id={`modules-${category}`}
+              className="font-mono text-[11px] uppercase tracking-[0.22em] text-[var(--color-scene-1)]"
+            >
               {CATEGORY_LABELS[category as ModuleCategory]}
-            </p>
+            </h2>
             <div className="mt-5 grid gap-4 md:grid-cols-2 md:gap-5">
               {items
                 .sort((a, b) => a.order - b.order)
@@ -78,9 +81,9 @@ function ModuleCard({ m }: { m: (typeof MODULES)[number] }) {
   const inner = (
     <>
       <div className="flex items-start justify-between gap-3">
-        <h2 className="text-lg font-medium tracking-[-0.01em] text-zinc-100 md:text-xl">
+        <h3 className="text-lg font-medium tracking-[-0.01em] text-zinc-100 md:text-xl">
           {m.title}
-        </h2>
+        </h3>
         <span
           className={`shrink-0 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] ${
             interactive ? "text-emerald-300/90" : "text-zinc-500"

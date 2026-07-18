@@ -14,13 +14,14 @@ import {
   type Deliverable,
   type FeedEntry,
   type Persona,
-  type Rule,
 } from "@/lib/playground/lattice-deliverables";
 import { Avatar } from "@/components/demo/Avatar";
 import { MockupThumb } from "@/components/demo/DeliverableMockup";
 import { SceneCTA } from "@/components/demo/SceneCTA";
 import { OutcomePanel } from "@/components/demo/OutcomePanel";
+import { LearnBeat } from "@/components/demo/LearnBeat";
 import { flowPulse } from "@/lib/flowPulse";
+import { formatRelative } from "@/lib/formatRelative";
 
 const FRESH_DECAY_MS = 2200;
 
@@ -82,7 +83,7 @@ export default function LatticeReviewLoop() {
             onClick={() => dispatch({ type: "RESET" })}
             className="inline-flex min-h-10 items-center justify-center rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-300 transition-all hover:border-white/20 hover:bg-white/[0.06] hover:text-zinc-50 active:scale-[0.98] lg:min-h-0"
           >
-            ↻ reset
+            <span aria-hidden>↻</span> reset
           </button>
         </div>
       </header>
@@ -94,7 +95,7 @@ export default function LatticeReviewLoop() {
             <ClientCard key={d.id} d={d} dispatch={dispatch} />
           ))}
           {byState("shipped").map((d) => (
-            <DoneCard key={d.id} d={d} label="Shipped" tone="emerald" />
+            <DoneCard key={d.id} d={d} label="Shipped" />
           ))}
           <EmptyIf
             show={byState("with_client", "shipped").length === 0}
@@ -128,7 +129,29 @@ export default function LatticeReviewLoop() {
         </Column>
       </div>
 
-      <LearnBeat rules={state.rules} learnedCount={learnedCount} />
+      <LearnBeat
+        rules={state.rules}
+        learnedCount={learnedCount}
+        flow="lat-rules"
+        headingId="lattice-rules-heading"
+        heading="house rules · what every approval teaches"
+        learnedLabel={`learned from ${PERSONAS.client.firstName}`}
+        emptyText={`Have ${PERSONAS.client.firstName} approve or revise a deliverable and the studio starts a house rulebook.`}
+        renderMeta={(rule) => (
+          <p className="mt-0.5 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+            <span>
+              {rule.audience === "editor"
+                ? `for ${PERSONAS.editor.firstName}`
+                : `for ${PERSONAS.pm.firstName}`}
+            </span>
+            {rule.learned ? (
+              <span className="text-[var(--color-scene-1)]">
+                · learned from {PERSONAS.client.firstName}
+              </span>
+            ) : null}
+          </p>
+        )}
+      />
       <CapabilityStrip />
       <OutcomePanel
         stats={[
@@ -165,20 +188,24 @@ function Column({
   flow?: string;
   children: React.ReactNode;
 }) {
+  const headingId = `lattice-col-${persona.name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")}-heading`;
   return (
     <section
       data-flow={flow}
+      aria-labelledby={headingId}
       className="scene-card min-w-[82%] shrink-0 snap-start rounded-2xl p-5 sm:min-w-[48%] lg:min-w-0"
     >
       <header className="flex items-center gap-3 border-b border-white/5 pb-4">
         <Avatar initials={persona.initials} hue={persona.hue} size="md" />
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium text-zinc-50">
+          <h2 id={headingId} className="truncate text-sm font-medium text-zinc-50">
             {persona.name}
             <span className="ml-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
               {persona.role}
             </span>
-          </p>
+          </h2>
           <p className="truncate text-[11px] text-zinc-400">{persona.contextLine}</p>
         </div>
       </header>
@@ -249,6 +276,7 @@ function ClientCard({
             value={note}
             onChange={(e) => setNote(e.target.value)}
             rows={2}
+            aria-label="Revision note"
             placeholder="What should change?"
             className="w-full rounded-lg border border-white/10 bg-black/30 px-2.5 py-2 text-xs text-zinc-100 placeholder:text-zinc-500 focus:border-[var(--color-scene-1)]/60 focus:outline-none focus:ring-2 focus:ring-[var(--color-scene-1)]/35"
           />
@@ -261,7 +289,7 @@ function ClientCard({
               }}
               className="inline-flex min-h-10 items-center justify-center rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-1.5 text-xs font-medium text-amber-200 transition-all hover:bg-amber-400/20 active:scale-[0.98] lg:min-h-0"
             >
-              Send revision →
+              Send revision <span aria-hidden>→</span>
             </button>
             <button
               type="button"
@@ -282,7 +310,7 @@ function ClientCard({
             }}
             className="inline-flex min-h-10 items-center justify-center rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-all hover:bg-emerald-400/20 active:scale-[0.98] lg:min-h-0"
           >
-            Approve →
+            Approve <span aria-hidden>→</span>
           </button>
           <button
             type="button"
@@ -317,9 +345,9 @@ function PMReviewCard({
           flowPulse(e.currentTarget, "lat-client");
           dispatch({ type: "PM_APPROVE", id: d.id });
         }}
-        className="mt-2 inline-flex min-h-10 items-center justify-center rounded-lg border border-sky-400/30 bg-sky-400/10 px-3 py-1.5 text-xs font-medium text-sky-200 transition-all hover:bg-sky-400/20 active:scale-[0.98] lg:min-h-0"
+        className="mt-2 inline-flex min-h-10 items-center justify-center rounded-lg border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/10 px-3 py-1.5 text-xs font-medium text-[var(--color-scene-1)] transition-all hover:bg-[var(--color-scene-1)]/20 active:scale-[0.98] lg:min-h-0"
       >
-        Approve &amp; send to client →
+        Approve &amp; send to client <span aria-hidden>→</span>
       </button>
     </CardShell>
   );
@@ -346,9 +374,9 @@ function PMRevisionCard({
           flowPulse(e.currentTarget, "lat-editor");
           dispatch({ type: "PM_TO_EDITOR", id: d.id });
         }}
-        className="mt-2 inline-flex min-h-10 items-center justify-center rounded-lg border border-violet-400/30 bg-violet-400/10 px-3 py-1.5 text-xs font-medium text-violet-200 transition-all hover:bg-violet-400/20 active:scale-[0.98] lg:min-h-0"
+        className="mt-2 inline-flex min-h-10 items-center justify-center rounded-lg border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/10 px-3 py-1.5 text-xs font-medium text-[var(--color-scene-1)] transition-all hover:bg-[var(--color-scene-1)]/20 active:scale-[0.98] lg:min-h-0"
       >
-        Push to editor →
+        Push to editor <span aria-hidden>→</span>
       </button>
     </CardShell>
   );
@@ -380,9 +408,9 @@ function EditorCard({
           flowPulse(e.currentTarget, "lat-pm");
           dispatch({ type: "EDITOR_SUBMIT", id: d.id });
         }}
-        className="mt-2 inline-flex min-h-10 items-center justify-center rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-all hover:bg-emerald-400/20 active:scale-[0.98] lg:min-h-0"
+        className="mt-2 inline-flex min-h-10 items-center justify-center rounded-lg border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/10 px-3 py-1.5 text-xs font-medium text-[var(--color-scene-1)] transition-all hover:bg-[var(--color-scene-1)]/20 active:scale-[0.98] lg:min-h-0"
       >
-        ↑ Submit for review
+        <span aria-hidden>↑</span> Submit for review
       </button>
     </CardShell>
   );
@@ -396,7 +424,6 @@ function DoneCard({
 }: {
   d: Deliverable;
   label: string;
-  tone: "emerald";
 }) {
   return (
     <div
@@ -409,89 +436,10 @@ function DoneCard({
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium text-zinc-200">{d.title}</p>
         <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80">
-          ✓ {label} · v{d.version}
+          <span aria-hidden>✓</span> {label} · v{d.version}
         </p>
       </div>
     </div>
-  );
-}
-
-// ─── Learn-beat ─────────────────────────────────────────────────────
-
-function LearnBeat({
-  rules,
-  learnedCount,
-}: {
-  rules: Rule[];
-  learnedCount: number;
-}) {
-  return (
-    <section data-flow="lat-rules" className="mt-5 scene-card rounded-2xl p-5">
-      <div className="flex items-baseline justify-between gap-2">
-        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
-          house rules · what every approval teaches
-        </p>
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-          {rules.length} {rules.length === 1 ? "rule" : "rules"}
-          {learnedCount > 0 ? (
-            <>
-              {" "}
-              ·{" "}
-              <span className="text-[var(--color-scene-1)]">
-                {learnedCount} learned from {PERSONAS.client.firstName}
-              </span>
-            </>
-          ) : null}
-        </p>
-      </div>
-      {rules.length === 0 ? (
-        <p className="mt-3 rounded-lg border border-dashed border-white/10 px-3 py-4 text-center text-[11px] text-zinc-500">
-          Have {PERSONAS.client.firstName} approve or revise a deliverable and
-          the studio starts a house rulebook.
-        </p>
-      ) : (
-        <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {rules.map((rule) => (
-            <RuleRow key={rule.id} rule={rule} />
-          ))}
-        </ul>
-      )}
-    </section>
-  );
-}
-
-function RuleRow({ rule }: { rule: Rule }) {
-  const isDo = rule.kind === "do";
-  const audienceLabel =
-    rule.audience === "editor"
-      ? `for ${PERSONAS.editor.firstName}`
-      : `for ${PERSONAS.pm.firstName}`;
-  return (
-    <li
-      className={[
-        "rounded-lg border px-3 py-2",
-        rule.fresh
-          ? "pg-fresh border-[var(--color-scene-1)]/45"
-          : "border-white/10 bg-white/[0.02]",
-      ].join(" ")}
-    >
-      <div className="flex items-start gap-2">
-        <span className={isDo ? "text-emerald-400" : "text-rose-400"}>
-          {isDo ? "✓" : "✗"}
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="text-[12px] leading-relaxed text-zinc-200">{rule.text}</p>
-          <p className="mt-0.5 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-            <span>{audienceLabel}</span>
-            {rule.learned ? (
-              <span className="text-[var(--color-scene-1)]">
-                · learned from {PERSONAS.client.firstName}
-              </span>
-            ) : null}
-          </p>
-        </div>
-      </div>
-    </li>
   );
 }
 
@@ -532,12 +480,12 @@ function CapabilityStrip() {
   return (
     <section className="mt-5 scene-card rounded-2xl p-5" aria-labelledby="os-heading">
       <div className="flex items-baseline justify-between gap-2">
-        <p
+        <h2
           id="os-heading"
           className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500"
         >
           the rest of the OS · running alongside this loop
-        </p>
+        </h2>
         <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
           one system
         </p>
@@ -568,11 +516,20 @@ function CapabilityStrip() {
 
 function ActivityFeed({ feed }: { feed: FeedEntry[] }) {
   return (
-    <section className="mt-5 scene-card rounded-2xl p-5">
-      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
+    <section
+      className="mt-5 scene-card rounded-2xl p-5"
+      aria-labelledby="lattice-activity-heading"
+    >
+      <h2
+        id="lattice-activity-heading"
+        className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500"
+      >
         activity feed · real-time
-      </p>
-      <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      </h2>
+      <ul
+        aria-live="polite"
+        className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3"
+      >
         {feed.slice(0, 6).map((e) => (
           <li
             key={e.id}
@@ -596,13 +553,4 @@ function ActivityFeed({ feed }: { feed: FeedEntry[] }) {
       </ul>
     </section>
   );
-}
-
-function formatRelative(ts: number): string {
-  const deltaSec = Math.max(0, Math.round((Date.now() - ts) / 1000));
-  if (deltaSec < 30) return "just now";
-  if (deltaSec < 90) return "1 min ago";
-  if (deltaSec < 3600) return `${Math.round(deltaSec / 60)} min ago`;
-  if (deltaSec < 7200) return "1 hr ago";
-  return `${Math.round(deltaSec / 3600)} hr ago`;
 }

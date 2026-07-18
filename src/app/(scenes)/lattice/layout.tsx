@@ -27,7 +27,7 @@ export default function LatticeSceneLayout({
         } as React.CSSProperties
       }
     >
-      <Topbar sceneName={SCENE.name} personaLabel={SCENE.codename} showReset={false} />
+      <Topbar sceneName={SCENE.name} personaLabel={SCENE.codename} />
       <main>{children}</main>
     </div>
   );

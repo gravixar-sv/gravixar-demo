@@ -7,7 +7,7 @@
 // founder approves. Same "AI drafts, human approves" grammar as the
 // other scenes. See src/lib/playground/cockpit-data.ts.
 
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useState } from "react";
 import {
   FOUNDER,
   cockpitReducer,
@@ -15,14 +15,15 @@ import {
   type CockpitEvent,
   type FeedEntry,
   type MoneyItem,
-  type Rule,
   type Signal,
   type Todo,
 } from "@/lib/playground/cockpit-data";
 import { Avatar } from "@/components/demo/Avatar";
 import { SceneCTA } from "@/components/demo/SceneCTA";
 import { OutcomePanel } from "@/components/demo/OutcomePanel";
+import { LearnBeat } from "@/components/demo/LearnBeat";
 import { flowPulse } from "@/lib/flowPulse";
+import { formatRelative } from "@/lib/formatRelative";
 
 const FRESH_DECAY_MS = 2200;
 
@@ -79,7 +80,7 @@ export default function FounderCockpit() {
           onClick={() => dispatch({ type: "RESET" })}
           className="inline-flex min-h-10 items-center justify-center rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-300 transition-all hover:border-white/20 hover:bg-white/[0.06] hover:text-zinc-50 active:scale-[0.98] lg:min-h-0"
         >
-          ↻ reset
+          <span aria-hidden>↻</span> reset
         </button>
       </header>
 
@@ -99,7 +100,15 @@ export default function FounderCockpit() {
         <MoneyColumn money={state.money} dispatch={dispatch} />
       </div>
 
-      <LearnBeat rules={state.rules} learnedCount={learnedCount} />
+      <LearnBeat
+        rules={state.rules}
+        learnedCount={learnedCount}
+        flow="cp-rules"
+        headingId="cockpit-rules-heading"
+        heading="what it learned from you"
+        emptyText="Approve a draft below and the cockpit starts learning your shape."
+        learnedNote="learned from your approval"
+      />
       <OutcomePanel
         stats={[
           { value: "312", label: "emails triaged", sub: "this month" },
@@ -125,11 +134,14 @@ export default function FounderCockpit() {
 function Col({
   label,
   status,
+  headingId,
   flow,
   children,
 }: {
   label: string;
   status: string;
+  /** Ties the column heading to its section for assistive tech. */
+  headingId: string;
   /** Name other columns target with flowPulse(). */
   flow?: string;
   children: React.ReactNode;
@@ -137,11 +149,15 @@ function Col({
   return (
     <section
       data-flow={flow}
+      aria-labelledby={headingId}
       className="scene-card min-w-[82%] shrink-0 snap-start rounded-2xl p-5 sm:min-w-[48%] lg:min-w-0"
     >
-      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-300">
+      <h2
+        id={headingId}
+        className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-300"
+      >
         {label}
-      </p>
+      </h2>
       <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
         {status}
       </p>
@@ -159,13 +175,22 @@ function InboxColumn({
   signals: Signal[];
   dispatch: React.Dispatch<CockpitEvent>;
 }) {
+  // The button a visitor clicks is replaced by its result, so focus would
+  // fall to <body>. Remember which card just resolved and move focus to
+  // the status line that took the button's place.
+  const [resolvedId, setResolvedId] = useState<string | null>(null);
   return (
-    <Col label="Inbox" status="ai-triaged overnight">
+    <Col
+      label="Inbox"
+      status="ai-triaged overnight"
+      headingId="cockpit-inbox-heading"
+    >
       {signals.map((s) => {
         const u = URGENCY[s.urgency];
         return (
           <div
             key={s.id}
+            aria-live="polite"
             className={[
               "rounded-xl border p-3.5",
               s.fresh
@@ -183,27 +208,37 @@ function InboxColumn({
             </div>
             <p className="mt-1 text-xs text-zinc-400">{s.subject}</p>
             <p className="mt-2 flex gap-1.5 text-[11px] leading-relaxed text-zinc-400">
-              <span className="text-[var(--color-scene-1)]">✦</span>
+              <span aria-hidden className="text-[var(--color-scene-1)]">✦</span>
               <span>{s.aiNote}</span>
             </p>
             {s.autoFiled ? (
               <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                ✓ auto-filed
+                <span aria-hidden>✓</span> auto-filed
               </p>
             ) : s.routed ? (
-              <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
-                → moved to Today
+              <p
+                ref={(el) => {
+                  if (el && resolvedId === s.id) {
+                    el.focus();
+                    setResolvedId(null);
+                  }
+                }}
+                tabIndex={-1}
+                className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]"
+              >
+                <span aria-hidden>→</span> moved to Today
               </p>
             ) : (
               <button
                 type="button"
                 onClick={(e) => {
                   flowPulse(e.currentTarget, "cp-today");
+                  setResolvedId(s.id);
                   dispatch({ type: "ROUTE_SIGNAL", id: s.id });
                 }}
                 className="mt-2 inline-flex min-h-10 items-center justify-center rounded-lg border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/10 px-3 py-1.5 text-xs font-medium text-[var(--color-scene-1)] transition-all hover:bg-[var(--color-scene-1)]/20 active:scale-[0.98] lg:min-h-0"
               >
-                → Add to Today
+                <span aria-hidden>→</span> Add to Today
               </button>
             )}
           </div>
@@ -222,8 +257,14 @@ function TodayColumn({
   todos: Todo[];
   dispatch: React.Dispatch<CockpitEvent>;
 }) {
+  const [resolvedId, setResolvedId] = useState<string | null>(null);
   return (
-    <Col label="Today · needs you" status="ai-drafted · you approve" flow="cp-today">
+    <Col
+      label="Today · needs you"
+      status="ai-drafted · you approve"
+      headingId="cockpit-today-heading"
+      flow="cp-today"
+    >
       {todos.length === 0 ? (
         <p className="rounded-lg border border-dashed border-white/10 px-3 py-6 text-center text-[11px] text-zinc-500">
           Clear. Route something from the inbox.
@@ -232,6 +273,7 @@ function TodayColumn({
       {todos.map((t) => (
         <div
           key={t.id}
+          aria-live="polite"
           className={[
             "rounded-xl border p-3.5",
             t.fresh
@@ -243,8 +285,17 @@ function TodayColumn({
         >
           <p className="text-sm font-medium text-zinc-100">{t.label}</p>
           {t.done ? (
-            <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80">
-              ✓ approved + sent
+            <p
+              ref={(el) => {
+                if (el && resolvedId === t.id) {
+                  el.focus();
+                  setResolvedId(null);
+                }
+              }}
+              tabIndex={-1}
+              className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80"
+            >
+              <span aria-hidden>✓</span> approved + sent
             </p>
           ) : (
             <>
@@ -256,11 +307,12 @@ function TodayColumn({
                   type="button"
                   onClick={(e) => {
                     flowPulse(e.currentTarget, "cp-rules");
+                    setResolvedId(t.id);
                     dispatch({ type: "APPROVE_TODO", id: t.id });
                   }}
                   className="inline-flex min-h-10 items-center justify-center rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-all hover:bg-emerald-400/20 active:scale-[0.98] lg:min-h-0"
                 >
-                  Approve &amp; send →
+                  Approve &amp; send <span aria-hidden>→</span>
                 </button>
                 <button
                   type="button"
@@ -289,8 +341,13 @@ function MoneyColumn({
 }) {
   const summary = money.filter((m) => !m.flag);
   const flagged = money.filter((m) => m.flag);
+  const [resolvedId, setResolvedId] = useState<string | null>(null);
   return (
-    <Col label="Money" status="auto-categorised · flags surfaced">
+    <Col
+      label="Money"
+      status="auto-categorised · flags surfaced"
+      headingId="cockpit-money-heading"
+    >
       <div className="grid grid-cols-2 gap-2">
         {summary.map((m) => (
           <div key={m.id} className="rounded-xl border border-white/10 bg-black/20 p-3">
@@ -309,6 +366,7 @@ function MoneyColumn({
       {flagged.map((m) => (
         <div
           key={m.id}
+          aria-live="polite"
           className={[
             "rounded-xl border p-3.5",
             m.fresh
@@ -329,19 +387,29 @@ function MoneyColumn({
           <p className="mt-1 text-[11px] text-zinc-400">{m.sub}</p>
           {m.flag === "overdue" ? (
             m.chased ? (
-              <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
-                → reminder drafted in Today
+              <p
+                ref={(el) => {
+                  if (el && resolvedId === m.id) {
+                    el.focus();
+                    setResolvedId(null);
+                  }
+                }}
+                tabIndex={-1}
+                className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]"
+              >
+                <span aria-hidden>→</span> reminder drafted in Today
               </p>
             ) : (
               <button
                 type="button"
                 onClick={(e) => {
                   flowPulse(e.currentTarget, "cp-today");
+                  setResolvedId(m.id);
                   dispatch({ type: "CHASE_INVOICE", id: m.id });
                 }}
                 className="mt-2 inline-flex min-h-10 items-center justify-center rounded-lg border border-rose-400/30 bg-rose-400/10 px-3 py-1.5 text-xs font-medium text-rose-200 transition-all hover:bg-rose-400/20 active:scale-[0.98] lg:min-h-0"
               >
-                Chase it →
+                Chase it <span aria-hidden>→</span>
               </button>
             )
           ) : null}
@@ -351,86 +419,24 @@ function MoneyColumn({
   );
 }
 
-// ─── Learn-beat ─────────────────────────────────────────────────────
-
-function LearnBeat({
-  rules,
-  learnedCount,
-}: {
-  rules: Rule[];
-  learnedCount: number;
-}) {
-  return (
-    <section data-flow="cp-rules" className="mt-5 scene-card rounded-2xl p-5">
-      <div className="flex items-baseline justify-between gap-2">
-        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
-          what it learned from you
-        </p>
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-          {rules.length} {rules.length === 1 ? "rule" : "rules"}
-          {learnedCount > 0 ? (
-            <>
-              {" "}
-              ·{" "}
-              <span className="text-[var(--color-scene-1)]">
-                {learnedCount} learned from you
-              </span>
-            </>
-          ) : null}
-        </p>
-      </div>
-      {rules.length === 0 ? (
-        <p className="mt-3 rounded-lg border border-dashed border-white/10 px-3 py-4 text-center text-[11px] text-zinc-500">
-          Approve a draft below and the cockpit starts learning your shape.
-        </p>
-      ) : (
-        <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {rules.map((rule) => (
-            <RuleRow key={rule.id} rule={rule} />
-          ))}
-        </ul>
-      )}
-    </section>
-  );
-}
-
-function RuleRow({ rule }: { rule: Rule }) {
-  const isDo = rule.kind === "do";
-  return (
-    <li
-      className={[
-        "rounded-lg border px-3 py-2",
-        rule.fresh
-          ? "pg-fresh border-[var(--color-scene-1)]/45"
-          : "border-white/10 bg-white/[0.02]",
-      ].join(" ")}
-    >
-      <div className="flex items-start gap-2">
-        <span className={isDo ? "text-emerald-400" : "text-rose-400"}>
-          {isDo ? "✓" : "✗"}
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="text-[12px] leading-relaxed text-zinc-200">{rule.text}</p>
-          {rule.learned ? (
-            <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
-              learned from your approval
-            </p>
-          ) : null}
-        </div>
-      </div>
-    </li>
-  );
-}
-
 // ─── Activity feed ──────────────────────────────────────────────────
 
 function ActivityFeed({ feed }: { feed: FeedEntry[] }) {
   return (
-    <section className="mt-5 scene-card rounded-2xl p-5">
-      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
+    <section
+      className="mt-5 scene-card rounded-2xl p-5"
+      aria-labelledby="cockpit-feed-heading"
+    >
+      <h2
+        id="cockpit-feed-heading"
+        className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500"
+      >
         what the cockpit did · real-time
-      </p>
-      <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      </h2>
+      <ul
+        aria-live="polite"
+        className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3"
+      >
         {feed.slice(0, 6).map((e) => (
           <li
             key={e.id}
@@ -450,13 +456,4 @@ function ActivityFeed({ feed }: { feed: FeedEntry[] }) {
       </ul>
     </section>
   );
-}
-
-function formatRelative(ts: number): string {
-  const deltaSec = Math.max(0, Math.round((Date.now() - ts) / 1000));
-  if (deltaSec < 30) return "just now";
-  if (deltaSec < 90) return "1 min ago";
-  if (deltaSec < 3600) return `${Math.round(deltaSec / 60)} min ago`;
-  if (deltaSec < 7200) return "1 hr ago";
-  return `${Math.round(deltaSec / 3600)} hr ago`;
 }

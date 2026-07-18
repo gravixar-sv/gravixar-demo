@@ -37,33 +37,35 @@ export function OutcomePanel({
       aria-labelledby="outcome-heading"
     >
       <div className="flex items-baseline justify-between gap-2">
-        <p
+        <h2
           id="outcome-heading"
           className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500"
         >
           outcomes · what this loop ships
-        </p>
+        </h2>
         <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
           illustrative sample data
         </p>
       </div>
 
+      {/* A dl group is dt-then-dd; `order` puts the big number on top
+          visually without breaking that. */}
       <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {stats.map((s) => (
           <div
             key={s.label}
-            className="rounded-xl border border-white/10 bg-black/20 p-3.5"
+            className="flex flex-col rounded-xl border border-white/10 bg-black/20 p-3.5"
           >
-            <dd className="text-2xl font-medium tabular-nums tracking-[-0.02em] text-[var(--color-scene-1)]">
-              {s.value}
-            </dd>
-            <dt className="mt-1 text-[12px] leading-tight text-zinc-300">
+            <dt className="order-2 mt-1 text-xs leading-tight text-zinc-300">
               {s.label}
             </dt>
+            <dd className="order-1 text-2xl font-medium tabular-nums tracking-[-0.02em] text-[var(--color-scene-1)]">
+              {s.value}
+            </dd>
             {s.sub ? (
-              <p className="mt-0.5 text-[10px] leading-tight text-zinc-500">
+              <dd className="order-3 mt-0.5 text-[10px] leading-tight text-zinc-500">
                 {s.sub}
-              </p>
+              </dd>
             ) : null}
           </div>
         ))}

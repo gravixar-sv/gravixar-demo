@@ -5,7 +5,7 @@
 // → the run logs to the shared feed in column 3. Same cascade pattern
 // as the Lattice playground; deterministic mock output (no live API).
 
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useRef } from "react";
 import {
   STUDIO_AGENTS,
   findStudioAgent,
@@ -15,13 +15,14 @@ import {
   createInitialStudioState,
   studioReducer,
   type GateState,
-  type Rule,
   type StudioEvent,
 } from "@/lib/playground/studio-reducer";
 import type { AuditEntry } from "@/lib/playground/reducer";
 import { SceneCTA } from "@/components/demo/SceneCTA";
 import { OutcomePanel } from "@/components/demo/OutcomePanel";
+import { LearnBeat } from "@/components/demo/LearnBeat";
 import { flowPulse } from "@/lib/flowPulse";
+import { formatRelative } from "@/lib/formatRelative";
 
 const FRESH_DECAY_MS = 2000;
 
@@ -83,7 +84,7 @@ export default function StudioMixPlayground() {
             onClick={() => dispatch({ type: "RESET" })}
             className="inline-flex min-h-10 items-center justify-center rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-300 transition-all hover:border-white/20 hover:bg-white/[0.06] hover:text-zinc-50 active:scale-[0.98] lg:min-h-0"
           >
-            ↻ reset
+            <span aria-hidden>↻</span> reset
           </button>
         </div>
       </header>
@@ -99,7 +100,14 @@ export default function StudioMixPlayground() {
         <FeedColumn feed={state.feed} />
       </div>
 
-      <LearnBeat rules={state.rules} learnedCount={learnedCount} />
+      <LearnBeat
+        rules={state.rules}
+        learnedCount={learnedCount}
+        headingId="studio-rules-heading"
+        heading="studio policy · what every approval teaches"
+        emptyText="Run ECHO + approve or discard the draft and the studio starts a policy book."
+        learnedNote="learned from your call"
+      />
       <OutcomePanel
         stats={[
           { value: "9,640", label: "drafts generated", sub: "all gated" },
@@ -120,87 +128,19 @@ export default function StudioMixPlayground() {
   );
 }
 
-// ─── Learn-beat ─────────────────────────────────────────────────────
-
-function LearnBeat({
-  rules,
-  learnedCount,
-}: {
-  rules: Rule[];
-  learnedCount: number;
-}) {
-  return (
-    <section className="mt-5 scene-card rounded-2xl p-5">
-      <div className="flex items-baseline justify-between gap-2">
-        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
-          studio policy · what every approval teaches
-        </p>
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-          {rules.length} {rules.length === 1 ? "rule" : "rules"}
-          {learnedCount > 0 ? (
-            <>
-              {" "}
-              ·{" "}
-              <span className="text-[var(--color-scene-1)]">
-                {learnedCount} learned from you
-              </span>
-            </>
-          ) : null}
-        </p>
-      </div>
-      {rules.length === 0 ? (
-        <p className="mt-3 rounded-lg border border-dashed border-white/10 px-3 py-4 text-center text-[11px] text-zinc-500">
-          Run ECHO + approve or discard the draft and the studio starts a policy book.
-        </p>
-      ) : (
-        <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {rules.map((rule) => (
-            <RuleRow key={rule.id} rule={rule} />
-          ))}
-        </ul>
-      )}
-    </section>
-  );
-}
-
-function RuleRow({ rule }: { rule: Rule }) {
-  const isDo = rule.kind === "do";
-  return (
-    <li
-      className={[
-        "rounded-lg border px-3 py-2",
-        rule.fresh
-          ? "pg-fresh border-[var(--color-scene-1)]/45"
-          : "border-white/10 bg-white/[0.02]",
-      ].join(" ")}
-    >
-      <div className="flex items-start gap-2">
-        <span className={isDo ? "text-emerald-400" : "text-rose-400"}>
-          {isDo ? "✓" : "✗"}
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="text-[12px] leading-relaxed text-zinc-200">{rule.text}</p>
-          {rule.learned ? (
-            <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
-              learned from your call
-            </p>
-          ) : null}
-        </div>
-      </div>
-    </li>
-  );
-}
-
 // ─── Column shell ───────────────────────────────────────────────────
 
 function ColumnShell({
   label,
   status,
+  headingId,
   flow,
   children,
 }: {
   label: string;
   status: string;
+  /** Ties the column heading to its section for assistive tech. */
+  headingId: string;
   /** Name other columns target with flowPulse(). */
   flow?: string;
   children: React.ReactNode;
@@ -208,17 +148,21 @@ function ColumnShell({
   return (
     <section
       data-flow={flow}
+      aria-labelledby={headingId}
       className="scene-card min-w-[82%] shrink-0 snap-start rounded-2xl p-5 sm:min-w-[48%] lg:min-w-0"
     >
       <div className="flex items-center gap-2 border-b border-white/5 pb-3">
-        <span className="flex gap-1.5">
+        <span aria-hidden className="flex gap-1.5">
           <span className="h-2 w-2 rounded-full bg-zinc-700" />
           <span className="h-2 w-2 rounded-full bg-zinc-700" />
           <span className="h-2 w-2 rounded-full bg-zinc-700" />
         </span>
-        <span className="ml-1 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-300">
+        <h2
+          id={headingId}
+          className="ml-1 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-300"
+        >
           {label}
-        </span>
+        </h2>
       </div>
       <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
         {status}
@@ -240,7 +184,11 @@ function AgentsColumn({
   onRun: (key: StudioAgent["key"]) => void;
 }) {
   return (
-    <ColumnShell label="agents" status="4 registered · click run">
+    <ColumnShell
+      label="agents"
+      status="4 registered · click run"
+      headingId="studio-agents-heading"
+    >
       <ul className="space-y-2.5">
         {STUDIO_AGENTS.map((agent) => {
           const isCurrent = currentKey === agent.key;
@@ -279,11 +227,11 @@ function AgentsColumn({
                   className="inline-flex min-h-10 items-center justify-center rounded-lg border border-[var(--agent)]/35 bg-[var(--agent)]/10 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.15em] text-[var(--agent)] transition-all hover:bg-[var(--agent)]/20 active:scale-[0.98] lg:min-h-0"
                   style={{ "--agent": agent.color } as React.CSSProperties}
                 >
-                  ▸ run{hasRun ? " again" : ""}
+                  <span aria-hidden>▸</span> run{hasRun ? " again" : ""}
                 </button>
                 {hasRun ? (
                   <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80">
-                    ✓ ran
+                    <span aria-hidden>✓</span> ran
                   </span>
                 ) : null}
               </div>
@@ -306,10 +254,22 @@ function OutputColumn({
   gate: GateState;
   dispatch: React.Dispatch<StudioEvent>;
 }) {
+  // Approving / discarding swaps the buttons for a status line, so move
+  // focus onto the gate region rather than dropping it to <body>. Only a
+  // gate decision arms this — a plain run leaves focus on the run button.
+  const gateRef = useRef<HTMLDivElement>(null);
+  const decidedRef = useRef(false);
+  useEffect(() => {
+    if (!decidedRef.current) return;
+    decidedRef.current = false;
+    gateRef.current?.focus();
+  }, [gate]);
+
   return (
     <ColumnShell
       label="output"
       status={agent ? `${agent.name.toLowerCase()} · ${agent.outputTitle}` : "no run yet"}
+      headingId="studio-output-heading"
       flow="studio-output"
     >
       {agent ? (
@@ -337,50 +297,56 @@ function OutputColumn({
             ))}
           </div>
 
-          {/* Approval gate — writer agents wait for a human; read-only run autonomously */}
-          {agent.gated ? (
-            gate === "pending" ? (
-              <div className="mt-3 border-t border-white/5 pt-3">
-                <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-amber-300/90">
-                  ⏸ waiting on you · this would publish
-                </p>
-                <div className="mt-2 flex gap-2">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      flowPulse(e.currentTarget, "studio-feed");
-                      dispatch({ type: "APPROVE" });
-                    }}
-                    className="inline-flex min-h-10 items-center justify-center rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-all hover:bg-emerald-400/20 active:scale-[0.98] lg:min-h-0"
-                  >
-                    Approve &amp; publish →
-                  </button>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      flowPulse(e.currentTarget, "studio-feed");
-                      dispatch({ type: "DISCARD" });
-                    }}
-                    className="inline-flex min-h-10 items-center justify-center rounded-lg px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:text-zinc-200 lg:min-h-0"
-                  >
-                    Discard
-                  </button>
+          {/* Approval gate — writer agents wait for a human; read-only run
+              autonomously. The wrapper is the stable live region: it exists
+              before the decision, so the swap is announced. */}
+          <div ref={gateRef} tabIndex={-1} aria-live="polite">
+            {agent.gated ? (
+              gate === "pending" ? (
+                <div className="mt-3 border-t border-white/5 pt-3">
+                  <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-amber-300/90">
+                    <span aria-hidden>⏸</span> waiting on you · this would publish
+                  </p>
+                  <div className="mt-2 flex gap-2">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        flowPulse(e.currentTarget, "studio-feed");
+                        decidedRef.current = true;
+                        dispatch({ type: "APPROVE" });
+                      }}
+                      className="inline-flex min-h-10 items-center justify-center rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-all hover:bg-emerald-400/20 active:scale-[0.98] lg:min-h-0"
+                    >
+                      Approve &amp; publish <span aria-hidden>→</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        flowPulse(e.currentTarget, "studio-feed");
+                        decidedRef.current = true;
+                        dispatch({ type: "DISCARD" });
+                      }}
+                      className="inline-flex min-h-10 items-center justify-center rounded-lg px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:text-zinc-200 lg:min-h-0"
+                    >
+                      Discard
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ) : gate === "approved" ? (
-              <p className="mt-3 border-t border-white/5 pt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80">
-                ✓ approved + published
-              </p>
-            ) : gate === "discarded" ? (
+              ) : gate === "approved" ? (
+                <p className="mt-3 border-t border-white/5 pt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80">
+                  <span aria-hidden>✓</span> approved + published
+                </p>
+              ) : gate === "discarded" ? (
+                <p className="mt-3 border-t border-white/5 pt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+                  <span aria-hidden>✕</span> draft discarded
+                </p>
+              ) : null
+            ) : (
               <p className="mt-3 border-t border-white/5 pt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                ✕ draft discarded
+                <span aria-hidden>✓</span> ran autonomously · read-only, nothing to approve
               </p>
-            ) : null
-          ) : (
-            <p className="mt-3 border-t border-white/5 pt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-              ✓ ran autonomously · read-only, nothing to approve
-            </p>
-          )}
+            )}
+          </div>
         </div>
       ) : (
         <div className="flex min-h-[180px] flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-white/10 px-6 text-center">
@@ -400,8 +366,13 @@ function OutputColumn({
 
 function FeedColumn({ feed }: { feed: AuditEntry[] }) {
   return (
-    <ColumnShell label="audit log" status="every action logged · real-time" flow="studio-feed">
-      <ul className="space-y-2">
+    <ColumnShell
+      label="audit log"
+      status="every action logged · real-time"
+      headingId="studio-feed-heading"
+      flow="studio-feed"
+    >
+      <ul aria-live="polite" className="space-y-2">
         {feed.map((entry) => (
           <li
             key={entry.id}
@@ -440,13 +411,3 @@ function FeedColumn({ feed }: { feed: AuditEntry[] }) {
   );
 }
 
-// ─── helpers ────────────────────────────────────────────────────────
-
-function formatRelative(ts: number): string {
-  const deltaSec = Math.max(0, Math.round((Date.now() - ts) / 1000));
-  if (deltaSec < 30) return "just now";
-  if (deltaSec < 90) return "1 min ago";
-  if (deltaSec < 3600) return `${Math.round(deltaSec / 60)} min ago`;
-  if (deltaSec < 7200) return "1 hr ago";
-  return `${Math.round(deltaSec / 3600)} hr ago`;
-}

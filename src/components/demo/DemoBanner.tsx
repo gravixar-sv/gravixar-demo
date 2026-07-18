@@ -9,11 +9,11 @@ export function DemoBanner() {
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-2 gap-y-0.5 px-6 py-2 text-[11px] font-mono uppercase tracking-widest text-zinc-300 md:text-xs">
         <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-mark)] text-[var(--color-mark)]" />
         <span>live demo</span>
-        <span className="text-zinc-600">·</span>
+        <span aria-hidden className="text-zinc-600">·</span>
         <span>sample data · click anything, nothing&apos;s saved</span>
-        <span className="hidden sm:inline text-zinc-600">·</span>
+        <span aria-hidden className="hidden sm:inline text-zinc-600">·</span>
         <span className="hidden sm:inline">resets every Sunday</span>
-        <span className="hidden md:inline text-zinc-600">·</span>
+        <span aria-hidden className="hidden md:inline text-zinc-600">·</span>
         <a
           href="https://gravixar.com/contact"
           rel="noreferrer"

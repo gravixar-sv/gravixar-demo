@@ -42,6 +42,19 @@
   body {
     min-height: 100dvh;
   }
+  /* Tailwind 4 preflight ships `cursor: default` on buttons; every
+     button in the demo is clickable, so restore the affordance. */
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+  /* One scene-tinted focus ring for every interactive element. The
+     scene layouts override --color-scene-1, so keyboard focus matches
+     each scene's accent for free. Utility-level focus-visible classes
+     (hero CTAs, scene cards) still win where they're set. */
+  :where(button, a):focus-visible {
+    outline: 2px solid var(--color-scene-1, #ff6b6b);
+    outline-offset: 2px;
+  }
   /* Headings carry the display face. */
   h1,
   h2,

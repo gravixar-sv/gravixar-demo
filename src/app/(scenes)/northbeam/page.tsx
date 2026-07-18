@@ -67,7 +67,7 @@ export default function NorthbeamBrandAgent() {
         <button
           type="button"
           onClick={() => dispatch({ type: "RESET" })}
-          className="rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-300 transition-colors hover:border-white/20 hover:bg-white/[0.06] hover:text-zinc-50"
+          className="inline-flex min-h-10 items-center justify-center rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-300 transition-all hover:border-white/20 hover:bg-white/[0.06] hover:text-zinc-50 active:scale-[0.98] lg:min-h-0"
         >
           ↻ reset
         </button>
@@ -141,7 +141,7 @@ function Col({
       className="scene-card min-w-[82%] shrink-0 snap-start rounded-2xl p-5 sm:min-w-[48%] lg:min-w-0"
     >
       <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-300">{label}</p>
-      <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-600">{status}</p>
+      <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">{status}</p>
       <div className="mt-4 space-y-3">{children}</div>
     </section>
   );
@@ -169,21 +169,21 @@ function RequestCard({
         <MockupThumb kind={req.kind} brand="northbeam" />
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-zinc-100">{req.title}</p>
-          <p className="mt-1 text-[11px] italic leading-relaxed text-zinc-500">
+          <p className="mt-1 text-[11px] italic leading-relaxed text-zinc-400">
             &ldquo;{req.brief}&rdquo;
           </p>
-          <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.16em] text-zinc-600">
+          <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-500">
             {req.by}
           </p>
         </div>
       </div>
 
       {req.status === "published" ? (
-        <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.18em] text-emerald-300/80">
+        <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80">
           ✓ approved + published
         </p>
       ) : req.status === "dropped" ? (
-        <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+        <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
           ✕ dropped · off-brand
         </p>
       ) : (
@@ -194,10 +194,10 @@ function RequestCard({
             dispatch({ type: "GENERATE", id: req.id });
           }}
           className={[
-            "mt-3 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors",
+            "mt-3 inline-flex min-h-10 items-center justify-center rounded-lg border px-3 py-1.5 text-xs font-medium transition-all active:scale-[0.98] lg:min-h-0",
             req.offBrand
               ? "border-amber-400/35 bg-amber-400/10 text-amber-200 hover:bg-amber-400/20"
-              : "border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/10 text-lime-200 hover:bg-[var(--color-scene-1)]/20",
+              : "border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/10 text-[var(--color-scene-1)] hover:bg-[var(--color-scene-1)]/20",
           ].join(" ")}
         >
           {req.offBrand ? "▸ generate (watch the guardrail)" : "▸ generate on-brand"}
@@ -220,7 +220,7 @@ function Workspace({
     return (
       <div className="flex flex-col items-center gap-4 rounded-lg border border-dashed border-white/10 px-3 py-10 text-center">
         <span aria-hidden className="agent-orb" />
-        <p className="text-[11px] leading-relaxed text-zinc-600">
+        <p className="text-[11px] leading-relaxed text-zinc-500">
           The agent is standing by.
           <br />
           Pick a request on the left and it drafts on-brand here.
@@ -244,7 +244,7 @@ function Workspace({
           <p className="text-sm font-medium text-zinc-100">{draft.title}</p>
           <p
             className={[
-              "mt-0.5 font-mono text-[9px] uppercase tracking-[0.18em]",
+              "mt-0.5 font-mono text-[11px] uppercase tracking-[0.18em]",
               isDrift ? "text-amber-300/90" : "text-[var(--color-scene-1)]",
             ].join(" ")}
           >
@@ -268,7 +268,7 @@ function Workspace({
       {/* Reasoning: applied rules (draft) or violations (drift) */}
       {draft.applied && draft.applied.length > 0 ? (
         <div className="mt-3">
-          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-600">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
             brand rules applied
           </p>
           <ul className="mt-1.5 space-y-1">
@@ -283,7 +283,7 @@ function Workspace({
       ) : null}
       {draft.violations && draft.violations.length > 0 ? (
         <div className="mt-3">
-          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-amber-300/80">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber-300/80">
             breaks these rules
           </p>
           <ul className="mt-1.5 space-y-1">
@@ -301,7 +301,7 @@ function Workspace({
       <div className="mt-4 border-t border-white/5 pt-3">
         {gate === "pending" ? (
           <>
-            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-amber-300/90">
+            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-amber-300/90">
               ⏸ waiting on you · this would publish
             </p>
             <div className="mt-2 flex flex-wrap gap-2">
@@ -311,7 +311,7 @@ function Workspace({
                   flowPulse(e.currentTarget, "nb-memory");
                   dispatch({ type: "APPROVE" });
                 }}
-                className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-colors hover:bg-emerald-400/20"
+                className="inline-flex min-h-10 items-center justify-center rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-all hover:bg-emerald-400/20 active:scale-[0.98] lg:min-h-0"
               >
                 Approve &amp; publish →
               </button>
@@ -321,7 +321,7 @@ function Workspace({
                   flowPulse(e.currentTarget, "nb-memory");
                   dispatch({ type: "REQUEST_CHANGE" });
                 }}
-                className="rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-1.5 text-xs font-medium text-amber-200 transition-colors hover:bg-amber-400/20"
+                className="inline-flex min-h-10 items-center justify-center rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-1.5 text-xs font-medium text-amber-200 transition-all hover:bg-amber-400/20 active:scale-[0.98] lg:min-h-0"
               >
                 Request change
               </button>
@@ -329,32 +329,32 @@ function Workspace({
           </>
         ) : gate === "blocked" ? (
           <>
-            <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-amber-300/90">
+            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-amber-300/90">
               ⏸ won&apos;t ship as-is · your call
             </p>
             <div className="mt-2 flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={() => dispatch({ type: "OVERRIDE" })}
-                className="rounded-lg border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/10 px-3 py-1.5 text-xs font-medium text-lime-200 transition-colors hover:bg-[var(--color-scene-1)]/20"
+                className="inline-flex min-h-10 items-center justify-center rounded-lg border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/10 px-3 py-1.5 text-xs font-medium text-[var(--color-scene-1)] transition-all hover:bg-[var(--color-scene-1)]/20 active:scale-[0.98] lg:min-h-0"
               >
                 Override → draft a clean version
               </button>
               <button
                 type="button"
                 onClick={() => dispatch({ type: "DROP" })}
-                className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-zinc-400 transition-colors hover:bg-white/[0.06]"
+                className="inline-flex min-h-10 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-zinc-400 transition-all hover:bg-white/[0.06] active:scale-[0.98] lg:min-h-0"
               >
                 Drop request
               </button>
             </div>
           </>
         ) : gate === "approved" ? (
-          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-emerald-300/80">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80">
             ✓ approved + published · agent learned a rule →
           </p>
         ) : gate === "changed" ? (
-          <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-amber-300/80">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-amber-300/80">
             ↩ sent back · agent learned a don&apos;t-rule →
           </p>
         ) : null}
@@ -379,7 +379,7 @@ function RuleRow({ rule }: { rule: BrandRule }) {
         <div className="min-w-0 flex-1">
           <p className="text-[12px] leading-relaxed text-zinc-200">{rule.text}</p>
           {rule.learned ? (
-            <p className="mt-0.5 font-mono text-[8px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
+            <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
               learned from your approval
             </p>
           ) : null}
@@ -392,7 +392,7 @@ function RuleRow({ rule }: { rule: BrandRule }) {
 function AuditTrail({ feed }: { feed: AuditEntry[] }) {
   return (
     <section className="mt-5 scene-card rounded-2xl p-5">
-      <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600">
+      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
         audit trail · every action logged
       </p>
       <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -406,7 +406,7 @@ function AuditTrail({ feed }: { feed: AuditEntry[] }) {
                 : "border-white/10 bg-white/[0.02] text-zinc-300",
             ].join(" ")}
           >
-            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
               {formatRelative(e.ts)}
             </span>
             <p className="mt-1">

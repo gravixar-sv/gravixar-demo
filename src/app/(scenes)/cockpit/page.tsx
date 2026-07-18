@@ -69,7 +69,7 @@ export default function FounderCockpit() {
             <h1 className="mt-1 text-2xl font-medium tracking-[-0.02em] text-zinc-50 md:text-3xl">
               Good morning, {FOUNDER.name.split(" ")[0]}.
             </h1>
-            <p className="mt-1 text-sm text-zinc-500">
+            <p className="mt-1 text-sm text-zinc-400">
               {FOUNDER.business} · {FOUNDER.tagline}
             </p>
           </div>
@@ -77,7 +77,7 @@ export default function FounderCockpit() {
         <button
           type="button"
           onClick={() => dispatch({ type: "RESET" })}
-          className="rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-300 transition-colors hover:border-white/20 hover:bg-white/[0.06] hover:text-zinc-50"
+          className="inline-flex min-h-10 items-center justify-center rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-300 transition-all hover:border-white/20 hover:bg-white/[0.06] hover:text-zinc-50 active:scale-[0.98] lg:min-h-0"
         >
           ↻ reset
         </button>
@@ -142,7 +142,7 @@ function Col({
       <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-300">
         {label}
       </p>
-      <p className="mt-1 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-600">
+      <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
         {status}
       </p>
       <div className="mt-4 space-y-3">{children}</div>
@@ -168,27 +168,30 @@ function InboxColumn({
             key={s.id}
             className={[
               "rounded-xl border p-3.5",
-              s.fresh ? "pg-fresh border-[var(--color-scene-1)]/45" : "border-white/10 bg-black/20",
-              s.routed ? "opacity-50" : "",
+              s.fresh
+                ? "pg-fresh border-[var(--color-scene-1)]/45"
+                : s.routed
+                  ? "border-white/5 bg-black/10"
+                  : "border-white/10 bg-black/20",
             ].join(" ")}
           >
             <div className="flex items-center justify-between gap-2">
               <span className="truncate text-sm font-medium text-zinc-100">{s.from}</span>
-              <span className={`shrink-0 rounded-full border px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.16em] ${u.cls}`}>
+              <span className={`shrink-0 rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.16em] ${u.cls}`}>
                 {u.label}
               </span>
             </div>
             <p className="mt-1 text-xs text-zinc-400">{s.subject}</p>
-            <p className="mt-2 flex gap-1.5 text-[11px] leading-relaxed text-zinc-500">
+            <p className="mt-2 flex gap-1.5 text-[11px] leading-relaxed text-zinc-400">
               <span className="text-[var(--color-scene-1)]">✦</span>
               <span>{s.aiNote}</span>
             </p>
             {s.autoFiled ? (
-              <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-600">
+              <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
                 ✓ auto-filed
               </p>
             ) : s.routed ? (
-              <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
+              <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
                 → moved to Today
               </p>
             ) : (
@@ -198,7 +201,7 @@ function InboxColumn({
                   flowPulse(e.currentTarget, "cp-today");
                   dispatch({ type: "ROUTE_SIGNAL", id: s.id });
                 }}
-                className="mt-2 rounded-lg border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/10 px-3 py-1.5 text-xs font-medium text-amber-200 transition-colors hover:bg-[var(--color-scene-1)]/20"
+                className="mt-2 inline-flex min-h-10 items-center justify-center rounded-lg border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/10 px-3 py-1.5 text-xs font-medium text-[var(--color-scene-1)] transition-all hover:bg-[var(--color-scene-1)]/20 active:scale-[0.98] lg:min-h-0"
               >
                 → Add to Today
               </button>
@@ -222,7 +225,7 @@ function TodayColumn({
   return (
     <Col label="Today · needs you" status="ai-drafted · you approve" flow="cp-today">
       {todos.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-white/10 px-3 py-6 text-center text-[11px] text-zinc-600">
+        <p className="rounded-lg border border-dashed border-white/10 px-3 py-6 text-center text-[11px] text-zinc-500">
           Clear. Route something from the inbox.
         </p>
       ) : null}
@@ -240,7 +243,7 @@ function TodayColumn({
         >
           <p className="text-sm font-medium text-zinc-100">{t.label}</p>
           {t.done ? (
-            <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.18em] text-emerald-300/80">
+            <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80">
               ✓ approved + sent
             </p>
           ) : (
@@ -255,14 +258,14 @@ function TodayColumn({
                     flowPulse(e.currentTarget, "cp-rules");
                     dispatch({ type: "APPROVE_TODO", id: t.id });
                   }}
-                  className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-colors hover:bg-emerald-400/20"
+                  className="inline-flex min-h-10 items-center justify-center rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200 transition-all hover:bg-emerald-400/20 active:scale-[0.98] lg:min-h-0"
                 >
                   Approve &amp; send →
                 </button>
                 <button
                   type="button"
                   onClick={() => dispatch({ type: "DISMISS_TODO", id: t.id })}
-                  className="rounded-lg px-2 py-1.5 text-xs text-zinc-500 hover:text-zinc-300"
+                  className="inline-flex min-h-10 items-center justify-center rounded-lg px-3 py-1.5 text-xs text-zinc-400 transition-colors hover:text-zinc-200 lg:min-h-0"
                 >
                   Dismiss
                 </button>
@@ -291,15 +294,15 @@ function MoneyColumn({
       <div className="grid grid-cols-2 gap-2">
         {summary.map((m) => (
           <div key={m.id} className="rounded-xl border border-white/10 bg-black/20 p-3">
-            <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-zinc-500">
+            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-400">
               {m.label}
             </p>
             <p
-              className={`mt-1 text-lg font-medium ${m.direction === "in" ? "text-emerald-300" : "text-zinc-200"}`}
+              className={`mt-1 text-lg font-medium tabular-nums ${m.direction === "in" ? "text-emerald-300" : "text-zinc-200"}`}
             >
               {m.amount}
             </p>
-            <p className="mt-0.5 text-[10px] leading-tight text-zinc-600">{m.sub}</p>
+            <p className="mt-0.5 text-[10px] leading-tight text-zinc-500">{m.sub}</p>
           </div>
         ))}
       </div>
@@ -318,15 +321,15 @@ function MoneyColumn({
           <div className="flex items-center justify-between gap-2">
             <span className="truncate text-sm font-medium text-zinc-100">{m.label}</span>
             <span
-              className={`shrink-0 rounded-full border px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.16em] ${m.flag === "overdue" ? "border-rose-400/40 text-rose-300" : "border-amber-400/40 text-amber-300"}`}
+              className={`shrink-0 rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.16em] ${m.flag === "overdue" ? "border-rose-400/40 text-rose-300" : "border-amber-400/40 text-amber-300"}`}
             >
               {m.flag === "overdue" ? `${m.amount} overdue` : "heads-up"}
             </span>
           </div>
-          <p className="mt-1 text-[11px] text-zinc-500">{m.sub}</p>
+          <p className="mt-1 text-[11px] text-zinc-400">{m.sub}</p>
           {m.flag === "overdue" ? (
             m.chased ? (
-              <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
+              <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
                 → reminder drafted in Today
               </p>
             ) : (
@@ -336,7 +339,7 @@ function MoneyColumn({
                   flowPulse(e.currentTarget, "cp-today");
                   dispatch({ type: "CHASE_INVOICE", id: m.id });
                 }}
-                className="mt-2 rounded-lg border border-rose-400/30 bg-rose-400/10 px-3 py-1.5 text-xs font-medium text-rose-200 transition-colors hover:bg-rose-400/20"
+                className="mt-2 inline-flex min-h-10 items-center justify-center rounded-lg border border-rose-400/30 bg-rose-400/10 px-3 py-1.5 text-xs font-medium text-rose-200 transition-all hover:bg-rose-400/20 active:scale-[0.98] lg:min-h-0"
               >
                 Chase it →
               </button>
@@ -360,10 +363,10 @@ function LearnBeat({
   return (
     <section data-flow="cp-rules" className="mt-5 scene-card rounded-2xl p-5">
       <div className="flex items-baseline justify-between gap-2">
-        <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600">
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
           what it learned from you
         </p>
-        <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
           {rules.length} {rules.length === 1 ? "rule" : "rules"}
           {learnedCount > 0 ? (
             <>
@@ -377,7 +380,7 @@ function LearnBeat({
         </p>
       </div>
       {rules.length === 0 ? (
-        <p className="mt-3 rounded-lg border border-dashed border-white/10 px-3 py-4 text-center text-[11px] text-zinc-600">
+        <p className="mt-3 rounded-lg border border-dashed border-white/10 px-3 py-4 text-center text-[11px] text-zinc-500">
           Approve a draft below and the cockpit starts learning your shape.
         </p>
       ) : (
@@ -409,7 +412,7 @@ function RuleRow({ rule }: { rule: Rule }) {
         <div className="min-w-0 flex-1">
           <p className="text-[12px] leading-relaxed text-zinc-200">{rule.text}</p>
           {rule.learned ? (
-            <p className="mt-0.5 font-mono text-[8px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
+            <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
               learned from your approval
             </p>
           ) : null}
@@ -424,7 +427,7 @@ function RuleRow({ rule }: { rule: Rule }) {
 function ActivityFeed({ feed }: { feed: FeedEntry[] }) {
   return (
     <section className="mt-5 scene-card rounded-2xl p-5">
-      <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600">
+      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
         what the cockpit did · real-time
       </p>
       <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
@@ -438,7 +441,7 @@ function ActivityFeed({ feed }: { feed: FeedEntry[] }) {
                 : "border-white/10 bg-white/[0.02] text-zinc-300",
             ].join(" ")}
           >
-            <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-zinc-500">
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
               {formatRelative(e.ts)}
             </span>
             <p className="mt-1">{e.text}</p>

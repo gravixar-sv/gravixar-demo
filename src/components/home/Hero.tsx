@@ -49,7 +49,7 @@ export function Hero() {
             <span key={line.text} className="block overflow-hidden pb-[0.08em]">
               <span
                 className={`hero-line ${i > 0 ? `hero-line-${i + 1}` : ""} block will-change-transform ${
-                  line.accent ? "text-[#ff6b6b]" : ""
+                  line.accent ? "text-[var(--color-scene-1)]" : ""
                 }`}
               >
                 {line.text}
@@ -66,7 +66,7 @@ export function Hero() {
         <div className="hero-soft mt-8 flex flex-wrap items-center gap-4">
           <a
             href="#scenes"
-            className="inline-flex items-center gap-2 rounded-lg bg-[#ff6b6b] px-5 py-3 text-sm font-semibold text-[#160808] transition-[transform,filter] duration-200 hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff6b6b] active:scale-[0.98]"
+            className="inline-flex items-center gap-2 rounded-lg bg-[var(--color-scene-1)] px-5 py-3 text-sm font-semibold text-[#160808] transition-[transform,filter] duration-200 hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-scene-1)] active:scale-[0.98]"
           >
             Explore the scenes
             <span aria-hidden>↓</span>
@@ -79,13 +79,13 @@ export function Hero() {
           </a>
         </div>
 
-        <div className="hero-soft mt-12 flex items-center gap-6 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-600">
+        <div className="hero-soft mt-12 flex items-center gap-6 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
           <span className="hidden items-center gap-2 md:flex">
             <span className="inline-block h-px w-10 bg-zinc-700" aria-hidden />
             work in, chaos
           </span>
           <span className="flex items-center gap-2">
-            <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#ff6b6b]/80" aria-hidden />
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--color-scene-1)]/80" aria-hidden />
             your approval
           </span>
           <span className="hidden items-center gap-2 md:flex">

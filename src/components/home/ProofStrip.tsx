@@ -34,7 +34,7 @@ export function ProofStrip() {
       <div className="mx-auto max-w-7xl px-6 py-24 md:px-10 md:py-28 lg:px-12">
         <div className="grid gap-12 lg:grid-cols-[1.2fr_1fr] lg:gap-20">
           <div>
-            <p data-reveal className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#ff6b6b]">
+            <p data-reveal className="font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--color-scene-1)]">
               not a concept reel
             </p>
             <h2
@@ -63,7 +63,7 @@ export function ProofStrip() {
             <p data-reveal className="mt-5">
               <Link
                 href="/modules"
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-[#ff6b6b] transition-colors hover:text-white"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-scene-1)] transition-colors hover:text-white"
               >
                 Try the modules in isolation
                 <span aria-hidden>→</span>
@@ -74,7 +74,7 @@ export function ProofStrip() {
           <div data-reveal className="flex flex-col justify-center rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent p-8 md:p-10">
             <h3 className="text-2xl font-medium tracking-[-0.02em] text-zinc-50">
               Want this loop on{" "}
-              <span className="text-[#ff6b6b]">your ops?</span>
+              <span className="text-[var(--color-scene-1)]">your ops?</span>
             </h3>
             <p className="mt-3 text-sm leading-relaxed text-zinc-400">
               One call to scope it. Most builds run 4 to 8 weeks, owned by
@@ -84,7 +84,7 @@ export function ProofStrip() {
               <a
                 href="https://gravixar.com/contact"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-lg bg-[#ff6b6b] px-5 py-3 text-sm font-semibold text-[#160808] transition-[transform,filter] duration-200 hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff6b6b] active:scale-[0.98]"
+                className="inline-flex items-center gap-2 rounded-lg bg-[var(--color-scene-1)] px-5 py-3 text-sm font-semibold text-[#160808] transition-[transform,filter] duration-200 hover:brightness-110 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-scene-1)] active:scale-[0.98]"
               >
                 Book a 30-min call
                 <span aria-hidden>→</span>
@@ -100,7 +100,7 @@ export function ProofStrip() {
           </div>
         </div>
 
-        <p data-reveal className="mt-16 border-t border-white/5 pt-8 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
+        <p data-reveal className="mt-16 border-t border-white/5 pt-8 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
           sandbox · sample data · resets every Sunday · no sign-in · nothing
           you press here leaves the page
         </p>

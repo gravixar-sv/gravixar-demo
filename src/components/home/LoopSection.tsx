@@ -84,7 +84,7 @@ export function LoopSection() {
     >
       <div className="mx-auto max-w-7xl px-6 py-24 md:px-10 md:py-32 lg:px-12">
         <header data-reveal className="max-w-2xl">
-          <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-[#ff6b6b]">
+          <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--color-scene-1)]">
             the loop
           </p>
           <h2
@@ -117,14 +117,14 @@ export function LoopSection() {
                   aria-hidden
                   className={`absolute left-0 top-9 hidden h-[15px] w-[15px] rounded-full border transition-colors duration-300 first:top-1 lg:block ${
                     active === i
-                      ? "border-[#ff6b6b] bg-[#ff6b6b]/20"
+                      ? "border-[var(--color-scene-1)] bg-[var(--color-scene-1)]/20"
                       : "border-zinc-700 bg-[#050508]"
                   }`}
                   style={i === 0 ? { top: "0.35rem" } : undefined}
                 />
                 <p
                   className={`font-mono text-[10px] uppercase tracking-[0.22em] transition-colors duration-300 ${
-                    active === i ? "text-[#ff6b6b]" : "text-zinc-600"
+                    active === i ? "text-[var(--color-scene-1)]" : "text-zinc-500"
                   }`}
                 >
                   {beat.index}
@@ -143,7 +143,7 @@ export function LoopSection() {
                   {beat.sceneTags.map((tag) => (
                     <span
                       key={tag}
-                      className="rounded-full border border-white/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.16em] text-zinc-500"
+                      className="rounded-full border border-white/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-500"
                     >
                       {tag}
                     </span>
@@ -225,14 +225,14 @@ function Row({
 }) {
   const toneCls =
     tone === "accent"
-      ? "border-[#ff6b6b]/35 bg-[#ff6b6b]/[0.06]"
+      ? "border-[var(--color-scene-1)]/35 bg-[var(--color-scene-1)]/[0.06]"
       : tone === "ok"
         ? "border-emerald-400/25 bg-emerald-400/[0.05]"
         : "border-white/8 bg-white/[0.02]";
   return (
     <div className={`flex items-center justify-between gap-3 rounded-lg border px-3.5 py-2.5 ${toneCls}`}>
       <span className="truncate text-xs text-zinc-200">{label}</span>
-      <span className="shrink-0 font-mono text-[9px] uppercase tracking-[0.16em] text-zinc-500">
+      <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-500">
         {meta}
       </span>
     </div>
@@ -242,7 +242,7 @@ function Row({
 function ConsoleArrive({ on }: { on: boolean }) {
   return (
     <Panel on={on}>
-      <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600">
+      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
         overnight · unsorted
       </p>
       <div className="mt-3 space-y-2">
@@ -252,7 +252,7 @@ function ConsoleArrive({ on }: { on: boolean }) {
         <Row tone="neutral" label="9 newsletters, 3 receipts" meta="noise" />
         <Row tone="neutral" label="New lead: agency, 12 seats" meta="form" />
       </div>
-      <p className="mt-4 text-[11px] leading-relaxed text-zinc-500">
+      <p className="mt-4 text-[11px] leading-relaxed text-zinc-400">
         Nothing triaged yet. This is the pile.
       </p>
     </Panel>
@@ -262,7 +262,7 @@ function ConsoleArrive({ on }: { on: boolean }) {
 function ConsoleDraft({ on }: { on: boolean }) {
   return (
     <Panel on={on}>
-      <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600">
+      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
         agent pass · 06:00
       </p>
       <div className="mt-3 space-y-2">
@@ -272,7 +272,7 @@ function ConsoleDraft({ on }: { on: boolean }) {
         <Row tone="neutral" label="Noise auto-filed, 12 items" meta="filed" />
         <Row tone="accent" label="Lead qualified + summary written" meta="draft" />
       </div>
-      <p className="mt-4 text-[11px] leading-relaxed text-zinc-500">
+      <p className="mt-4 text-[11px] leading-relaxed text-zinc-400">
         The 80% is done. None of it has shipped.
       </p>
     </Panel>
@@ -282,7 +282,7 @@ function ConsoleDraft({ on }: { on: boolean }) {
 function ConsoleGate({ on }: { on: boolean }) {
   return (
     <Panel on={on}>
-      <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600">
+      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
         waiting on you · 3 items
       </p>
       <div className="mt-3 space-y-2">
@@ -298,7 +298,7 @@ function ConsoleGate({ on }: { on: boolean }) {
           Send back
         </span>
       </div>
-      <p className="mt-4 text-[11px] leading-relaxed text-zinc-500">
+      <p className="mt-4 text-[11px] leading-relaxed text-zinc-400">
         Outbound, money, and publishing all stop here. Every decision lands
         in an append-only audit trail.
       </p>
@@ -309,7 +309,7 @@ function ConsoleGate({ on }: { on: boolean }) {
 function ConsoleLearn({ on }: { on: boolean }) {
   return (
     <Panel on={on}>
-      <p className="font-mono text-[9px] uppercase tracking-[0.2em] text-zinc-600">
+      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
         rulebook · learned from you
       </p>
       <div className="mt-3 space-y-2">
@@ -318,7 +318,7 @@ function ConsoleLearn({ on }: { on: boolean }) {
         <Row tone="neutral" label="✓ Writer agents never auto-publish" meta="house" />
         <Row tone="neutral" label="✗ No discount language in spring drop" meta="house" />
       </div>
-      <p className="mt-4 text-[11px] leading-relaxed text-zinc-500">
+      <p className="mt-4 text-[11px] leading-relaxed text-zinc-400">
         Two new rules from today&apos;s approvals. Tomorrow&apos;s drafts
         start from them.
       </p>

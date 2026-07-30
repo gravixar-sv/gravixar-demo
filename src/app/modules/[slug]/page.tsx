@@ -60,22 +60,38 @@ export default async function ModulePage(
           {isInteractive && Widget ? (
             <Widget />
           ) : (
-            <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-10 text-center backdrop-blur-md">
-              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
-                coming online
+            <div className="scene-card rounded-2xl p-10">
+              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-400">
+                in production, no sandbox here
               </p>
-              <p className="mt-3 text-base text-zinc-300">
-                The interactive sandbox for this module hasn&apos;t shipped
-                yet. The pattern is running in production at{" "}
-                <span className="text-zinc-100">{m.runningIn.join(" + ")}</span>
-                , the demo wrapper is in build.
+              <p className="mt-3 max-w-xl text-base leading-relaxed text-zinc-300">
+                This one runs in{" "}
+                <span className="text-zinc-100">{m.runningIn.join(" and ")}</span>
+                . It has no sandbox on this site, because the pattern only
+                means anything against a real database, real roles, and real
+                money. Rebuilding that as a toy would demonstrate the toy.
               </p>
-              <Link
-                href="/modules"
-                className="mt-6 inline-block rounded-md border border-white/10 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-300 transition-colors hover:border-white/30 hover:text-white"
-              >
-                ← all modules
-              </Link>
+              <p className="mt-3 max-w-xl text-base leading-relaxed text-zinc-400">
+                The write-up covers how it works and where it is deployed.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <a
+                  href={`https://gravixar.com/modules/${m.slug}`}
+                  rel="noreferrer"
+                  className="inline-flex min-h-10 items-center justify-center rounded-lg bg-[var(--color-scene-1)] px-5 py-2.5 text-sm font-semibold text-[#160808] transition-[transform,filter] duration-200 hover:brightness-110 active:scale-[0.98] lg:min-h-0"
+                >
+                  Read the write-up
+                  <span aria-hidden className="ml-1.5">
+                    →
+                  </span>
+                </a>
+                <Link
+                  href="/modules"
+                  className="inline-flex min-h-10 items-center justify-center rounded-lg border border-white/15 px-4 py-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-300 transition-[color,border-color,transform] duration-150 hover:border-white/30 hover:text-white active:scale-[0.98] lg:min-h-0"
+                >
+                  ← all modules
+                </Link>
+              </div>
             </div>
           )}
         </div>

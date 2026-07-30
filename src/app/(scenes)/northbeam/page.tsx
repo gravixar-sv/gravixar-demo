@@ -1,6 +1,6 @@
 "use client";
 
-// Northbeam Goods — a real brand AGENT, as a 3-column workspace.
+// Northbeam Goods, a real brand AGENT, as a 3-column workspace.
 // Requests (plain briefs) → Brand agent (drafts on-brand, or BLOCKS drift at
 // the guardrail) → Brand memory (the do/don't rules it LEARNS from your
 // approvals). Approve a draft and watch a rule appear in column three; send
@@ -129,7 +129,7 @@ export default function NorthbeamBrandAgent() {
           { value: "94", label: "brand rules learned", sub: "from your approvals" },
           { value: "100%", label: "published assets gated", sub: "by a human" },
         ]}
-        liveProductLabel="the brand agent we ship"
+        liveProductLabel="the brand agent I ship"
       />
       <AuditTrail feed={state.feed} />
       <SceneCTA
@@ -431,7 +431,7 @@ function Workspace({
 }
 
 // Brand memory rows live inside the column (not the shared LearnBeat
-// section), so this keeps its own row — but with the shared component's
+// section), so this keeps its own row, but with the shared component's
 // semantics: a real <li>, and the do/don't glyph named for screen
 // readers instead of being read as "check mark" / "ballot X".
 function RuleRow({ rule }: { rule: BrandRule }) {

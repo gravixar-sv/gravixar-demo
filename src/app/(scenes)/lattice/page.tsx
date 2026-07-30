@@ -1,6 +1,6 @@
 "use client";
 
-// Lattice review-loop — a deliverable handoff across three columns.
+// Lattice review-loop, a deliverable handoff across three columns.
 // Client (Mira) · PM (Kai) · Editor (Sage). A deliverable is a real
 // object that moves column→column as it's approved / revised / pushed
 // back, with an attachment that pops on hover and an activity feed
@@ -64,7 +64,7 @@ export default function LatticeReviewLoop() {
           </h1>
           <p className="mt-3 text-base leading-relaxed text-zinc-400">
             This is the deliverable review loop from an agency operating system
-            we run in production. Work flows Editor → PM → Client and back. Act
+            I run in production. Work flows Editor → PM → Client and back. Act
             in any column. Approve, request a revision, or push it back, and
             watch the card hand off to the next person. Hover any thumbnail to
             preview. Every client approval and revision <span className="text-zinc-300">teaches the studio
@@ -152,7 +152,6 @@ export default function LatticeReviewLoop() {
           </p>
         )}
       />
-      <CapabilityStrip />
       <OutcomePanel
         stats={[
           { value: "1,284", label: "deliverables approved", sub: "last 90 days" },
@@ -160,9 +159,13 @@ export default function LatticeReviewLoop() {
           { value: "£38k", label: "partner commissions paid", sub: "6 partners, auto-split" },
           { value: "318", label: "leave & WFH requests", sub: "gated + audited" },
         ]}
-        liveProductLabel="the agency OS we run"
+        liveProductLabel="the agency OS I run"
       />
       <ActivityFeed feed={state.feed} />
+      {/* Scene-specific sections attach after the receipts, so the four
+          shared beats (learn, outcome, receipts, CTA) read in the same
+          order in every scene. */}
+      <CapabilityStrip />
 
       <SceneCTA
         personaLabel="Agencies"

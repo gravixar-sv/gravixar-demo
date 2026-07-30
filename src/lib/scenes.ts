@@ -1,11 +1,17 @@
 // Scene registry. The entry screen (self-explaining scene index) and
 // each scene layout read this. Plain-English fields (whatItIs, tryLine,
 // openLabel) power the scene-index cards so a first-time visitor knows
-// exactly what each scene is, who it's for, and what they'll do —
+// exactly what each scene is, who it's for, and what they'll do,
 // per the NN/g information-scent + "link is a promise" findings.
 
 export type SceneStatus = "live" | "coming-online";
 export type ScenePersona = "agency" | "founders" | "brand" | "healthcare";
+
+// Roster policy: a scene appears here only once it is genuinely
+// clickable. Roadmap scenes live in the brain, not in this file, because
+// every field below exists to be rendered, and a scene that renders a
+// promise it cannot keep costs more than the anticipation buys. The
+// `status` filter in SceneGallery is the guard that enforces it.
 
 export type Scene = {
   slug: string;
@@ -19,7 +25,7 @@ export type Scene = {
   status: SceneStatus;
   /** The audience persona this scene is built for. */
   persona: ScenePersona;
-  /** Display label for the persona — shown as a "for X" tag on the card. */
+  /** Display label for the persona, shown as a "for X" tag on the card. */
   personaLabel: string;
   /** Plain-English "what this is" subtitle. Sits next to the branded
    *  scene name so the jargon name is never unexplained. */
@@ -30,8 +36,6 @@ export type Scene = {
   openLabel: string;
   /** The visitor's pain this scene addresses (kept for reference / SEO). */
   problemStatement: string;
-  /** Tailwind utility class that applies the scene's CSS-var overrides. */
-  paletteClass: string;
   /** Background gradient utility name (defined in globals.css). */
   bgUtility: string;
   /** Display font label, informational, the actual font wires in the layout. */
@@ -57,7 +61,6 @@ export const SCENES: Scene[] = [
     openLabel: "Open the OS",
     problemStatement:
       "Your agency runs on five tools and a dozen spreadsheets.",
-    paletteClass: "scene-lattice",
     bgUtility: "bg-lattice",
     displayFont: "fraunces",
     swatches: ["#0a1230", "#FF6B6B", "#F5E6D3"],
@@ -66,9 +69,9 @@ export const SCENES: Scene[] = [
     slug: "studio-mix",
     name: "Agent Console",
     codename: "Studio Mix",
-    tagline: "The supervised AI layer we ship, on the Claude API, behind a human gate.",
+    tagline: "The supervised AI layer I ship, on the Claude API, behind a human gate.",
     description:
-      "The real AI layer we put into a client's ops: content drafting, candidate and inbound assessment, feedback triage, anomaly watch. Built on the Claude API. Read-only agents run on their own; anything that writes, spends, or publishes waits behind a human.",
+      "The real AI layer I put into a client's ops: content drafting, candidate and inbound assessment, feedback triage, anomaly watch. Built on the Claude API. Read-only agents run on their own; anything that writes, spends, or publishes waits behind a human.",
     bucket: "ai",
     status: "live",
     persona: "founders",
@@ -78,7 +81,6 @@ export const SCENES: Scene[] = [
     openLabel: "Open the console",
     problemStatement:
       "Your AI tooling is impressive in demos, invisible in production.",
-    paletteClass: "scene-studio-mix",
     bgUtility: "bg-studio-mix",
     displayFont: "jetbrains",
     swatches: ["#070a14", "#00E1FF", "#FF2D95"],
@@ -98,7 +100,6 @@ export const SCENES: Scene[] = [
     tryLine: "Inbox triage → today's priorities → cash flow, in one view",
     openLabel: "Open the cockpit",
     problemStatement: "You're CEO, support, and bookkeeper before lunch.",
-    paletteClass: "scene-cockpit",
     bgUtility: "bg-cockpit",
     displayFont: "inter",
     swatches: ["#14110a", "#FBBF24", "#FB923C"],
@@ -119,7 +120,6 @@ export const SCENES: Scene[] = [
     openLabel: "Open the workspace",
     problemStatement:
       "Everyone makes assets; staying on-brand is the bottleneck.",
-    paletteClass: "scene-northbeam",
     bgUtility: "bg-northbeam",
     displayFont: "fraunces",
     swatches: ["#1a2614", "#9DBE6E", "#F2DDC1"],
@@ -140,30 +140,9 @@ export const SCENES: Scene[] = [
     openLabel: "Open the portal",
     problemStatement:
       "Credentialing, claims, and new clinics live in three disconnected tools.",
-    paletteClass: "scene-care-ledger",
     bgUtility: "bg-care-ledger",
     displayFont: "inter",
     swatches: ["#06141a", "#2DD4BF", "#7DD3FC"],
-  },
-  {
-    slug: "verus",
-    name: "Verus Partners",
-    tagline: "Professional services intake, AI brief from the start.",
-    description:
-      "Adaptive AI intake wizard, brand brief generation from a website URL, discovery-booking flow. Showcases AI Tooling end-to-end.",
-    bucket: "ai",
-    status: "coming-online",
-    persona: "founders",
-    personaLabel: "founders & product teams",
-    whatItIs: "An AI intake wizard for professional services",
-    tryLine: "Adaptive intake that writes the brief for you",
-    openLabel: "Open the wizard",
-    problemStatement:
-      "Your AI tooling is impressive in demos, invisible in production.",
-    paletteClass: "scene-verus",
-    bgUtility: "bg-gallery",
-    displayFont: "fraunces",
-    swatches: ["#1a0f1f", "#C9A227", "#7E5BEF"],
   },
 ];
 

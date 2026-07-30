@@ -43,7 +43,7 @@ export function Topbar({
             <>
               <Link
                 href="/"
-                className="inline-flex items-center gap-1.5 rounded-md border border-white/15 bg-white/[0.05] px-3 py-1.5 text-xs font-medium text-zinc-200 transition-colors hover:border-white/30 hover:bg-white/[0.1] hover:text-white"
+                className="inline-flex min-h-10 items-center gap-1.5 rounded-md border border-white/15 bg-white/[0.05] px-3 py-1.5 text-xs font-medium text-zinc-200 transition-[color,background-color,border-color,transform] duration-150 hover:border-white/30 hover:bg-white/[0.1] hover:text-white active:scale-[0.98] lg:min-h-0"
               >
                 <span aria-hidden>←</span>
                 <span>All scenes</span>

@@ -1,6 +1,6 @@
 "use client";
 
-// Founder Cockpit — a solo founder's daily brief as a 3-column live
+// Founder Cockpit, a solo founder's daily brief as a 3-column live
 // workspace. Inbox (AI-triaged signals) → Today (drafted actions
 // awaiting approval) → Money (cash in/out + flagged items). Routing a
 // signal or chasing an invoice drops a drafted action into Today; the
@@ -116,7 +116,7 @@ export default function FounderCockpit() {
           { value: "£18.6k", label: "invoices chased & paid", sub: "9 reminders sent" },
           { value: "47", label: "drafts approved", sub: "you held the gate" },
         ]}
-        liveProductLabel="the cockpit we run our own days on"
+        liveProductLabel="the cockpit I run my own days on"
       />
       <ActivityFeed feed={state.feed} />
       <SceneCTA

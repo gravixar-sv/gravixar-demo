@@ -1,6 +1,6 @@
 "use client";
 
-// Studio Mix playground — the AI-agents console as a 3-column live
+// Studio Mix playground, the AI-agents console as a 3-column live
 // workspace. Run an agent in column 1 → its output appears in column 2
 // → the run logs to the shared feed in column 3. Same cascade pattern
 // as the Lattice playground; deterministic mock output (no live API).
@@ -64,7 +64,7 @@ export default function StudioMixPlayground() {
             ask before they act.
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-zinc-400">
-            The real AI layer we ship into a team&apos;s ops, on the Claude API:
+            The real AI layer I ship into a team&apos;s ops, on the Claude API:
             content drafting, candidate and inbound assessment, feedback triage,
             anomaly watch. Read-only work runs on its own; anything that writes,
             spends, or publishes waits behind a human. Run one on the left, see
@@ -115,7 +115,7 @@ export default function StudioMixPlayground() {
           { value: "1,120", label: "candidates assessed", sub: "human decides" },
           { value: "0", label: "auto-publishes", sub: "by design" },
         ]}
-        liveProductLabel="the AI layer we ship"
+        liveProductLabel="the AI layer I ship"
       />
 
       <SceneCTA
@@ -172,7 +172,7 @@ function ColumnShell({
   );
 }
 
-// ─── Column 1 — Agents (trigger) ────────────────────────────────────
+// ─── Column 1, Agents (trigger) ────────────────────────────────────
 
 function AgentsColumn({
   currentKey,
@@ -243,7 +243,7 @@ function AgentsColumn({
   );
 }
 
-// ─── Column 2 — Output (result) ─────────────────────────────────────
+// ─── Column 2, Output (result) ─────────────────────────────────────
 
 function OutputColumn({
   agent,
@@ -256,7 +256,7 @@ function OutputColumn({
 }) {
   // Approving / discarding swaps the buttons for a status line, so move
   // focus onto the gate region rather than dropping it to <body>. Only a
-  // gate decision arms this — a plain run leaves focus on the run button.
+  // gate decision arms this. A plain run leaves focus on the run button.
   const gateRef = useRef<HTMLDivElement>(null);
   const decidedRef = useRef(false);
   useEffect(() => {
@@ -297,7 +297,7 @@ function OutputColumn({
             ))}
           </div>
 
-          {/* Approval gate — writer agents wait for a human; read-only run
+          {/* Approval gate. Writer agents wait for a human; read-only run
               autonomously. The wrapper is the stable live region: it exists
               before the decision, so the swap is announced. */}
           <div ref={gateRef} tabIndex={-1} aria-live="polite">
@@ -362,7 +362,7 @@ function OutputColumn({
   );
 }
 
-// ─── Column 3 — Run feed (cascade target) ───────────────────────────
+// ─── Column 3, Run feed (cascade target) ───────────────────────────
 
 function FeedColumn({ feed }: { feed: AuditEntry[] }) {
   return (

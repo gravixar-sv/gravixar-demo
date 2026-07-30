@@ -1,12 +1,12 @@
-// Care Ledger — a HIPAA-conscious medical-billing + credentialing portal
+// Care Ledger, a HIPAA-conscious medical-billing + credentialing portal
 // for a clinic network, as a 3-column live workspace. Mirrors a live
-// portal we've shipped; the signature loop runs left to right:
+// portal I've shipped; the signature loop runs left to right:
 //
 //   Credentialing intake  →  Finance / billing  →  Sales pipeline
 //
 //   - Credentialing: providers come in (NPI / license / DEA / CAQH), a
 //     Zoom intake call is the human touchpoint, then a human credentials
-//     them — which enables billing downstream.
+//     them, which enables billing downstream.
 //   - Billing: claim batches and billing-enablement requests wait behind
 //     an approval gate. Nothing submits without a human.
 //   - Sales: clinics move through a pipeline with a Zoom discovery call;
@@ -38,7 +38,7 @@ export type Provider = {
   name: string;
   specialty: string;
   creds: Credential[];
-  /** Zoom intake call — the human touchpoint before credentialing. */
+  /** Zoom intake call, the human touchpoint before credentialing. */
   intake: "scheduled" | "done";
   status: "intake" | "credentialed";
   fresh?: boolean;
@@ -253,7 +253,7 @@ export function careLedgerReducer(
     case "CREDENTIAL": {
       const p = state.providers.find((x) => x.id === event.id);
       if (!p || p.status === "credentialed" || p.intake !== "done") return state;
-      // Credentialing a provider enables billing downstream — a billing
+      // Credentialing a provider enables billing downstream. A billing
       // enablement request drops into the finance column behind the gate.
       const billItem: BillingItem = {
         id: nextId("b"),
@@ -304,7 +304,7 @@ export function careLedgerReducer(
       const nextStage = STAGE_ORDER[idx + 1] as DealStage;
 
       // Signing (reaching "contract") sends the clinic's providers into
-      // credentialing — the loop closes back to column one.
+      // credentialing, and the loop closes back to column one.
       const signing = nextStage === "contract";
       const spawnProvider: Provider | null =
         signing && d.spawns

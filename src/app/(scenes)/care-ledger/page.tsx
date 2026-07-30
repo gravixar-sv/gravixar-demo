@@ -1,13 +1,13 @@
 "use client";
 
-// Care Ledger — a HIPAA-conscious medical-billing + credentialing portal
+// Care Ledger, a HIPAA-conscious medical-billing + credentialing portal
 // as a 3-column live workspace. Credentialing intake → finance/billing →
 // sales pipeline, with Zoom touchpoints for the intake call and the
 // discovery call, an approval gate on billing, a learn beat, and an
 // audit trail. The architecture story is front and centre: no PHI in the
 // portal, isolated by design. See src/lib/playground/care-ledger-data.ts.
 //
-// All data is illustrative sample data — no real patient, provider, or
+// All data is illustrative sample data. No real patient, provider, or
 // clinic information, and no real names.
 
 import { useEffect, useReducer } from "react";
@@ -153,7 +153,7 @@ export default function CareLedgerPortal() {
           { value: "9", label: "clinics onboarded", sub: "Zoom-first pipeline" },
           { value: "0", label: "PHI records stored", sub: "isolated by design" },
         ]}
-        liveProductLabel="the billing portal we shipped"
+        liveProductLabel="the billing portal I shipped"
       />
       <AuditTrail feed={state.feed} />
 

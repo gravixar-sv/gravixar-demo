@@ -6,7 +6,7 @@
 //    reads these as a real company's KPIs.
 //  - A bridge footer: "See the live product →" to the matching
 //    anonymized case study on gravixar.com, plus a "this same loop runs
-//    our own ops" link to book a call.
+//    my own ops" link to book a call.
 //
 // Static + CSS-only, so it respects the CSS-first reveal rule and is
 // reduced-motion / no-WebGL safe, and it wraps on mobile.
@@ -26,7 +26,7 @@ export function OutcomePanel({
   liveProductHref = "https://gravixar.com",
 }: {
   stats: OutcomeStat[];
-  /** Anonymized case-study name, e.g. "the agency OS we run in production". */
+  /** Anonymized case-study name, e.g. "the agency OS I run in production". */
   liveProductLabel: string;
   /** Where "see the live product" points (anonymized case study). */
   liveProductHref?: string;
@@ -88,7 +88,7 @@ export function OutcomePanel({
           rel="noreferrer"
           className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500 transition-colors hover:text-zinc-200"
         >
-          this same loop runs our own ops →
+          this same loop runs my own ops →
         </a>
       </div>
 

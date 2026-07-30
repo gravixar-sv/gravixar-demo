@@ -1,7 +1,11 @@
-// Sitewide banner above the topbar. Tells a first-time visitor the two
-// things that lower the barrier to clicking around: it's safe (sample
-// data, nothing they do is saved) and it self-heals (resets weekly).
+// Sitewide banner above the topbar. Tells a first-time visitor the one
+// thing that lowers the barrier to clicking around: it is safe, because
+// every scene is local component state that never leaves the tab.
 // Ends with a real next step rather than a bare domain.
+//
+// No "resets weekly" claim here. It used to sit beside "nothing's
+// saved" and the pair read as a contradiction; nothing is persisted in
+// the first place, so there is nothing to reset.
 
 export function DemoBanner() {
   return (
@@ -12,7 +16,7 @@ export function DemoBanner() {
         <span aria-hidden className="text-zinc-600">·</span>
         <span>sample data · click anything, nothing&apos;s saved</span>
         <span aria-hidden className="hidden sm:inline text-zinc-600">·</span>
-        <span className="hidden sm:inline">resets every Sunday</span>
+        <span className="hidden sm:inline">reload and it starts over</span>
         <span aria-hidden className="hidden md:inline text-zinc-600">·</span>
         <a
           href="https://gravixar.com/contact"

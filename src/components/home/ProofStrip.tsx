@@ -101,8 +101,8 @@ export function ProofStrip() {
         </div>
 
         <p data-reveal className="mt-16 border-t border-white/5 pt-8 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-          sandbox · sample data · resets every Sunday · no sign-in · nothing
-          you press here leaves the page
+          sandbox · sample data, no sign-in, nothing you press here leaves the
+          page
         </p>
       </div>
     </section>

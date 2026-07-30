@@ -1,10 +1,21 @@
-// Module registry, matches the 12 entries on gravixar.com/modules
-// (the marketing site's productization narrative). The demo's /modules
-// surface lets visitors poke at each pattern in a sandbox without
-// signing into a scene. Three are interactive in the MVP, the rest
-// render a "coming soon" panel.
+// Module registry, mirroring gravixar.com/modules (the marketing site's
+// productization narrative). Slugs must match `content/modules/*.mdx`
+// there one for one, because every card here links to its write-up.
+//
+// Deliberately NOT a count in this comment. It used to say "matches the
+// 12 entries", and it went false the day marketing added a 13th. Counts
+// are derived below and interpolated into the page, never typed into
+// prose. Same rule the marketing repo settled on for DEMO_SCENES.
+//
+// `status` is about THIS site only, not about whether the module is
+// finished. Everything here runs in production somewhere; `interactive`
+// just means the sandbox for it has been built on the demo, and
+// `production` means it has not. Nothing on this shelf is unreleased,
+// so nothing on it says "coming soon" (that framing made a real library
+// read as an unfinished page, and an undated "coming" is an aging
+// promise, the same failure mode as the retired Verus scene).
 
-export type ModuleStatus = "interactive" | "coming-soon";
+export type ModuleStatus = "interactive" | "production";
 
 export type ModuleCategory = "auth" | "audit" | "ai" | "finance" | "ops" | "comms";
 
@@ -61,7 +72,7 @@ export const MODULES: DemoModule[] = [
     category: "ai",
     summary:
       "Adaptive client intake. Visitor types one or two sentences about their business, the wizard fetches their site, drafts a brand brief the PM walks into the discovery call already holding.",
-    status: "coming-soon",
+    status: "production",
     runningIn: ["Broomstick Hub"],
     stack: ["Anthropic Claude", "Vercel AI Gateway"],
     order: 4,
@@ -72,7 +83,7 @@ export const MODULES: DemoModule[] = [
     category: "ai",
     summary:
       "Two independent defenses on every Claude call: a PHI sniffer regex pre-persistence, and a wrapper that prepends a stop-clause to every system prompt.",
-    status: "coming-soon",
+    status: "production",
     runningIn: ["Beeline Medical"],
     stack: ["Anthropic Claude", "phiSniffer regex"],
     order: 5,
@@ -83,7 +94,7 @@ export const MODULES: DemoModule[] = [
     category: "auth",
     summary:
       "NextAuth v5 JWT with the security defaults that should be standard but usually aren't: lockout, breach-list password check, anti-enumeration, invite-only signup.",
-    status: "coming-soon",
+    status: "production",
     runningIn: ["Broomstick Hub", "Beeline Medical"],
     stack: ["NextAuth v5", "bcrypt", "HIBP k-anonymity"],
     order: 6,
@@ -94,7 +105,7 @@ export const MODULES: DemoModule[] = [
     category: "auth",
     summary:
       "STAFF < TEAM_LEAD < MANAGER < ADMIN role ladder plus an isSuperAdmin tier. Guards make permission errors loud and uniform.",
-    status: "coming-soon",
+    status: "production",
     runningIn: ["Broomstick Hub", "Beeline Medical"],
     stack: ["TypeScript", "AuthError"],
     order: 7,
@@ -105,7 +116,7 @@ export const MODULES: DemoModule[] = [
     category: "finance",
     summary:
       "Every monetary row stores native amount + native currency + an FxRateSnapshot foreign key. Reports compute against the snapshot, never live FX.",
-    status: "coming-soon",
+    status: "production",
     runningIn: ["Beeline Medical"],
     stack: ["Prisma 7", "Open Exchange Rates", "decimal.js"],
     order: 8,
@@ -116,7 +127,7 @@ export const MODULES: DemoModule[] = [
     category: "finance",
     summary:
       "Property-tested salary engine for Pakistan's FBR slabs and EOBI rates. Forward Gross→Net + bisection Net→Gross solver. 17/17 vitest property tests green.",
-    status: "coming-soon",
+    status: "production",
     runningIn: ["Beeline Medical"],
     stack: ["vitest + fast-check", "decimal.js"],
     order: 9,
@@ -127,7 +138,7 @@ export const MODULES: DemoModule[] = [
     category: "ops",
     summary:
       "NPI / state license / DEA / board cert / CAQH / UK GMC / other, with 90/60/30/7-day expiry windows. AI-generated reminder copy via the HIPAA-aware wrapper.",
-    status: "coming-soon",
+    status: "production",
     runningIn: ["Beeline Medical"],
     stack: ["Vercel Cron", "Anthropic Claude"],
     order: 10,
@@ -138,7 +149,7 @@ export const MODULES: DemoModule[] = [
     category: "ops",
     summary:
       "Annual / sick / unpaid / parental / bereavement leave with pro-rated entitlements for new joiners. Balance updates run inside a Prisma transaction so balances can't desync.",
-    status: "coming-soon",
+    status: "production",
     runningIn: ["Broomstick Hub", "Beeline Medical"],
     stack: ["Prisma transactions", "Resend"],
     order: 11,
@@ -149,15 +160,41 @@ export const MODULES: DemoModule[] = [
     category: "audit",
     summary:
       "Sweeps the audit log nightly for anomalies (mass-signup spikes, DELETE bursts, stuck inquiries) and emails admins when something trips. Quiet when nothing is wrong.",
-    status: "coming-soon",
+    status: "production",
     runningIn: ["Broomstick Hub"],
     stack: ["Vercel Cron", "Resend"],
     order: 12,
+  },
+  {
+    slug: "shared-core-package",
+    title: "Shared core package",
+    category: "ops",
+    summary:
+      "The reused parts are a private, versioned npm package, not a folder someone copies. One source for the shared modules, auth and 2FA the flagship among them, propagated by a dependency bump rather than a copy.",
+    status: "production",
+    runningIn: ["Broomstick Hub", "Gravixar HQ", "gravixar.com"],
+    stack: ["Private npm package", "Parity test battery"],
+    order: 13,
   },
 ];
 
 export const findModule = (slug: string) =>
   MODULES.find((m) => m.slug === slug);
+
+// Derived, never hand-typed. The page interpolates these so the shelf
+// cannot describe a size it does not have.
+export const MODULE_COUNT = MODULES.length;
+export const INTERACTIVE_COUNT = MODULES.filter(
+  (m) => m.status === "interactive",
+).length;
+
+/** Small-number words, so headline copy reads as prose but stays derived. */
+const NUMBER_WORDS = [
+  "Zero", "One", "Two", "Three", "Four", "Five", "Six",
+  "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen",
+] as const;
+
+export const numberWord = (n: number): string => NUMBER_WORDS[n] ?? String(n);
 
 export const CATEGORY_LABELS: Record<ModuleCategory, string> = {
   auth: "auth & permissions",

@@ -152,7 +152,7 @@ export function AuditLogRestore() {
               return (
                 <li
                   key={row.id}
-                  className="flex items-center justify-between gap-3 px-5 py-3"
+                  className="row-land flex items-center justify-between gap-3 px-5 py-3 first:rounded-t-2xl"
                 >
                   <div className="min-w-0">
                     <p className="text-sm text-zinc-200">

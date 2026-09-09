@@ -66,6 +66,29 @@
     background: var(--color-scene-1, #ff1f2d);
     color: #050508;
   }
+  /* "Explore the scenes" and "How the loop works" are in-page anchors;
+     glide to them instead of jumping. Motion-safe only. */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+  /* View Transitions (src/lib/viewTransition.ts). The root opts OUT so
+     there is no full-page crossfade: only elements that carry a
+     view-transition-name animate, everything else keeps rendering live
+     (the flowPulse orb, hover states, the agent-output stagger). */
+  html {
+    view-transition-name: none;
+  }
+  ::view-transition-group(*) {
+    animation-duration: 520ms;
+    animation-timing-function: var(--ease-in-out);
+  }
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 320ms;
+    animation-timing-function: var(--ease-out);
+  }
 }
 
 @layer utilities {
@@ -388,6 +411,113 @@
     animation: conduitDraw 900ms var(--ease-out) 120ms both;
   }
 
+  /* ── Cards that travel (View Transitions) ──────────────────────── */
+
+  /* A card with a view-transition-name is moved by the transition, so
+     its arrival flash must not ALSO fade it in (the new snapshot would
+     start invisible and the hand-off would blink mid-flight). Same
+     background flash as pg-fresh, no opacity or translate. Browsers
+     without View Transitions fall back to the full pg-fresh arrival. */
+  @keyframes pgFreshStill {
+    0%   { background-color: var(--color-scene-glow, rgba(255,107,107,0.18)); }
+    100% { background-color: rgba(255,255,255,0.02); }
+  }
+  .pg-fresh-move {
+    animation: pgFreshIn 2s ease-out both;
+  }
+  @supports (view-transition-name: none) {
+    .pg-fresh-move {
+      animation-name: pgFreshStill;
+    }
+  }
+
+  /* ── The landing: the column the orb flies INTO ───────────────── */
+
+  /* flowPulse adds .is-receiving to the target column when the orb
+     lands. One accent ring blooms out and fades, so the reaction is
+     pinned to a place on the grid, not just to a row inside it. */
+  @keyframes pgReceive {
+    0%   { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 0 0 var(--color-scene-glow, rgba(255,107,107,0.35)); }
+    30%  { box-shadow: inset 0 0 0 1px var(--color-scene-1), 0 0 0 5px transparent; }
+    100% { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 0 0 transparent; }
+  }
+  .is-receiving {
+    animation: pgReceive 900ms var(--ease-out) both;
+  }
+
+  /* ── Start here: the first sensible button in a scene ─────────── */
+
+  /* A quiet scene-accent ring pulses out of the button until the first
+     click anywhere in the workspace (src/lib/useStartHint.ts). It sits
+     under the button's own hover / focus treatment and never blocks a
+     pointer. */
+  @keyframes hintRing {
+    0%   { opacity: 0.85; transform: scale(1); }
+    70%  { opacity: 0;    transform: scale(1.22); }
+    100% { opacity: 0;    transform: scale(1.22); }
+  }
+  [data-hint="true"] {
+    position: relative;
+  }
+  [data-hint="true"]::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: inherit;
+    border: 1.5px solid var(--color-scene-1);
+    pointer-events: none;
+    animation: hintRing 2.2s var(--ease-out) 900ms infinite;
+  }
+
+  /* ── State flips that should be seen: pills, counts, chips ─────── */
+
+  /* Remount a pill with a `key` when its value changes and it pops
+     into place. Never from scale(0): nothing appears from nothing. */
+  @keyframes popIn {
+    from { opacity: 0.4; transform: scale(0.85); }
+    to   { opacity: 1;   transform: none; }
+  }
+  .pop-in {
+    animation: popIn 360ms var(--ease-out) both;
+  }
+  /* Chips that flip together (credential badges) land one after another. */
+  .pop-in:nth-child(2) { animation-delay: 60ms; }
+  .pop-in:nth-child(3) { animation-delay: 120ms; }
+  .pop-in:nth-child(4) { animation-delay: 180ms; }
+  .pop-in:nth-child(5) { animation-delay: 240ms; }
+
+  /* ── Index loop console: rows populate per beat ───────────────── */
+
+  /* The console panel already crossfades per beat; its rows now land
+     one at a time so each beat reads as the console FILLING, not a
+     slide swap. Transition (not keyframes) so a fast scroll that
+     flips beats mid-flight stays interruptible. */
+  .loop-rows > * {
+    transition:
+      opacity 420ms var(--ease-out),
+      transform 420ms var(--ease-out);
+  }
+  [data-on="false"] .loop-rows > * {
+    opacity: 0;
+    transform: translateY(6px);
+    transition-delay: 0ms;
+  }
+  [data-on="true"] .loop-rows > *:nth-child(1) { transition-delay: 60ms; }
+  [data-on="true"] .loop-rows > *:nth-child(2) { transition-delay: 120ms; }
+  [data-on="true"] .loop-rows > *:nth-child(3) { transition-delay: 180ms; }
+  [data-on="true"] .loop-rows > *:nth-child(4) { transition-delay: 240ms; }
+  [data-on="true"] .loop-rows > *:nth-child(5) { transition-delay: 300ms; }
+  [data-on="true"] .loop-rows > *:nth-child(n+6) { transition-delay: 360ms; }
+
+  /* ── Module widgets: a new audit row is an event ──────────────── */
+
+  /* Widgets have no reducer and no fresh flag; a row that mounts IS a
+     new row, so it animates on mount. Reset empties the list, so
+     nothing re-animates that a visitor has already seen. */
+  .row-land {
+    animation: pgFreshIn 1.6s ease-out both;
+  }
+
   /* Honour system reduce-motion. The tour still works, just skips the
      entrance fade and the pulse animation. */
   @media (prefers-reduced-motion: reduce) {
@@ -406,6 +536,13 @@
     .hero-line, .hero-line-2, .hero-line-3, .hero-soft { animation: none; }
     .agent-orb { animation: none; opacity: 0.7; }
     .pg-stagger > * { animation: none; }
+    .pg-fresh-move { animation: none; }
+    .is-receiving { animation: none; }
+    [data-hint="true"]::after { animation: none; opacity: 0.55; }
+    .pop-in { animation: none; }
+    .loop-rows > * { transition: none; }
+    [data-on="false"] .loop-rows > * { opacity: 1; transform: none; }
+    .row-land { animation: none; }
   }
 
   /* Agency-style card surface, matches the marketing site's

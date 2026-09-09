@@ -6,6 +6,10 @@
 // eye travels WITH the work. The destination's own pg-fresh / pg-cue
 // flash then lands the arrival.
 //
+// When the orb lands, the receiving column gets a one-shot accent ring
+// (.is-receiving, see globals.css) so the reaction is pinned to a place,
+// not just to a row inside it.
+//
 // Transform/opacity only, a single throwaway element per flight,
 // skipped under prefers-reduced-motion, and silently a no-op if the
 // target isn't on screen (mobile swipe-columns).
@@ -60,7 +64,12 @@ export function flowPulse(source: Element | null, targetName: string) {
   const flight = { p: 0 };
   gsap.set(dot, { x: from.x - 4.5, y: from.y - 4.5, scale: 0.4, opacity: 0 });
   gsap
-    .timeline({ onComplete: () => dot.remove() })
+    .timeline({
+      onComplete: () => {
+        dot.remove();
+        receive(target);
+      },
+    })
     .to(dot, { opacity: 1, scale: 1, duration: 0.12, ease: "power1.out" }, 0)
     .to(
       flight,
@@ -79,4 +88,14 @@ export function flowPulse(source: Element | null, targetName: string) {
       0,
     )
     .to(dot, { scale: 2.2, opacity: 0, duration: 0.26, ease: "power2.out" }, 0.58);
+}
+
+// The landing: re-trigger the ring even if the previous one is still
+// fading, then clear it so the next flight can start it again.
+function receive(target: Element) {
+  target.classList.remove("is-receiving");
+  // Force a style flush so removing + re-adding restarts the animation.
+  void (target as HTMLElement).offsetWidth;
+  target.classList.add("is-receiving");
+  window.setTimeout(() => target.classList.remove("is-receiving"), 1000);
 }

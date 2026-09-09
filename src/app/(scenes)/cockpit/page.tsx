@@ -7,7 +7,7 @@
 // founder approves. Same "AI drafts, human approves" grammar as the
 // other scenes. See src/lib/playground/cockpit-data.ts.
 
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FOUNDER,
   cockpitReducer,
@@ -24,6 +24,9 @@ import { OutcomePanel } from "@/components/demo/OutcomePanel";
 import { LearnBeat } from "@/components/demo/LearnBeat";
 import { flowPulse } from "@/lib/flowPulse";
 import { formatRelative } from "@/lib/formatRelative";
+import { useSceneDispatch } from "@/lib/useSceneDispatch";
+import { useStartHint } from "@/lib/useStartHint";
+import { vtName } from "@/lib/viewTransition";
 
 const FRESH_DECAY_MS = 2200;
 
@@ -34,11 +37,11 @@ const URGENCY: Record<Signal["urgency"], { label: string; cls: string }> = {
 };
 
 export default function FounderCockpit() {
-  const [state, dispatch] = useReducer(
+  const [state, dispatch] = useSceneDispatch(
     cockpitReducer,
-    undefined,
     createInitialCockpitState,
   );
+  const { hint, endHint } = useStartHint();
 
   useEffect(() => {
     const ids = [
@@ -52,7 +55,7 @@ export default function FounderCockpit() {
       window.setTimeout(() => dispatch({ type: "DECAY_FRESH", id }), FRESH_DECAY_MS),
     );
     return () => timers.forEach((t) => window.clearTimeout(t));
-  }, [state.signals, state.todos, state.rules, state.feed]);
+  }, [state.signals, state.todos, state.rules, state.feed, dispatch]);
 
   const openTodos = state.todos.filter((t) => !t.done).length;
   const learnedCount = state.rules.filter((r) => r.learned).length;
@@ -90,12 +93,17 @@ export default function FounderCockpit() {
         decide; the cockpit does the typing, <span className="text-zinc-300">and
         learns from every approval below</span>.{" "}
         {openTodos > 0 ? (
-          <span className="text-zinc-300">{openTodos} waiting on you.</span>
+          <span key={openTodos} className="pop-in inline-block text-zinc-300">
+            {openTodos} waiting on you.
+          </span>
         ) : null}
       </p>
 
-      <div className="scene-columns mt-7 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:pb-0">
-        <InboxColumn signals={state.signals} dispatch={dispatch} />
+      <div
+        onClickCapture={endHint}
+        className="scene-columns mt-7 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:pb-0"
+      >
+        <InboxColumn signals={state.signals} dispatch={dispatch} hint={hint} />
         <TodayColumn todos={state.todos} dispatch={dispatch} />
         <MoneyColumn money={state.money} dispatch={dispatch} />
       </div>
@@ -171,10 +179,14 @@ function Col({
 function InboxColumn({
   signals,
   dispatch,
+  hint,
 }: {
   signals: Signal[];
   dispatch: React.Dispatch<CockpitEvent>;
+  /** "Start here" ring on the first signal that can be routed. */
+  hint: boolean;
 }) {
+  const firstRoutable = signals.find((s) => !s.autoFiled && !s.routed)?.id;
   // The button a visitor clicks is replaced by its result, so focus would
   // fall to <body>. Remember which card just resolved and move focus to
   // the status line that took the button's place.
@@ -191,6 +203,7 @@ function InboxColumn({
           <div
             key={s.id}
             aria-live="polite"
+            style={{ viewTransitionName: vtName("cp-signal", s.id) }}
             className={[
               "rounded-xl border p-3.5",
               s.fresh
@@ -231,6 +244,7 @@ function InboxColumn({
             ) : (
               <button
                 type="button"
+                data-hint={hint && s.id === firstRoutable ? "true" : undefined}
                 onClick={(e) => {
                   flowPulse(e.currentTarget, "cp-today");
                   setResolvedId(s.id);
@@ -274,6 +288,7 @@ function TodayColumn({
         <div
           key={t.id}
           aria-live="polite"
+          style={{ viewTransitionName: vtName("cp-todo", t.id) }}
           className={[
             "rounded-xl border p-3.5",
             t.fresh
@@ -367,6 +382,7 @@ function MoneyColumn({
         <div
           key={m.id}
           aria-live="polite"
+          style={{ viewTransitionName: vtName("cp-money", m.id) }}
           className={[
             "rounded-xl border p-3.5",
             m.fresh
@@ -440,6 +456,7 @@ function ActivityFeed({ feed }: { feed: FeedEntry[] }) {
         {feed.slice(0, 6).map((e) => (
           <li
             key={e.id}
+            style={{ viewTransitionName: vtName("cp-feed", e.id) }}
             className={[
               "rounded-lg border px-3 py-2 text-xs leading-relaxed",
               e.fresh

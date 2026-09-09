@@ -9,7 +9,11 @@
 //    my own ops" link to book a call.
 //
 // Static + CSS-only, so it respects the CSS-first reveal rule and is
-// reduced-motion / no-WebGL safe, and it wraps on mobile.
+// reduced-motion / no-WebGL safe, and it wraps on mobile. The big
+// numbers count up the first time they scroll into view (CountUp
+// renders the final value server-side, so nothing depends on it).
+
+import { CountUp } from "@/components/demo/CountUp";
 
 export type OutcomeStat = {
   /** Big illustrative number, e.g. "1,284". */
@@ -60,7 +64,7 @@ export function OutcomePanel({
               {s.label}
             </dt>
             <dd className="order-1 text-2xl font-medium tabular-nums tracking-[-0.02em] text-[var(--color-scene-1)]">
-              {s.value}
+              <CountUp value={s.value} />
             </dd>
             {s.sub ? (
               <dd className="order-3 mt-0.5 text-[10px] leading-tight text-zinc-500">

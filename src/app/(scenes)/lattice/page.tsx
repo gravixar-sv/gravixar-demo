@@ -5,8 +5,13 @@
 // object that moves column→column as it's approved / revised / pushed
 // back, with an attachment that pops on hover and an activity feed
 // logging every hop. See src/lib/playground/lattice-deliverables.ts.
+//
+// Every card carries a view-transition-name keyed on its deliverable,
+// and every action dispatches inside a View Transition, so a hand-off
+// is a card physically sliding from one column to the next (and reset
+// rewinds them all). The orb flight covers browsers without it.
 
-import { useEffect, useReducer, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   PERSONAS,
   createInitialLatticeState,
@@ -22,15 +27,18 @@ import { OutcomePanel } from "@/components/demo/OutcomePanel";
 import { LearnBeat } from "@/components/demo/LearnBeat";
 import { flowPulse } from "@/lib/flowPulse";
 import { formatRelative } from "@/lib/formatRelative";
+import { useSceneDispatch } from "@/lib/useSceneDispatch";
+import { useStartHint } from "@/lib/useStartHint";
+import { vtName } from "@/lib/viewTransition";
 
 const FRESH_DECAY_MS = 2200;
 
 export default function LatticeReviewLoop() {
-  const [state, dispatch] = useReducer(
+  const [state, dispatch] = useSceneDispatch(
     latticeReducer,
-    undefined,
     createInitialLatticeState,
   );
+  const { hint, endHint } = useStartHint();
 
   useEffect(() => {
     const ids = [
@@ -43,7 +51,7 @@ export default function LatticeReviewLoop() {
       window.setTimeout(() => dispatch({ type: "DECAY_FRESH", id }), FRESH_DECAY_MS),
     );
     return () => timers.forEach((t) => window.clearTimeout(t));
-  }, [state.deliverables, state.rules, state.feed]);
+  }, [state.deliverables, state.rules, state.feed, dispatch]);
 
   const byState = (...states: Deliverable["state"][]) =>
     state.deliverables.filter((d) => states.includes(d.state));
@@ -74,7 +82,10 @@ export default function LatticeReviewLoop() {
         </div>
         <div className="flex items-center gap-3">
           {shipped > 0 ? (
-            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80">
+            <span
+              key={shipped}
+              className="pop-in inline-block font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80"
+            >
               {shipped} shipped
             </span>
           ) : null}
@@ -88,11 +99,14 @@ export default function LatticeReviewLoop() {
         </div>
       </header>
 
-      <div className="scene-columns mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:pb-0">
+      <div
+        onClickCapture={endHint}
+        className="scene-columns mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:pb-0"
+      >
         {/* ── Client ── */}
         <Column persona={PERSONAS.client} status="your review" flow="lat-client">
-          {byState("with_client").map((d) => (
-            <ClientCard key={d.id} d={d} dispatch={dispatch} />
+          {byState("with_client").map((d, i) => (
+            <ClientCard key={d.id} d={d} dispatch={dispatch} hint={hint && i === 0} />
           ))}
           {byState("shipped").map((d) => (
             <DoneCard key={d.id} d={d} label="Shipped" />
@@ -229,10 +243,11 @@ function CardShell({
 }) {
   return (
     <div
+      style={{ viewTransitionName: vtName("lat", d.id) }}
       className={[
         "rounded-xl border p-3.5",
         d.fresh
-          ? "pg-fresh border-[var(--color-scene-1)]/45"
+          ? "pg-fresh-move border-[var(--color-scene-1)]/45"
           : "border-white/10 bg-black/20",
       ].join(" ")}
     >
@@ -264,9 +279,12 @@ function EmptyIf({ show, text }: { show: boolean; text: string }) {
 function ClientCard({
   d,
   dispatch,
+  hint = false,
 }: {
   d: Deliverable;
   dispatch: React.Dispatch<import("@/lib/playground/lattice-deliverables").LatticeEvent>;
+  /** "Start here" ring on Approve, until the visitor's first click. */
+  hint?: boolean;
 }) {
   const [note, setNote] = useState("");
   const [revising, setRevising] = useState(false);
@@ -307,6 +325,7 @@ function ClientCard({
         <div className="mt-3 flex flex-wrap gap-2">
           <button
             type="button"
+            data-hint={hint ? "true" : undefined}
             onClick={(e) => {
               flowPulse(e.currentTarget, "lat-rules");
               dispatch({ type: "CLIENT_APPROVE", id: d.id });
@@ -430,9 +449,10 @@ function DoneCard({
 }) {
   return (
     <div
+      style={{ viewTransitionName: vtName("lat", d.id) }}
       className={[
         "flex items-center gap-3 rounded-xl border px-3.5 py-3",
-        d.fresh ? "pg-fresh border-emerald-400/40" : "border-white/10 bg-black/20",
+        d.fresh ? "pg-fresh-move border-emerald-400/40" : "border-white/10 bg-black/20",
       ].join(" ")}
     >
       <MockupThumb kind={d.kind} />
@@ -536,6 +556,7 @@ function ActivityFeed({ feed }: { feed: FeedEntry[] }) {
         {feed.slice(0, 6).map((e) => (
           <li
             key={e.id}
+            style={{ viewTransitionName: vtName("lat-feed", e.id) }}
             className={[
               "rounded-lg border px-3 py-2 text-xs",
               e.fresh

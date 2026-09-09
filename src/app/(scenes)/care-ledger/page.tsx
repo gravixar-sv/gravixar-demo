@@ -10,7 +10,7 @@
 // All data is illustrative sample data. No real patient, provider, or
 // clinic information, and no real names.
 
-import { useEffect, useReducer } from "react";
+import { useEffect } from "react";
 import {
   STAGE_LABEL,
   careLedgerReducer,
@@ -27,15 +27,18 @@ import { OutcomePanel } from "@/components/demo/OutcomePanel";
 import { LearnBeat } from "@/components/demo/LearnBeat";
 import { flowPulse } from "@/lib/flowPulse";
 import { formatRelative } from "@/lib/formatRelative";
+import { useSceneDispatch } from "@/lib/useSceneDispatch";
+import { useStartHint } from "@/lib/useStartHint";
+import { vtName } from "@/lib/viewTransition";
 
 const FRESH_DECAY_MS = 2200;
 
 export default function CareLedgerPortal() {
-  const [state, dispatch] = useReducer(
+  const [state, dispatch] = useSceneDispatch(
     careLedgerReducer,
-    undefined,
     createInitialCareLedgerState,
   );
+  const { hint, endHint } = useStartHint();
 
   useEffect(() => {
     const ids = [
@@ -50,7 +53,7 @@ export default function CareLedgerPortal() {
       window.setTimeout(() => dispatch({ type: "DECAY_FRESH", id }), FRESH_DECAY_MS),
     );
     return () => timers.forEach((t) => window.clearTimeout(t));
-  }, [state.providers, state.billing, state.deals, state.rules, state.feed]);
+  }, [state.providers, state.billing, state.deals, state.rules, state.feed, dispatch]);
 
   const credentialed = state.providers.filter((p) => p.status === "credentialed").length;
   const learnedCount = state.rules.filter((r) => r.learned).length;
@@ -77,7 +80,10 @@ export default function CareLedgerPortal() {
         </div>
         <div className="flex items-center gap-3">
           {credentialed > 0 ? (
-            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
+            <span
+              key={credentialed}
+              className="pop-in inline-block font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]"
+            >
               {credentialed} credentialed
             </span>
           ) : null}
@@ -93,11 +99,14 @@ export default function CareLedgerPortal() {
 
       <ArchitectureCallout />
 
-      <div className="scene-columns mt-7 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:pb-0">
+      <div
+        onClickCapture={endHint}
+        className="scene-columns mt-7 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-3 lg:gap-5 lg:overflow-visible lg:pb-0"
+      >
         {/* Credentialing intake */}
         <Col label="Credentialing" status="provider intake · Zoom touchpoint" flow="cl-cred">
-          {state.providers.map((p) => (
-            <ProviderCard key={p.id} p={p} dispatch={dispatch} />
+          {state.providers.map((p, i) => (
+            <ProviderCard key={p.id} p={p} dispatch={dispatch} hint={hint && i === 0} />
           ))}
           <EmptyIf
             show={state.providers.length === 0}
@@ -241,14 +250,18 @@ function EmptyIf({ show, text }: { show: boolean; text: string }) {
 function ProviderCard({
   p,
   dispatch,
+  hint = false,
 }: {
   p: Provider;
   dispatch: React.Dispatch<CareLedgerEvent>;
+  /** "Start here" ring on this card's action, until the first click. */
+  hint?: boolean;
 }) {
   const credentialed = p.status === "credentialed";
   const intakeDone = p.intake === "done";
   return (
     <div
+      style={{ viewTransitionName: vtName("cl-prov", p.id) }}
       className={[
         "rounded-xl border p-3.5",
         p.fresh
@@ -273,9 +286,10 @@ function ProviderCard({
           const ok = c.status === "verified";
           return (
             <span
-              key={c.kind}
+              key={`${c.kind}-${c.status}`}
               className={[
                 "rounded-md border px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em]",
+                p.fresh ? "pop-in inline-block" : "",
                 ok
                   ? "border-[var(--color-scene-1)]/40 text-[var(--color-scene-1)]"
                   : "border-amber-400/35 text-amber-300/90",
@@ -305,6 +319,7 @@ function ProviderCard({
       ) : intakeDone ? (
         <button
           type="button"
+          data-hint={hint ? "true" : undefined}
           onClick={(e) => {
             flowPulse(e.currentTarget, "cl-billing");
             dispatch({ type: "CREDENTIAL", id: p.id });
@@ -316,6 +331,7 @@ function ProviderCard({
       ) : (
         <button
           type="button"
+          data-hint={hint ? "true" : undefined}
           onClick={() => dispatch({ type: "COMPLETE_INTAKE", id: p.id })}
           className="mt-3 inline-flex min-h-10 items-center justify-center rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-1.5 text-xs font-medium text-amber-200 transition-all hover:bg-amber-400/20 active:scale-[0.98] lg:min-h-0"
         >
@@ -348,6 +364,7 @@ function BillingCard({
   const approved = item.state === "approved";
   return (
     <div
+      style={{ viewTransitionName: vtName("cl-bill", item.id) }}
       className={[
         "rounded-xl border p-3.5",
         item.fresh
@@ -412,6 +429,7 @@ function DealCard({
   const live = deal.stage === "live";
   return (
     <div
+      style={{ viewTransitionName: vtName("cl-deal", deal.id) }}
       className={[
         "rounded-xl border p-3.5",
         deal.fresh ? "pg-fresh border-[var(--color-scene-1)]/45" : "border-white/10 bg-black/20",
@@ -423,7 +441,8 @@ function DealCard({
           <p className="text-[11px] text-zinc-400">{deal.seats}</p>
         </div>
         <span
-          className={`shrink-0 rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] ${STAGE_TONE[deal.stage]}`}
+          key={deal.stage}
+          className={`${deal.fresh ? "pop-in" : ""} shrink-0 rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] ${STAGE_TONE[deal.stage]}`}
         >
           {STAGE_LABEL[deal.stage]}
         </span>
@@ -478,6 +497,7 @@ function AuditTrail({ feed }: { feed: AuditEntry[] }) {
         {feed.slice(0, 6).map((e) => (
           <li
             key={e.id}
+            style={{ viewTransitionName: vtName("cl-feed", e.id) }}
             className={[
               "rounded-lg border px-3 py-2 text-xs leading-relaxed",
               e.fresh

@@ -74,6 +74,7 @@ function SceneCard({
     <Link
       href={`/${scene.slug}`}
       data-reveal
+      style={{ "--card-accent": accent } as React.CSSProperties}
       className={`group block rounded-2xl p-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-scene-1)] ${
         offset ? "md:mt-8" : ""
       }`}

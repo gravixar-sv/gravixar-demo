@@ -109,7 +109,10 @@ export function DailyCheckin() {
               <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
                 {s.value.toLowerCase()}
               </p>
-              <p className="mt-1 text-2xl font-medium tabular-nums text-zinc-100">
+              <p
+                key={s.total}
+                className="pop-in mt-1 origin-left text-2xl font-medium tabular-nums text-zinc-100"
+              >
                 {s.total}
               </p>
             </div>
@@ -145,7 +148,7 @@ function Row({
   return (
     <li
       className={`flex items-center justify-between gap-3 px-5 py-3 ${
-        highlight ? "bg-[var(--color-scene-1)]/[0.04]" : ""
+        highlight ? "row-land rounded-t-2xl bg-[var(--color-scene-1)]/[0.04]" : ""
       }`}
     >
       <div>
@@ -155,7 +158,8 @@ function Row({
         </p>
       </div>
       <span
-        className={`rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em] ${tone}`}
+        key={status}
+        className={`${highlight ? "pop-in" : ""} rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em] ${tone}`}
       >
         {status.toLowerCase()}
       </span>

@@ -5,7 +5,7 @@
 // → the run logs to the shared feed in column 3. Same cascade pattern
 // as the Lattice playground; deterministic mock output (no live API).
 
-import { useEffect, useReducer, useRef } from "react";
+import { useEffect, useRef } from "react";
 import {
   STUDIO_AGENTS,
   findStudioAgent,
@@ -23,15 +23,18 @@ import { OutcomePanel } from "@/components/demo/OutcomePanel";
 import { LearnBeat } from "@/components/demo/LearnBeat";
 import { flowPulse } from "@/lib/flowPulse";
 import { formatRelative } from "@/lib/formatRelative";
+import { useSceneDispatch } from "@/lib/useSceneDispatch";
+import { useStartHint } from "@/lib/useStartHint";
+import { vtName } from "@/lib/viewTransition";
 
 const FRESH_DECAY_MS = 2000;
 
 export default function StudioMixPlayground() {
-  const [state, dispatch] = useReducer(
+  const [state, dispatch] = useSceneDispatch(
     studioReducer,
-    undefined,
     createInitialStudioState,
   );
+  const { hint, endHint } = useStartHint();
 
   useEffect(() => {
     const freshIds = [
@@ -45,7 +48,7 @@ export default function StudioMixPlayground() {
     return () => {
       for (const t of timers) window.clearTimeout(t);
     };
-  }, [state.feed, state.rules]);
+  }, [state.feed, state.rules, dispatch]);
 
   const current = state.current ? findStudioAgent(state.current) ?? null : null;
   const learnedCount = state.rules.filter((r) => r.learned).length;
@@ -75,7 +78,10 @@ export default function StudioMixPlayground() {
         </div>
         <div className="flex items-center gap-3">
           {state.ran.length > 0 ? (
-            <span className="font-mono text-[10px] uppercase tracking-[0.18em] tabular-nums text-zinc-500">
+            <span
+              key={state.ran.length}
+              className="pop-in inline-block font-mono text-[10px] uppercase tracking-[0.18em] tabular-nums text-zinc-500"
+            >
               {state.ran.length}/4 agents run
             </span>
           ) : null}
@@ -90,10 +96,14 @@ export default function StudioMixPlayground() {
       </header>
 
       {/* ── 3 columns ───────────────────────────────────────────── */}
-      <div className="scene-columns mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-[0.9fr_1.2fr_1fr] lg:gap-5 lg:overflow-visible lg:pb-0">
+      <div
+        onClickCapture={endHint}
+        className="scene-columns mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-[0.9fr_1.2fr_1fr] lg:gap-5 lg:overflow-visible lg:pb-0"
+      >
         <AgentsColumn
           currentKey={state.current}
           ran={state.ran}
+          hint={hint}
           onRun={(key) => dispatch({ type: "RUN", key })}
         />
         <OutputColumn agent={current} gate={state.gate} dispatch={dispatch} />
@@ -177,10 +187,13 @@ function ColumnShell({
 function AgentsColumn({
   currentKey,
   ran,
+  hint,
   onRun,
 }: {
   currentKey: string | null;
   ran: string[];
+  /** "Start here" ring on the first agent's run button. */
+  hint: boolean;
   onRun: (key: StudioAgent["key"]) => void;
 }) {
   return (
@@ -190,7 +203,7 @@ function AgentsColumn({
       headingId="studio-agents-heading"
     >
       <ul className="space-y-2.5">
-        {STUDIO_AGENTS.map((agent) => {
+        {STUDIO_AGENTS.map((agent, i) => {
           const isCurrent = currentKey === agent.key;
           const hasRun = ran.includes(agent.key);
           return (
@@ -220,6 +233,7 @@ function AgentsColumn({
               <div className="mt-3 flex items-center gap-2">
                 <button
                   type="button"
+                  data-hint={hint && i === 0 ? "true" : undefined}
                   onClick={(e) => {
                     flowPulse(e.currentTarget, "studio-output");
                     onRun(agent.key);
@@ -276,7 +290,10 @@ function OutputColumn({
         <div
           key={agent.key}
           className="pg-fresh rounded-xl border p-4"
-          style={{ borderColor: `${agent.color}40` }}
+          style={{
+            borderColor: `${agent.color}40`,
+            viewTransitionName: vtName("st-out", agent.key),
+          }}
         >
           <div className="flex items-center gap-2 border-b border-white/5 pb-2">
             <span
@@ -376,6 +393,7 @@ function FeedColumn({ feed }: { feed: AuditEntry[] }) {
         {feed.map((entry) => (
           <li
             key={entry.id}
+            style={{ viewTransitionName: vtName("st-feed", entry.id) }}
             className={[
               "rounded-lg border px-3 py-2 text-xs",
               entry.fresh

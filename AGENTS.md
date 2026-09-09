@@ -160,6 +160,24 @@ scripts/capture.mjs            # pnpm capture
 - When a transform *is* the content (the attachment-preview zoom is how
   you read the attachment), reduced motion drops the animation, not the
   content.
+- **Scene actions dispatch inside a View Transition**
+  (`src/lib/useSceneDispatch.ts` over `src/lib/viewTransition.ts`).
+  Cards, rules and feed rows carry a `view-transition-name`
+  (`vtName(prefix, id)`), so a hand-off is the card sliding to its new
+  column and a reflow slides instead of jumping. The root opts out, so
+  there is no page crossfade and unnamed content (the orb, hovers, the
+  output stagger) keeps rendering live. A card that travels uses
+  `pg-fresh-move` (background flash only), never `pg-fresh`, or the
+  hand-off blinks. The update callback needs a rendering opportunity,
+  so a 160ms guard skips the transition and applies the update if the
+  pipeline is frozen: a click must never wait on the ticker. Names must
+  be unique in the document or the transition is skipped.
+- `flowPulse` lands with `.is-receiving` on the target column (one
+  accent ring). The first sensible button in a scene carries
+  `data-hint="true"` (`useStartHint`) until the first click anywhere in
+  the workspace. Pills and counts that change remount with a `key` and
+  `.pop-in`. `OutcomePanel` numbers count up via `CountUp`, which
+  renders the final value server-side.
 - Environment gotcha: the in-app preview browser **never advances CSS
   transitions**, which pins transitioned properties at their start value
   and makes computed-style checks read as broken. Verify transforms with

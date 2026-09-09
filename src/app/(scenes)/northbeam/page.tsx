@@ -7,7 +7,7 @@
 // one back and it learns what to avoid. Audit trail underneath.
 // See src/lib/playground/northbeam-data.ts.
 
-import { useEffect, useReducer, useRef } from "react";
+import { useEffect, useRef } from "react";
 import {
   createInitialNorthbeamState,
   northbeamReducer,
@@ -23,15 +23,18 @@ import { SceneCTA } from "@/components/demo/SceneCTA";
 import { OutcomePanel } from "@/components/demo/OutcomePanel";
 import { flowPulse } from "@/lib/flowPulse";
 import { formatRelative } from "@/lib/formatRelative";
+import { useSceneDispatch } from "@/lib/useSceneDispatch";
+import { useStartHint } from "@/lib/useStartHint";
+import { vtName } from "@/lib/viewTransition";
 
 const FRESH_DECAY_MS = 2200;
 
 export default function NorthbeamBrandAgent() {
-  const [state, dispatch] = useReducer(
+  const [state, dispatch] = useSceneDispatch(
     northbeamReducer,
-    undefined,
     createInitialNorthbeamState,
   );
+  const { hint, endHint } = useStartHint();
 
   useEffect(() => {
     const ids = [
@@ -43,7 +46,7 @@ export default function NorthbeamBrandAgent() {
       window.setTimeout(() => dispatch({ type: "DECAY_FRESH", id }), FRESH_DECAY_MS),
     );
     return () => timers.forEach((t) => window.clearTimeout(t));
-  }, [state.rules, state.feed]);
+  }, [state.rules, state.feed, dispatch]);
 
   const learnedCount = state.rules.filter((r) => r.learned).length;
 
@@ -74,19 +77,23 @@ export default function NorthbeamBrandAgent() {
         </button>
       </header>
 
-      <div className="scene-columns mt-7 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-[0.95fr_1.2fr_0.95fr] lg:gap-5 lg:overflow-visible lg:pb-0">
+      <div
+        onClickCapture={endHint}
+        className="scene-columns mt-7 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 lg:grid lg:grid-cols-[0.95fr_1.2fr_0.95fr] lg:gap-5 lg:overflow-visible lg:pb-0"
+      >
         {/* Requests */}
         <Col
           label="Requests"
           status="plain briefs · from the team"
           headingId="northbeam-requests-heading"
         >
-          {state.requests.map((r) => (
+          {state.requests.map((r, i) => (
             <RequestCard
               key={r.id}
               req={r}
               active={state.current === r.id}
               dispatch={dispatch}
+              hint={hint && i === 0}
             />
           ))}
         </Col>
@@ -105,6 +112,7 @@ export default function NorthbeamBrandAgent() {
         <Col
           label="Brand memory"
           status={`${state.rules.length} rules · ${learnedCount} learned from you`}
+          statusKey={learnedCount}
           headingId="northbeam-rules-heading"
           flow="nb-memory"
         >
@@ -145,12 +153,15 @@ export default function NorthbeamBrandAgent() {
 function Col({
   label,
   status,
+  statusKey,
   headingId,
   flow,
   children,
 }: {
   label: string;
   status: string;
+  /** Change this and the status line pops (the learned-rule count). */
+  statusKey?: number;
   /** Ties the column heading to its section for assistive tech. */
   headingId: string;
   /** Name other columns target with flowPulse(). */
@@ -169,7 +180,12 @@ function Col({
       >
         {label}
       </h2>
-      <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">{status}</p>
+      <p
+        key={statusKey}
+        className={`${statusKey ? "pop-in" : ""} mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500`}
+      >
+        {status}
+      </p>
       <div className="mt-4 space-y-3">{children}</div>
     </section>
   );
@@ -179,13 +195,17 @@ function RequestCard({
   req,
   active,
   dispatch,
+  hint = false,
 }: {
   req: BrandRequest;
   active: boolean;
   dispatch: React.Dispatch<NorthbeamEvent>;
+  /** "Start here" ring on generate, until the visitor's first click. */
+  hint?: boolean;
 }) {
   return (
     <div
+      style={{ viewTransitionName: vtName("nb-req", req.id) }}
       className={[
         "rounded-xl border p-3.5 transition-colors",
         active
@@ -217,6 +237,7 @@ function RequestCard({
       ) : (
         <button
           type="button"
+          data-hint={hint ? "true" : undefined}
           onClick={(e) => {
             flowPulse(e.currentTarget, "nb-agent");
             dispatch({ type: "GENERATE", id: req.id });
@@ -278,6 +299,7 @@ function Workspace({
 
   return (
     <div
+      style={{ viewTransitionName: "nb-draft" }}
       className={[
         "rounded-xl border p-4",
         isDrift ? "border-amber-400/40 bg-amber-400/[0.04]" : "border-white/10 bg-black/25",
@@ -438,6 +460,7 @@ function RuleRow({ rule }: { rule: BrandRule }) {
   const isDo = rule.kind === "do";
   return (
     <li
+      style={{ viewTransitionName: vtName("nb-rule", rule.id) }}
       className={[
         "rounded-lg border px-3 py-2",
         rule.fresh
@@ -482,6 +505,7 @@ function AuditTrail({ feed }: { feed: AuditEntry[] }) {
         {feed.slice(0, 6).map((e) => (
           <li
             key={e.id}
+            style={{ viewTransitionName: vtName("nb-feed", e.id) }}
             className={[
               "rounded-lg border px-3 py-2 text-xs leading-relaxed",
               e.fresh

@@ -172,7 +172,9 @@ export function LoopSection() {
 
 // ─── The console panel ──────────────────────────────────────────────
 // One framed panel whose contents morph per beat. All transitions are
-// opacity/transform via CSS so they stay cheap and interruptible.
+// opacity/transform via CSS so they stay cheap and interruptible. The
+// rows inside a panel land one at a time (`.loop-rows`, globals.css)
+// so each beat reads as the console filling up, not a slide swap.
 
 function LoopConsole({ step }: { step: number }) {
   return (
@@ -202,6 +204,7 @@ function Panel({ on, children }: { on: boolean; children: React.ReactNode }) {
   return (
     <div
       aria-hidden={!on}
+      data-on={on ? "true" : "false"}
       className={`absolute inset-0 p-5 transition-[opacity,transform] duration-500 ${
         on
           ? "translate-y-0 opacity-100"
@@ -245,7 +248,7 @@ function ConsoleArrive({ on }: { on: boolean }) {
       <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
         overnight · unsorted
       </p>
-      <div className="mt-3 space-y-2">
+      <div className="loop-rows mt-3 space-y-2">
         <Row tone="neutral" label="Re: invoice #0042, payment date?" meta="email" />
         <Row tone="neutral" label="Brief: spring drop launch copy" meta="request" />
         <Row tone="neutral" label="Homepage hero, v2 uploaded" meta="handoff" />
@@ -265,7 +268,7 @@ function ConsoleDraft({ on }: { on: boolean }) {
       <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
         agent pass · 06:00
       </p>
-      <div className="mt-3 space-y-2">
+      <div className="loop-rows mt-3 space-y-2">
         <Row tone="accent" label="Reply drafted: payment nudge, your tone" meta="draft" />
         <Row tone="accent" label="Launch copy drafted on-brand, 3 variants" meta="draft" />
         <Row tone="neutral" label="Hero v2 routed to PM review" meta="routed" />
@@ -285,7 +288,7 @@ function ConsoleGate({ on }: { on: boolean }) {
       <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
         waiting on you · 3 items
       </p>
-      <div className="mt-3 space-y-2">
+      <div className="loop-rows mt-3 space-y-2">
         <Row tone="accent" label="Payment nudge → Greenfield Studio" meta="approve?" />
         <Row tone="accent" label="Launch copy, variant B" meta="approve?" />
         <Row tone="accent" label="Lead reply + calendar link" meta="approve?" />
@@ -312,7 +315,7 @@ function ConsoleLearn({ on }: { on: boolean }) {
       <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
         rulebook · learned from you
       </p>
-      <div className="mt-3 space-y-2">
+      <div className="loop-rows mt-3 space-y-2">
         <Row tone="ok" label="✓ Chase overdue invoices at 12+ days" meta="new" />
         <Row tone="ok" label="✓ Launch copy: variant-B voice wins" meta="new" />
         <Row tone="neutral" label="✓ Writer agents never auto-publish" meta="house" />

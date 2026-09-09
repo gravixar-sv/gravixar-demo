@@ -7,6 +7,7 @@
 // now; scenes pass their own copy.
 
 import type { ReactNode } from "react";
+import { vtName } from "@/lib/viewTransition";
 
 /** Structural shape every scene's own Rule type satisfies. */
 export type LearnedRule = {
@@ -64,7 +65,8 @@ export function LearnBeat<R extends LearnedRule>({
             <>
               {" "}
               ·{" "}
-              <span className="text-[var(--color-scene-1)]">
+              {/* Keyed on the count so each increment pops into place. */}
+              <span key={learnedCount} className="pop-in inline-block text-[var(--color-scene-1)]">
                 {learnedCount} {learnedLabel}
               </span>
             </>
@@ -103,6 +105,9 @@ function RuleRow({
   const isDo = rule.kind === "do";
   return (
     <li
+      // Named so a new rule slides the existing ones over instead of
+      // jumping them (the scene wraps its actions in a View Transition).
+      style={{ viewTransitionName: vtName("rule", rule.id) }}
       className={[
         "rounded-lg border px-3 py-2",
         rule.fresh

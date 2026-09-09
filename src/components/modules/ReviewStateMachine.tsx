@@ -93,8 +93,10 @@ export function ReviewStateMachine() {
               {TASK_TITLE}
             </p>
           </div>
+          {/* Keyed on the state so each transition pops the pill. */}
           <span
-            className={`shrink-0 rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] ${STATE_TONE[state]}`}
+            key={state}
+            className={`pop-in shrink-0 rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] ${STATE_TONE[state]}`}
           >
             {state.replace(/_/g, " ").toLowerCase()}
           </span>
@@ -156,7 +158,7 @@ export function ReviewStateMachine() {
             {audit.map((row) => (
               <li
                 key={row.id}
-                className="flex items-center justify-between gap-3 px-5 py-3"
+                className="row-land flex items-center justify-between gap-3 px-5 py-3 first:rounded-t-2xl"
               >
                 <div className="min-w-0">
                   <p className="text-sm text-zinc-200">

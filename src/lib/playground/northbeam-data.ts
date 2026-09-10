@@ -9,6 +9,8 @@
 // other scenes, plus the missing beat — it learns from your approvals.
 
 import type { DeliverableKind } from "@/lib/playground/lattice-deliverables";
+import type { OutcomeStat } from "@/components/demo/OutcomePanel";
+import { formatCount } from "./outcomeFormat";
 
 export type RuleKind = "do" | "dont";
 
@@ -66,6 +68,11 @@ export type NorthbeamState = {
   gate: Gate;
   rules: BrandRule[];
   feed: AuditEntry[];
+  /** What the agent has done for this visitor. A draft and a block are
+   *  moments rather than objects that stick around (only the current
+   *  one is held), so the loop counts them as they happen and the
+   *  outcome tiles read the tally. */
+  tally: { drafted: number; blocked: number };
 };
 
 export type NorthbeamEvent =
@@ -220,7 +227,36 @@ export function createInitialNorthbeamState(): NorthbeamState {
       action: f.action,
       detail: f.detail,
     })),
+    tally: { drafted: 0, blocked: 0 },
   };
+}
+
+// Outcome tiles. Illustrative 90-day figures for the brand, with what
+// this visitor has had the agent do added on top. Every draft, block
+// and learned rule below is one the visitor triggered; the gate
+// percentage is the architecture, so it does not move.
+const OUTCOME_BASE = { drafted: 2_460, blocked: 187, learned: 94 };
+
+export function outcomeStats(state: NorthbeamState): OutcomeStat[] {
+  const learned = state.rules.filter((r) => r.learned).length;
+  return [
+    {
+      value: formatCount(OUTCOME_BASE.drafted + state.tally.drafted),
+      label: "assets drafted on-brand",
+      sub: "last 90 days",
+    },
+    {
+      value: formatCount(OUTCOME_BASE.blocked + state.tally.blocked),
+      label: "off-brand requests blocked",
+      sub: "at the guardrail",
+    },
+    {
+      value: formatCount(OUTCOME_BASE.learned + learned),
+      label: "brand rules learned",
+      sub: "from your approvals",
+    },
+    { value: "100%", label: "published assets gated", sub: "by a human" },
+  ];
 }
 
 // --- helpers ---
@@ -275,6 +311,7 @@ export function northbeamReducer(
           current: req.id,
           draft,
           gate: "blocked",
+          tally: { ...state.tally, blocked: state.tally.blocked + 1 },
           feed: log(state.feed, "Brand agent", "blocked an off-brand request", req.title),
         };
       }
@@ -294,6 +331,7 @@ export function northbeamReducer(
         current: req.id,
         draft,
         gate: "pending",
+        tally: { ...state.tally, drafted: state.tally.drafted + 1 },
         feed: log(state.feed, "Brand agent", "drafted an on-brand variant", req.title),
       };
     }
@@ -352,6 +390,7 @@ export function northbeamReducer(
         ...state,
         draft,
         gate: "pending",
+        tally: { ...state.tally, drafted: state.tally.drafted + 1 },
         feed: log(state.feed, "You", "overrode the block", "agent drafted a compliant version"),
       };
     }

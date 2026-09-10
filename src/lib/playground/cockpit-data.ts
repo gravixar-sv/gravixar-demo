@@ -9,6 +9,8 @@
 // hard-coded metric hierarchy (that framing didn't survive verification).
 
 import type { AvatarHue } from "@/components/demo/Avatar";
+import type { OutcomeStat } from "@/components/demo/OutcomePanel";
+import { formatCount, formatMoney } from "./outcomeFormat";
 
 export const FOUNDER = {
   name: "Remi Okafor",
@@ -57,6 +59,8 @@ export type Todo = {
   label: string;
   draft: string;
   source: "inbox" | "money";
+  /** Invoice value chased, carried from the money item this came from. */
+  amountGbp?: number;
   done?: boolean;
   /** Rule the cockpit learns the moment this todo is approved. */
   learnedRule?: RuleSpec;
@@ -69,7 +73,10 @@ export type MoneyItem = {
   id: string;
   label: string;
   sub: string;
+  /** Display string, which carries the sign or the word "watch". */
   amount: string;
+  /** The same figure as a number, where an outcome tile adds it up. */
+  amountGbp?: number;
   direction: "in" | "out";
   flag?: MoneyFlag;
   /** Overdue invoices can be chased → spawns a Today action. */
@@ -166,6 +173,7 @@ const MONEY_SEED: MoneyItem[] = [
     label: "Greenfield Studio",
     sub: "invoice #0042 · 12 days overdue",
     amount: "£1,500",
+    amountGbp: 1_500,
     direction: "in",
     flag: "overdue",
     draft: "Hi, just a friendly nudge that invoice #0042 (£1,500) is now 12 days past due. Could you confirm a payment date? Thanks! Remi",
@@ -222,6 +230,49 @@ function learnRule(rules: Rule[], spec: RuleSpec | undefined): Rule[] {
   return [{ id: nextRuleId(), text: spec.text, kind: spec.kind, learned: true, fresh: true }, ...rules];
 }
 
+// Outcome tiles. Illustrative month-to-date figures for the business,
+// with what this visitor has actually done added on top. Routing a
+// signal is one more email triaged, approving a draft is one more send
+// the founder gated, and the reminder that goes out chases its
+// invoice. Nothing here categorises a transaction, so that tile keeps
+// the overnight baseline.
+const OUTCOME_BASE = {
+  triaged: 312,
+  categorised: 1_940,
+  chasedGbp: 18_600,
+  reminders: 9,
+  approved: 47,
+};
+
+export function outcomeStats(state: CockpitState): OutcomeStat[] {
+  const routed = state.signals.filter((s) => s.routed).length;
+  const sent = state.todos.filter((t) => t.done);
+  const reminders = sent.filter((t) => t.source === "money");
+  const chased = reminders.reduce((sum, t) => sum + (t.amountGbp ?? 0), 0);
+  return [
+    {
+      value: formatCount(OUTCOME_BASE.triaged + routed),
+      label: "emails triaged",
+      sub: "this month",
+    },
+    {
+      value: formatCount(OUTCOME_BASE.categorised),
+      label: "transactions categorised",
+      sub: "overnight",
+    },
+    {
+      value: formatMoney("£", OUTCOME_BASE.chasedGbp + chased),
+      label: "invoices chased & paid",
+      sub: `${formatCount(OUTCOME_BASE.reminders + reminders.length)} reminders sent`,
+    },
+    {
+      value: formatCount(OUTCOME_BASE.approved + sent.length),
+      label: "drafts approved",
+      sub: "you held the gate",
+    },
+  ];
+}
+
 export function cockpitReducer(
   state: CockpitState,
   event: CockpitEvent,
@@ -263,6 +314,7 @@ export function cockpitReducer(
             label: `Send payment reminder · ${m.label}`,
             draft: m.draft,
             source: "money",
+            amountGbp: m.amountGbp,
             learnedRule: m.learnedRule,
             fresh: true,
           },

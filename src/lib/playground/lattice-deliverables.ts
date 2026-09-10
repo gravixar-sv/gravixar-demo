@@ -8,6 +8,8 @@
 //                  └── editing ←──┘  (revision_requested → PM pushes to Editor)
 
 import type { AvatarHue } from "@/components/demo/Avatar";
+import type { OutcomeStat } from "@/components/demo/OutcomePanel";
+import { formatCount, formatMoney } from "./outcomeFormat";
 
 export type RoleKey = "client" | "pm" | "editor";
 
@@ -251,6 +253,46 @@ function transition(
       ...state.feed,
     ],
   };
+}
+
+// Outcome tiles. Illustrative 90-day figures for the studio, with what
+// this visitor has actually done added on top, derived from the state
+// above so the reducer stays the only source of truth. A tile only
+// moves when the scene can genuinely move it: this loop ships
+// deliverables, it does not raise an invoice, pay a commission or book
+// leave, so those three stay at the baseline the rest of the page
+// quotes (see the capability strip in the scene).
+const OUTCOME_BASE = {
+  approved: 1_284,
+  invoicedGbp: 412_000,
+  commissionsGbp: 38_000,
+  leaveRequests: 318,
+};
+
+export function outcomeStats(state: LatticeState): OutcomeStat[] {
+  const shipped = state.deliverables.filter((d) => d.state === "shipped").length;
+  return [
+    {
+      value: formatCount(OUTCOME_BASE.approved + shipped),
+      label: "deliverables approved",
+      sub: "last 90 days",
+    },
+    {
+      value: formatMoney("£", OUTCOME_BASE.invoicedGbp),
+      label: "invoices issued",
+      sub: "12 active retainers",
+    },
+    {
+      value: formatMoney("£", OUTCOME_BASE.commissionsGbp),
+      label: "partner commissions paid",
+      sub: "6 partners, auto-split",
+    },
+    {
+      value: formatCount(OUTCOME_BASE.leaveRequests),
+      label: "leave & WFH requests",
+      sub: "gated + audited",
+    },
+  ];
 }
 
 export function latticeReducer(

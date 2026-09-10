@@ -12,6 +12,7 @@ import {
   FOUNDER,
   cockpitReducer,
   createInitialCockpitState,
+  outcomeStats,
   type CockpitEvent,
   type FeedEntry,
   type MoneyItem,
@@ -118,12 +119,7 @@ export default function FounderCockpit() {
         learnedNote="learned from your approval"
       />
       <OutcomePanel
-        stats={[
-          { value: "312", label: "emails triaged", sub: "this month" },
-          { value: "1,940", label: "transactions categorised", sub: "overnight" },
-          { value: "£18.6k", label: "invoices chased & paid", sub: "9 reminders sent" },
-          { value: "47", label: "drafts approved", sub: "you held the gate" },
-        ]}
+        stats={outcomeStats(state)}
         liveProductLabel="the cockpit I run my own days on"
       />
       <ActivityFeed feed={state.feed} />

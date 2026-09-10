@@ -37,6 +37,7 @@
     "typecheck": "tsc --noEmit",
     "capture": "node scripts/capture.mjs",
     "verify:learn-beat": "node scripts/verify-learn-beat.mjs",
+    "verify:outcomes": "node scripts/verify-outcomes.mjs",
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "tsx --env-file=.env.local prisma/seed.ts",

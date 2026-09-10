@@ -56,9 +56,12 @@ Port **3400** (marketing 3300, bs-hub 3000). Never background the dev
 server.
 
 Gate before any PR: `pnpm typecheck` **and** `pnpm build`. `pnpm lint`
-calls the Next-16-removed `next lint`; run `npx eslint .` instead.
-`pnpm capture` refreshes `public/scenes/*.png` with real headless-Chrome
-captures. `pnpm verify:learn-beat` asserts all 5 scenes learn on approve.
+runs `eslint .` (it called the Next-16-removed `next lint` until PR
+#53). `pnpm capture` refreshes `public/scenes/*.png` with real
+headless-Chrome captures. `pnpm verify:learn-beat` asserts all 5 scenes
+learn on approve, and `pnpm verify:outcomes` asserts all 5 move their
+outcome tiles on the visitor's own clicks and rewind them on reset.
+Both take the base URL as an argument (`... http://localhost:3400`).
 
 ## Scenes
 
@@ -100,7 +103,7 @@ src/
   lib/
     scenes.ts                  # scene registry (mirrored contract)
     modules.ts                 # 12 module manifest
-    playground/*-data.ts       # per-scene reducers + fixtures
+    playground/*-data.ts       # per-scene reducers + fixtures + outcomeStats()
     useReveal.ts               # the reveal hook, see motion rules
     flowPulse.ts, gsap.ts      # transient cross-column cue
 prisma/schema.prisma           # single file, inert
@@ -177,7 +180,12 @@ scripts/capture.mjs            # pnpm capture
   `data-hint="true"` (`useStartHint`) until the first click anywhere in
   the workspace. Pills and counts that change remount with a `key` and
   `.pop-in`. `OutcomePanel` numbers count up via `CountUp`, which
-  renders the final value server-side.
+  renders the final value server-side; each tile is derived from the
+  scene's own reducer (`outcomeStats(state)`, next to that reducer), so
+  a number the visitor's click moves pops rather than counting again.
+  Only tiles a scene can genuinely move are derived. The rest hold the
+  baseline, because a number that moves for no reason is the same lie
+  as one that never moves.
 - Environment gotcha: the in-app preview browser **never advances CSS
   transitions**, which pins transitioned properties at their start value
   and makes computed-style checks read as broken. Verify transforms with
@@ -187,7 +195,9 @@ scripts/capture.mjs            # pnpm capture
 
 UI repeated across scenes lives in one component, not five copies:
 `LearnBeat` (+ `RuleRow`), `OutcomePanel`, `DeliverableMockup`,
-`formatRelative`. Scene-specific variation goes through props. On record
+`formatRelative`, `playground/outcomeFormat` (scenes do outcome
+arithmetic on numbers and format at the edge, never by taking a
+formatted value like "£412k" apart). Scene-specific variation goes through props. On record
 exception: Brand Guardian keeps an inline rule column, because its rules
 *are* a column and `BrandRule.learned` does not satisfy `LearnedRule`.
 

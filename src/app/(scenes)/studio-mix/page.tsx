@@ -12,10 +12,13 @@ import {
   type StudioAgent,
 } from "@/lib/playground/studio-script";
 import {
+  agentsRun,
   createInitialStudioState,
+  outcomeStats,
   studioReducer,
   type GateState,
   type StudioEvent,
+  type StudioState,
 } from "@/lib/playground/studio-reducer";
 import type { AuditEntry } from "@/lib/playground/reducer";
 import { SceneCTA } from "@/components/demo/SceneCTA";
@@ -77,12 +80,12 @@ export default function StudioMixPlayground() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          {state.ran.length > 0 ? (
+          {agentsRun(state) > 0 ? (
             <span
-              key={state.ran.length}
+              key={agentsRun(state)}
               className="pop-in inline-block font-mono text-[10px] uppercase tracking-[0.18em] tabular-nums text-zinc-500"
             >
-              {state.ran.length}/4 agents run
+              {agentsRun(state)}/4 agents run
             </span>
           ) : null}
           <button
@@ -102,7 +105,7 @@ export default function StudioMixPlayground() {
       >
         <AgentsColumn
           currentKey={state.current}
-          ran={state.ran}
+          runs={state.runs}
           hint={hint}
           onRun={(key) => dispatch({ type: "RUN", key })}
         />
@@ -119,12 +122,7 @@ export default function StudioMixPlayground() {
         learnedNote="learned from your call"
       />
       <OutcomePanel
-        stats={[
-          { value: "9,640", label: "drafts generated", sub: "all gated" },
-          { value: "94%", label: "approved as-is", sub: "after a human read" },
-          { value: "1,120", label: "candidates assessed", sub: "human decides" },
-          { value: "0", label: "auto-publishes", sub: "by design" },
-        ]}
+        stats={outcomeStats(state)}
         liveProductLabel="the AI layer I ship"
       />
 
@@ -186,12 +184,12 @@ function ColumnShell({
 
 function AgentsColumn({
   currentKey,
-  ran,
+  runs,
   hint,
   onRun,
 }: {
   currentKey: string | null;
-  ran: string[];
+  runs: StudioState["runs"];
   /** "Start here" ring on the first agent's run button. */
   hint: boolean;
   onRun: (key: StudioAgent["key"]) => void;
@@ -205,7 +203,7 @@ function AgentsColumn({
       <ul className="space-y-2.5">
         {STUDIO_AGENTS.map((agent, i) => {
           const isCurrent = currentKey === agent.key;
-          const hasRun = ran.includes(agent.key);
+          const hasRun = runs[agent.key] > 0;
           return (
             <li
               key={agent.key}

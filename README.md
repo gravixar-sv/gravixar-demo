@@ -88,9 +88,10 @@ Open http://localhost:3400.
 | `pnpm build` | Production build. |
 | `pnpm capture` | Real headless-Chrome page captures with a scroll walk, into `public/scenes/`. Gives the page wall-clock time so viewport reveals and the WebGL field render the way a visitor sees them. |
 | `pnpm verify:learn-beat` | Asserts all 5 scenes grow a rule on approval. |
+| `pnpm verify:outcomes` | Asserts all 5 scenes move their outcome tiles on the visitor's own clicks, hold the tiles they cannot move, and rewind on reset. |
 
-`pnpm lint` calls `next lint`, which Next 16 removed. Run `npx eslint .`
-instead.
+Both `verify:` scripts drive real headless Chrome and take the base URL
+as an argument, e.g. `pnpm verify:outcomes http://localhost:3400`.
 
 ## House rules
 

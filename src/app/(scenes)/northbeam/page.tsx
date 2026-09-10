@@ -11,6 +11,7 @@ import { useEffect, useRef } from "react";
 import {
   createInitialNorthbeamState,
   northbeamReducer,
+  outcomeStats,
   type AuditEntry,
   type BrandRequest,
   type BrandRule,
@@ -131,12 +132,7 @@ export default function NorthbeamBrandAgent() {
       </div>
 
       <OutcomePanel
-        stats={[
-          { value: "2,460", label: "assets drafted on-brand", sub: "last 90 days" },
-          { value: "187", label: "off-brand requests blocked", sub: "at the guardrail" },
-          { value: "94", label: "brand rules learned", sub: "from your approvals" },
-          { value: "100%", label: "published assets gated", sub: "by a human" },
-        ]}
+        stats={outcomeStats(state)}
         liveProductLabel="the brand agent I ship"
       />
       <AuditTrail feed={state.feed} />

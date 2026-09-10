@@ -16,6 +16,7 @@ import {
   PERSONAS,
   createInitialLatticeState,
   latticeReducer,
+  outcomeStats,
   type Deliverable,
   type FeedEntry,
   type Persona,
@@ -167,12 +168,7 @@ export default function LatticeReviewLoop() {
         )}
       />
       <OutcomePanel
-        stats={[
-          { value: "1,284", label: "deliverables approved", sub: "last 90 days" },
-          { value: "£412k", label: "invoices issued", sub: "12 active retainers" },
-          { value: "£38k", label: "partner commissions paid", sub: "6 partners, auto-split" },
-          { value: "318", label: "leave & WFH requests", sub: "gated + audited" },
-        ]}
+        stats={outcomeStats(state)}
         liveProductLabel="the agency OS I run"
       />
       <ActivityFeed feed={state.feed} />

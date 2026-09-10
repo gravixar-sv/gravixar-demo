@@ -20,6 +20,9 @@
 // All data here is illustrative sample data: no real patient, provider,
 // or clinic information, and no real names.
 
+import type { OutcomeStat } from "@/components/demo/OutcomePanel";
+import { formatAmount, formatCount, formatMoney } from "./outcomeFormat";
+
 export type RuleKind = "do" | "dont";
 export type RuleSpec = { text: string; kind: RuleKind };
 export type Rule = RuleSpec & {
@@ -49,7 +52,9 @@ export type BillingItem = {
   id: string;
   label: string;
   detail: string;
-  amount?: string;
+  /** Claim value in whole dollars. Formatted for display at the edge,
+   *  so the finance and outcome tiles can add it up as a number. */
+  amountUsd?: number;
   state: "pending" | "approved";
   source: "credentialing" | "claims";
   learnedRule?: RuleSpec;
@@ -85,7 +90,6 @@ export type AuditEntry = {
 export type CareLedgerState = {
   providers: Provider[];
   billing: BillingItem[];
-  finance: FinanceTile[];
   deals: Deal[];
   rules: Rule[];
   feed: AuditEntry[];
@@ -135,7 +139,7 @@ const BILLING_SEED: BillingItem[] = [
     id: "b-batch",
     label: "Claim batch · week 24",
     detail: "118 claims · CPT/ICD codes only, no PHI",
-    amount: "$84,200",
+    amountUsd: 84_200,
     state: "pending",
     source: "claims",
     learnedRule: {
@@ -143,11 +147,6 @@ const BILLING_SEED: BillingItem[] = [
       kind: "do",
     },
   },
-];
-
-const FINANCE_SEED: FinanceTile[] = [
-  { id: "f-paid", label: "Collected", value: "$612k", sub: "this quarter" },
-  { id: "f-ar", label: "In A/R", value: "$148k", sub: "32 days avg" },
 ];
 
 const DEALS_SEED: Deal[] = [
@@ -191,7 +190,6 @@ export function createInitialCareLedgerState(): CareLedgerState {
   return {
     providers: PROVIDERS_SEED.map((p) => ({ ...p, creds: p.creds.map((c) => ({ ...c })) })),
     billing: BILLING_SEED.map((b) => ({ ...b })),
-    finance: FINANCE_SEED.map((f) => ({ ...f })),
     deals: DEALS_SEED.map((d) => ({ ...d })),
     rules: RULES_SEED.map((r) => ({ ...r })),
     feed: FEED_SEED.map((f) => ({
@@ -220,6 +218,72 @@ function learnRule(rules: Rule[], spec: RuleSpec | undefined): Rule[] {
   if (!spec) return rules;
   if (rules.some((r) => r.text.toLowerCase() === spec.text.toLowerCase())) return rules;
   return [{ id: nextId("cl"), text: spec.text, kind: spec.kind, learned: true, fresh: true }, ...rules];
+}
+
+// ── projections ────────────────────────────────────────────────────
+// Illustrative network-wide figures, with what this visitor has done
+// added on top. Both the finance column and the outcome panel read
+// them from here, so a claim batch you approve moves the same money in
+// both places instead of the two disagreeing on one screen.
+
+const OUTCOME_BASE = {
+  credentialed: 1_420,
+  collectedUsd: 612_000,
+  arUsd: 148_000,
+  clinics: 9,
+};
+
+const SEED_CREDENTIALED = PROVIDERS_SEED.filter((p) => p.status === "credentialed").length;
+const SEED_LIVE_CLINICS = DEALS_SEED.filter((d) => d.stage === "live").length;
+
+/** Claim money this visitor has put through the gate. */
+function approvedClaimsUsd(state: CareLedgerState): number {
+  return state.billing
+    .filter((b) => b.state === "approved" && b.source === "claims")
+    .reduce((sum, b) => sum + (b.amountUsd ?? 0), 0);
+}
+
+export function financeTiles(state: CareLedgerState): FinanceTile[] {
+  const cleared = approvedClaimsUsd(state);
+  return [
+    {
+      id: "f-paid",
+      label: "Collected",
+      value: formatMoney("$", OUTCOME_BASE.collectedUsd + cleared),
+      sub: "this quarter",
+    },
+    {
+      id: "f-ar",
+      label: "In A/R",
+      value: formatMoney("$", Math.max(0, OUTCOME_BASE.arUsd - cleared)),
+      sub: "32 days avg",
+    },
+  ];
+}
+
+export function outcomeStats(state: CareLedgerState): OutcomeStat[] {
+  const credentialed =
+    state.providers.filter((p) => p.status === "credentialed").length - SEED_CREDENTIALED;
+  const clinics = state.deals.filter((d) => d.stage === "live").length - SEED_LIVE_CLINICS;
+  return [
+    {
+      value: formatCount(OUTCOME_BASE.credentialed + credentialed),
+      label: "providers credentialed",
+      sub: "across the network",
+    },
+    {
+      value: formatMoney("$", OUTCOME_BASE.collectedUsd + approvedClaimsUsd(state)),
+      label: "claims collected",
+      sub: "this quarter",
+    },
+    {
+      value: formatCount(OUTCOME_BASE.clinics + clinics),
+      label: "clinics onboarded",
+      sub: "Zoom-first pipeline",
+    },
+    // Stays 0. That is the architecture, not a number waiting to grow.
+    { value: "0", label: "PHI records stored", sub: "isolated by design" },
+  ];
 }
 
 const STAGE_ORDER: DealStage[] = ["discovery", "demo", "contract", "live"];
@@ -291,7 +355,7 @@ export function careLedgerReducer(
           state.feed,
           "You",
           b.source === "claims" ? "approved + submitted a claim batch" : "approved billing enablement",
-          b.amount ? `${b.label} · ${b.amount}` : b.label,
+          b.amountUsd ? `${b.label} · ${formatAmount("$", b.amountUsd)}` : b.label,
         ),
       };
     }

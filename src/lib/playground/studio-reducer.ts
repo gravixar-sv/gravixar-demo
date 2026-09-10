@@ -11,6 +11,8 @@ import {
   type StudioRuleSpec,
 } from "./studio-script";
 import type { AuditEntry } from "./reducer";
+import type { OutcomeStat } from "@/components/demo/OutcomePanel";
+import { formatCount } from "./outcomeFormat";
 
 // Gate state for the current output. Writer agents (ECHO) produce a
 // draft that waits for a human; read-only agents complete autonomously.
@@ -29,8 +31,10 @@ export type StudioState = {
   current: StudioAgentKey | null;
   /** Approval state of the current output. */
   gate: GateState;
-  /** Keys that have been run at least once (for the "ran" chip). */
-  ran: StudioAgentKey[];
+  /** How many times each agent has been run this session. Drives the
+   *  "ran" chip, and the outcome tiles, which count every run rather
+   *  than only the first (running ECHO twice drafts twice). */
+  runs: Record<StudioAgentKey, number>;
   /** House rules + rules learned from approve/discard moments. */
   rules: Rule[];
   /** Shared run feed (newest first). */
@@ -71,10 +75,40 @@ export function createInitialStudioState(): StudioState {
   return {
     current: null,
     gate: "autonomous",
-    ran: [],
+    runs: { echo: 0, pulse: 0, river: 0, atlas: 0 },
     rules: RULES_SEED.map((r) => ({ ...r })),
     feed: seed,
   };
+}
+
+/** Agents run at least once, for the "N/4 agents run" chip. */
+export function agentsRun(state: StudioState): number {
+  return Object.values(state.runs).filter((n) => n > 0).length;
+}
+
+// Outcome tiles. Illustrative figures for the studio, with this
+// visitor's own runs added on top. ECHO is the only writer agent, so
+// it is the only one that generates a draft, and RIVER is the screener
+// behind "candidates assessed". PULSE watches and ATLAS reviews, so
+// neither has a tile to move. The two zero-and-percentage tiles are
+// the architecture, not counters.
+const OUTCOME_BASE = { drafts: 9_640, assessed: 1_120 };
+
+export function outcomeStats(state: StudioState): OutcomeStat[] {
+  return [
+    {
+      value: formatCount(OUTCOME_BASE.drafts + state.runs.echo),
+      label: "drafts generated",
+      sub: "all gated",
+    },
+    { value: "94%", label: "approved as-is", sub: "after a human read" },
+    {
+      value: formatCount(OUTCOME_BASE.assessed + state.runs.river),
+      label: "candidates assessed",
+      sub: "human decides",
+    },
+    { value: "0", label: "auto-publishes", sub: "by design" },
+  ];
 }
 
 function nextId(): string {
@@ -114,9 +148,7 @@ export function studioReducer(
       return {
         current: event.key,
         gate: gated ? "pending" : "autonomous",
-        ran: state.ran.includes(event.key)
-          ? state.ran
-          : [...state.ran, event.key],
+        runs: { ...state.runs, [event.key]: state.runs[event.key] + 1 },
         rules: state.rules,
         feed: [row, ...state.feed],
       };

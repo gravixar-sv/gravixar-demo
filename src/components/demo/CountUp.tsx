@@ -9,10 +9,25 @@
 // so with scripting off, reduced motion, or a throttled rAF the real
 // number is what's on the page. The count is a flourish layered on top
 // and a rescue timer snaps to the final value if the ticker stalls.
+//
+// A value that CHANGES after that first count is the visitor's own
+// click landing (the outcome tiles are derived from the scene's
+// reducer). It pops rather than counting again: tweening 1,284 to
+// 1,285 is invisible for most of a second and then steps, which reads
+// as a glitch, and `.pop-in` is already how a count that changed
+// announces itself everywhere else in a scene.
 
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
+
+import { cn } from "@/lib/cn";
 
 const DURATION_MS = 1100;
+
+// useLayoutEffect so a changed value pops from the frame it lands on,
+// with no flash of the settled number first. It has no server pass, so
+// fall back to useEffect there to keep React quiet.
+const useIsomorphicLayoutEffect =
+  typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 function parse(value: string) {
   const m = /^([^\d]*)(\d[\d,]*(?:\.\d+)?)(.*)$/.exec(value);
@@ -33,6 +48,13 @@ function format(n: number, grouped: boolean, decimals: number) {
   return frac ? `${withCommas}.${frac}` : withCommas;
 }
 
+/** Restart `.pop-in` on an element that may already be carrying it. */
+function pop(el: HTMLElement) {
+  el.classList.remove("pop-in");
+  el.getBoundingClientRect(); // reflow, so a repeat bump animates again
+  el.classList.add("pop-in");
+}
+
 export function CountUp({
   value,
   className,
@@ -41,10 +63,23 @@ export function CountUp({
   className?: string;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
+  /** The value the element has settled on, once it has counted up. */
+  const counted = useRef<string | null>(null);
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
+
+    // Already counted once: React has written the new number, so the
+    // page is correct either way. Just draw attention to it.
+    if (counted.current !== null) {
+      if (counted.current === value) return;
+      counted.current = value;
+      el.textContent = value;
+      pop(el);
+      return;
+    }
+
     const parsed = parse(value);
     if (!parsed || parsed.n === 0) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -64,6 +99,9 @@ export function CountUp({
     const run = () => {
       if (started) return;
       started = true;
+      // From here on the element owns its own text, and a later change
+      // to `value` pops instead of counting.
+      counted.current = value;
       const t0 = performance.now();
       const frame = (now: number) => {
         const t = Math.min(1, (now - t0) / DURATION_MS);
@@ -96,8 +134,10 @@ export function CountUp({
     };
   }, [value]);
 
+  // inline-block so the pop's transform applies, and so a formatted
+  // number never breaks across two lines.
   return (
-    <span ref={ref} className={className}>
+    <span ref={ref} className={cn("inline-block", className)}>
       {value}
     </span>
   );

@@ -15,6 +15,8 @@ import {
   STAGE_LABEL,
   careLedgerReducer,
   createInitialCareLedgerState,
+  financeTiles,
+  outcomeStats,
   type BillingItem,
   type CareLedgerEvent,
   type Deal,
@@ -22,6 +24,7 @@ import {
   type Provider,
   type AuditEntry,
 } from "@/lib/playground/care-ledger-data";
+import { formatAmount } from "@/lib/playground/outcomeFormat";
 import { SceneCTA } from "@/components/demo/SceneCTA";
 import { OutcomePanel } from "@/components/demo/OutcomePanel";
 import { LearnBeat } from "@/components/demo/LearnBeat";
@@ -117,7 +120,7 @@ export default function CareLedgerPortal() {
         {/* Finance / billing */}
         <Col label="Finance · billing" status="behind an approval gate" flow="cl-billing">
           <div className="grid grid-cols-2 gap-2">
-            {state.finance.map((f) => (
+            {financeTiles(state).map((f) => (
               <FinanceCard key={f.id} tile={f} />
             ))}
           </div>
@@ -156,12 +159,7 @@ export default function CareLedgerPortal() {
         emptyText="Credential a provider or approve a claim batch and the portal starts a policy book."
       />
       <OutcomePanel
-        stats={[
-          { value: "1,420", label: "providers credentialed", sub: "across the network" },
-          { value: "$612k", label: "claims collected", sub: "this quarter" },
-          { value: "9", label: "clinics onboarded", sub: "Zoom-first pipeline" },
-          { value: "0", label: "PHI records stored", sub: "isolated by design" },
-        ]}
+        stats={outcomeStats(state)}
         liveProductLabel="the billing portal I shipped"
       />
       <AuditTrail feed={state.feed} />
@@ -376,8 +374,10 @@ function BillingCard({
     >
       <div className="flex items-start justify-between gap-2">
         <p className="text-sm font-medium text-zinc-100">{item.label}</p>
-        {item.amount ? (
-          <span className="shrink-0 font-mono text-[11px] text-[var(--color-scene-1)]">{item.amount}</span>
+        {item.amountUsd ? (
+          <span className="shrink-0 font-mono text-[11px] text-[var(--color-scene-1)]">
+            {formatAmount("$", item.amountUsd)}
+          </span>
         ) : null}
       </div>
       <p className="mt-1 text-[11px] leading-relaxed text-zinc-400">{item.detail}</p>

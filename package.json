@@ -82,7 +82,7 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@types/three": "^0.184.1",
-    "@vercel/config": "^0.5.5",
+    "@vercel/config": "^0.7.0",
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.2.10",
     "prisma": "^7.8.0",

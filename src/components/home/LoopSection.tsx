@@ -1,4 +1,3 @@
-"use client";
 
 // "Every scene runs the same loop" — the four beats of the approval
 // loop, told as a scroll-driven story. The beats scroll on the left;
@@ -69,82 +68,75 @@ export function LoopSection() {
             onToggle: (self) => self.isActive && setActive(i),
           }),
         );
-        return () => triggers.forEach((t) => t.kill());
+        // The rail fills as the beats scroll past (scrubbed scaleY).
+        const fill = gsap.fromTo(
+          "[data-rail-fill]",
+          { scaleY: 0 },
+          {
+            scaleY: 1,
+            ease: "none",
+            scrollTrigger: { trigger: "[data-beats]", start: "top 55%", end: "bottom 55%", scrub: 0.3 },
+          },
+        );
+        return () => {
+          triggers.forEach((t) => t.kill());
+          fill.scrollTrigger?.kill();
+          fill.kill();
+        };
       });
     },
     { scope },
   );
 
   return (
-    <section
-      id="loop"
-      ref={scope}
-      className="relative border-t border-white/5"
-      aria-labelledby="loop-heading"
-    >
-      <div className="mx-auto max-w-7xl px-6 py-24 md:px-10 md:py-32 lg:px-12">
-        <header data-reveal className="max-w-2xl">
-          <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--color-scene-1)]">
-            the loop
-          </p>
-          <h2
-            id="loop-heading"
-            className="mt-4 text-3xl font-medium leading-[1.06] tracking-[-0.03em] text-zinc-50 md:text-5xl"
-          >
+    <section id="loop" ref={scope} className="relative scroll-mt-14 border-t border-line" aria-labelledby="loop-heading">
+      <div className="mx-auto max-w-[1440px] px-4 py-24 sm:px-6 md:py-32 lg:px-10">
+        <header data-reveal className="max-w-3xl">
+          <p className="eyebrow">The loop</p>
+          <h2 id="loop-heading" className="display mt-4 text-4xl text-ink-50 md:text-6xl">
             Every scene runs the same loop.
           </h2>
-          <p className="mt-4 max-w-xl text-base leading-relaxed text-zinc-400">
-            Different buyers, different workflows, one spine. Scroll it once
-            here, then go run it for real in any scene.
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-ink-400">
+            Different buyers, different workflows, one spine. Scroll it once here, then go run it for real in any
+            scene.
           </p>
         </header>
 
-        <div className="mt-16 grid gap-10 lg:grid-cols-[1fr_1.05fr] lg:gap-16">
-          {/* Beats */}
-          <ol className="relative">
-            {/* progress rail */}
-            <div
-              aria-hidden
-              className="absolute bottom-6 left-[7px] top-2 hidden w-px bg-white/8 lg:block"
-            />
+        <div className="mt-16 grid gap-10 lg:grid-cols-[1fr_1.05fr] lg:gap-20">
+          <ol data-beats className="relative">
+            <div aria-hidden className="absolute bottom-10 left-[11px] top-3 hidden w-px bg-white/[0.08] lg:block">
+              <div data-rail-fill className="h-full w-full origin-top scale-y-0 bg-scene" />
+            </div>
             {BEATS.map((beat, i) => (
-              <li
-                key={beat.key}
-                data-beat={beat.key}
-                data-reveal className="relative py-8 first:pt-0 lg:py-14 lg:pl-12"
-              >
+              <li key={beat.key} data-beat={beat.key} data-reveal className="relative py-8 first:pt-0 lg:py-16 lg:pl-16">
                 <span
                   aria-hidden
-                  className={`absolute left-0 top-9 hidden h-[15px] w-[15px] rounded-full border transition-colors duration-300 first:top-1 lg:block ${
+                  className={`absolute left-0 hidden h-[23px] w-[23px] items-center justify-center rounded-full border font-mono text-[10px] transition-[background-color,border-color,color] duration-300 lg:flex ${
+                    i === 0 ? "-top-1" : "top-[3.72rem]"
+                  } ${
                     active === i
-                      ? "border-[var(--color-scene-1)] bg-[var(--color-scene-1)]/20"
-                      : "border-zinc-700 bg-[#050508]"
-                  }`}
-                  style={i === 0 ? { top: "0.35rem" } : undefined}
-                />
-                <p
-                  className={`font-mono text-[10px] uppercase tracking-[0.22em] transition-colors duration-300 ${
-                    active === i ? "text-[var(--color-scene-1)]" : "text-zinc-500"
+                      ? "border-[var(--color-scene-1)] bg-scene text-ink-950"
+                      : active > i
+                        ? "border-[var(--color-scene-1)] bg-ink-950 text-scene-soft"
+                        : "border-ink-700 bg-ink-950 text-ink-500"
                   }`}
                 >
-                  {beat.index}
+                  {i + 1}
+                </span>
+                <p className={`label-mono transition-colors duration-300 ${active === i ? "!text-scene-soft" : ""}`}>
+                  Beat {beat.index}
                 </p>
                 <h3
-                  className={`mt-2 text-2xl font-medium tracking-[-0.02em] transition-colors duration-300 md:text-3xl ${
-                    active === i ? "text-zinc-50" : "text-zinc-400"
+                  className={`heading mt-3 text-3xl transition-colors duration-300 md:text-4xl ${
+                    active === i ? "text-ink-50" : "text-ink-400"
                   }`}
                 >
                   {beat.title}
                 </h3>
-                <p className="mt-3 max-w-md text-sm leading-relaxed text-zinc-400 md:text-base">
-                  {beat.body}
-                </p>
-                <p className="mt-4 flex flex-wrap gap-2">
+                <p className="mt-4 max-w-md text-base leading-relaxed text-ink-400">{beat.body}</p>
+                <p className="mt-5 flex flex-wrap gap-2">
                   {beat.sceneTags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full border border-white/10 px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-500"
-                    >
+                    <span key={tag} className="chip">
                       {tag}
                     </span>
                   ))}
@@ -158,9 +150,8 @@ export function LoopSection() {
             ))}
           </ol>
 
-          {/* Sticky console, desktop only */}
           <div className="relative hidden lg:block">
-            <div className="sticky top-24">
+            <div className="sticky top-28">
               <LoopConsole step={active} />
             </div>
           </div>
@@ -178,19 +169,24 @@ export function LoopSection() {
 
 function LoopConsole({ step }: { step: number }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a10] shadow-[0_32px_64px_-28px_rgba(0,0,0,0.8)]">
-      <div className="flex items-center gap-3 border-b border-white/5 px-5 py-3.5">
-        <span className="flex items-center gap-1.5" aria-hidden>
-          <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]/85" />
-          <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]/85" />
-          <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]/85" />
-        </span>
-        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
-          the loop · beat {String(step + 1).padStart(2, "0")} of 04
-        </span>
+    <div className="frame overflow-hidden rounded-[22px]">
+      <div className="flex items-center gap-3 border-b border-line bg-white/[0.015] px-5 py-3.5">
+        <span aria-hidden className="live-dot text-scene" />
+        <span className="text-[13px] font-semibold text-ink-100">The loop</span>
+        <span className="label-mono ml-auto">beat {String(step + 1).padStart(2, "0")} / 04</span>
+      </div>
+      <div aria-hidden className="flex gap-1 px-5 pt-4">
+        {[0, 1, 2, 3].map((i) => (
+          <span key={i} className="h-[3px] flex-1 overflow-hidden rounded-full bg-white/[0.06]">
+            <span
+              className="block h-full origin-left rounded-full bg-scene transition-transform duration-500"
+              style={{ transform: `scaleX(${i <= step ? 1 : 0})` }}
+            />
+          </span>
+        ))}
       </div>
 
-      <div className="relative min-h-[330px] p-5 md:min-h-[360px]">
+      <div className="relative min-h-[340px] p-5 md:min-h-[370px]">
         <ConsoleArrive on={step === 0} />
         <ConsoleDraft on={step === 1} />
         <ConsoleGate on={step === 2} />
@@ -228,16 +224,14 @@ function Row({
 }) {
   const toneCls =
     tone === "accent"
-      ? "border-[var(--color-scene-1)]/35 bg-[var(--color-scene-1)]/[0.06]"
+      ? "border-[color-mix(in_oklab,var(--color-scene-1)_35%,transparent)] bg-[color-mix(in_oklab,var(--color-scene-1)_7%,transparent)]"
       : tone === "ok"
         ? "border-emerald-400/25 bg-emerald-400/[0.05]"
-        : "border-white/8 bg-white/[0.02]";
+        : "border-line bg-white/[0.02]";
   return (
-    <div className={`flex items-center justify-between gap-3 rounded-lg border px-3.5 py-2.5 ${toneCls}`}>
-      <span className="truncate text-xs text-zinc-200">{label}</span>
-      <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-500">
-        {meta}
-      </span>
+    <div className={`flex items-center justify-between gap-3 rounded-xl border px-3.5 py-2.5 ${toneCls}`}>
+      <span className="truncate text-[13px] text-ink-200">{label}</span>
+      <span className="label-mono shrink-0">{meta}</span>
     </div>
   );
 }
@@ -245,7 +239,7 @@ function Row({
 function ConsoleArrive({ on }: { on: boolean }) {
   return (
     <Panel on={on}>
-      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
+      <p className="label-mono">
         overnight · unsorted
       </p>
       <div className="loop-rows mt-3 space-y-2">
@@ -255,7 +249,7 @@ function ConsoleArrive({ on }: { on: boolean }) {
         <Row tone="neutral" label="9 newsletters, 3 receipts" meta="noise" />
         <Row tone="neutral" label="New lead: agency, 12 seats" meta="form" />
       </div>
-      <p className="mt-4 text-[11px] leading-relaxed text-zinc-400">
+      <p className="mt-4 text-xs leading-relaxed text-ink-400">
         Nothing triaged yet. This is the pile.
       </p>
     </Panel>
@@ -265,7 +259,7 @@ function ConsoleArrive({ on }: { on: boolean }) {
 function ConsoleDraft({ on }: { on: boolean }) {
   return (
     <Panel on={on}>
-      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
+      <p className="label-mono">
         agent pass · 06:00
       </p>
       <div className="loop-rows mt-3 space-y-2">
@@ -275,7 +269,7 @@ function ConsoleDraft({ on }: { on: boolean }) {
         <Row tone="neutral" label="Noise auto-filed, 12 items" meta="filed" />
         <Row tone="accent" label="Lead qualified + summary written" meta="draft" />
       </div>
-      <p className="mt-4 text-[11px] leading-relaxed text-zinc-400">
+      <p className="mt-4 text-xs leading-relaxed text-ink-400">
         The 80% is done. None of it has shipped.
       </p>
     </Panel>
@@ -285,7 +279,7 @@ function ConsoleDraft({ on }: { on: boolean }) {
 function ConsoleGate({ on }: { on: boolean }) {
   return (
     <Panel on={on}>
-      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
+      <p className="label-mono">
         waiting on you · 3 items
       </p>
       <div className="loop-rows mt-3 space-y-2">
@@ -294,14 +288,12 @@ function ConsoleGate({ on }: { on: boolean }) {
         <Row tone="accent" label="Lead reply + calendar link" meta="approve?" />
       </div>
       <div className="mt-4 flex gap-2">
-        <span className="rounded-lg border border-emerald-400/30 bg-emerald-400/10 px-3 py-1.5 text-xs font-medium text-emerald-200">
-          Approve
-        </span>
-        <span className="rounded-lg border border-white/10 px-3 py-1.5 text-xs text-zinc-400">
-          Send back
-        </span>
+        {/* Pictures of the scenes' buttons, not controls: this console is
+            a diagram, so they are spans and nothing can be pressed. */}
+        <span className="btn btn-positive btn-sm pointer-events-none">Approve</span>
+        <span className="btn btn-quiet btn-sm pointer-events-none">Send back</span>
       </div>
-      <p className="mt-4 text-[11px] leading-relaxed text-zinc-400">
+      <p className="mt-4 text-xs leading-relaxed text-ink-400">
         Outbound, money, and publishing all stop here. Every decision lands
         in an append-only audit trail.
       </p>
@@ -312,7 +304,7 @@ function ConsoleGate({ on }: { on: boolean }) {
 function ConsoleLearn({ on }: { on: boolean }) {
   return (
     <Panel on={on}>
-      <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500">
+      <p className="label-mono">
         rulebook · learned from you
       </p>
       <div className="loop-rows mt-3 space-y-2">
@@ -321,7 +313,7 @@ function ConsoleLearn({ on }: { on: boolean }) {
         <Row tone="neutral" label="✓ Writer agents never auto-publish" meta="house" />
         <Row tone="neutral" label="✗ No discount language in spring drop" meta="house" />
       </div>
-      <p className="mt-4 text-[11px] leading-relaxed text-zinc-400">
+      <p className="mt-4 text-xs leading-relaxed text-ink-400">
         Two new rules from today&apos;s approvals. Tomorrow&apos;s drafts
         start from them.
       </p>

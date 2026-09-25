@@ -1,4 +1,3 @@
-"use client";
 
 // Daily check-in widget. Visitor picks their own status (first row in
 // the team grid), watches the team count update. The other 5 rows are

@@ -1,4 +1,3 @@
-"use client";
 
 // Audit log + safe-restore demo. Visitor edits a project's name, sees
 // an UPDATE row land in the audit log, then clicks restore to revert.

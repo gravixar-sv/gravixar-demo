@@ -21,6 +21,7 @@
 // or clinic information, and no real names.
 
 import type { OutcomeStat } from "@/components/demo/OutcomePanel";
+import type { TryStep } from "@/components/demo/SceneIntro";
 import { formatAmount, formatCount, formatMoney } from "./outcomeFormat";
 
 export type RuleKind = "do" | "dont";
@@ -294,6 +295,35 @@ const STAGE_LABEL: Record<DealStage, string> = {
   live: "Live",
 };
 export { STAGE_LABEL };
+
+// ── try the loop ───────────────────────────────────────────────────
+// The scene's promise, "credential a provider, enable billing, close
+// the clinic deal", as a live checklist. Each step reads the reducer's
+// own state and ticks only for something the visitor did: no seeded
+// provider is credentialed, no billing enablement exists until one is
+// credentialed, and no seeded deal starts at "contract" or later
+// unless it was already live (Lakeshore, excluded by comparing stages).
+
+const SEED_STAGE = new Map(DEALS_SEED.map((d) => [d.id, d.stage]));
+const CONTRACT_IDX = STAGE_ORDER.indexOf("contract");
+
+export function trySteps(state: CareLedgerState): TryStep[] {
+  const credentialed = state.providers.some((p) => p.status === "credentialed");
+  const billingEnabled = state.billing.some((b) => b.source === "credentialing" && b.state === "approved");
+  const dealClosed = state.deals.some((d) => {
+    const seed = SEED_STAGE.get(d.id);
+    return (
+      seed !== undefined &&
+      STAGE_ORDER.indexOf(seed) < CONTRACT_IDX &&
+      STAGE_ORDER.indexOf(d.stage) >= CONTRACT_IDX
+    );
+  });
+  return [
+    { label: "Verify and credential a provider", done: credentialed },
+    { label: "Approve their billing at the gate", done: billingEnabled },
+    { label: "Close a clinic deal", done: dealClosed },
+  ];
+}
 
 // ── reducer ────────────────────────────────────────────────────────
 

@@ -10,6 +10,7 @@
 
 import type { DeliverableKind } from "@/lib/playground/lattice-deliverables";
 import type { OutcomeStat } from "@/components/demo/OutcomePanel";
+import type { TryStep } from "@/components/demo/SceneIntro";
 import { formatCount } from "./outcomeFormat";
 
 export type RuleKind = "do" | "dont";
@@ -256,6 +257,23 @@ export function outcomeStats(state: NorthbeamState): OutcomeStat[] {
       sub: "from your approvals",
     },
     { value: "100%", label: "published assets gated", sub: "by a human" },
+  ];
+}
+
+// The scene's "Try the loop" checklist. Each step reads the reducer's
+// own state and can only tick from the visitor's click: the seeded feed
+// entries are excluded, the tally starts at zero, and no seeded rule is
+// `learned`, so all three are false at the initial state and on RESET.
+const SEED_FEED_IDS = new Set(FEED_SEED.map((f) => f.id));
+
+export function trySteps(state: NorthbeamState): TryStep[] {
+  const drafted = state.feed.some(
+    (e) => !SEED_FEED_IDS.has(e.id) && e.action === "drafted an on-brand variant",
+  );
+  return [
+    { label: "Generate an on-brand draft from a brief", done: drafted },
+    { label: "Approve or send it back to teach a rule", done: state.rules.some((r) => r.learned) },
+    { label: "Ask for the flash banner, hit the guardrail", done: state.tally.blocked > 0 },
   ];
 }
 

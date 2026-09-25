@@ -1,120 +1,163 @@
-"use client";
+// The scene portals. Real captured screenshots of each scene (the
+// product does the talking), one buyer per card, one concrete promise
+// per card. A bento: the featured scene is wide, the rest share the
+// rows. Each card carries its own scene's tokens, so its light, its
+// edge and its button speak in that scene's colour; on a fine pointer
+// it tilts toward the cursor and the screenshot parallaxes inside the
+// frame. Cards rise in on scroll (CSS-first reveal).
 
-// The scene portals. Real captured screenshots in neutral window
-// frames (the product does the talking), one buyer per card, one
-// concrete promise per card. Desktop is a two-column grid with a broken
-// vertical rhythm; cards rise in on scroll.
-
-import { useRef } from "react";
-import Link from "next/link";
+import { useRef, type CSSProperties } from "react";
 import { SCENES, type Scene } from "@/lib/scenes";
-import { ScenePreview } from "@/components/demo/ScenePreview";
 import { useReveal } from "@/lib/useReveal";
+import { useTilt } from "@/lib/interactions";
+import { SceneGlyph } from "@/components/demo/SceneLayout";
+import geometry from "../../../public/scenes/geometry.json";
+
+type Box = { x: number; y: number; w: number; h: number };
+const SCENE_GEOMETRY = geometry.scenes as Record<string, { frame: Box } | null>;
+
+// Where the card's picture window sits on the 1600x1000 capture: the
+// workspace frame's top-left, measured by `pnpm capture:scenes`. Wide
+// cards show more of the board, the row of three a closer two panes;
+// either way the window never runs past the bottom of the capture.
+// Returned as percentages of the card's own box, so the same pixels
+// fill the frame at every width.
+function framing(slug: string, wide: boolean, aspect: number): CSSProperties {
+  const frame = SCENE_GEOMETRY[slug]?.frame ?? { x: 120, y: 400, w: 1360, h: 600 };
+  const pad = 20;
+  const wanted = (wide ? 1120 : 900) + pad * 2;
+  const room = (geometry.viewport.h - (frame.y - pad)) * aspect;
+  const regionW = Math.min(wanted, room);
+  const regionH = regionW / aspect;
+  const x = frame.x - pad;
+  const y = frame.y - pad;
+  return {
+    width: `${(geometry.viewport.w / regionW) * 100}%`,
+    left: `${(-x / regionW) * 100}%`,
+    top: `${(-y / regionH) * 100}%`,
+  };
+}
+
+// From lg up: two wide cards, then three. Registry order.
+const SPANS = ["lg:col-span-3", "lg:col-span-3", "lg:col-span-2", "lg:col-span-2", "lg:col-span-2"];
 
 export function SceneGallery() {
   const scope = useRef<HTMLElement>(null);
   useReveal(scope);
 
-  // Only genuinely clickable scenes reach the gallery. Roadmap scenes
-  // are not listed at all, so every card here resolves to a real app.
+  // Only genuinely clickable scenes reach the gallery.
   const live = SCENES.filter((s) => s.status === "live");
 
   return (
-    <section
-      id="scenes"
-      ref={scope}
-      className="relative border-t border-white/5"
-      aria-labelledby="scenes-heading"
-    >
-      <div className="mx-auto max-w-7xl px-6 py-24 md:px-10 md:py-32 lg:px-12">
-        <header data-reveal className="flex flex-wrap items-end justify-between gap-6">
-          <div className="max-w-2xl">
-            <p className="font-mono text-[10px] uppercase tracking-[0.24em] text-[var(--color-scene-1)]">
-              the scenes
-            </p>
-            <h2
-              id="scenes-heading"
-              className="mt-4 text-3xl font-medium leading-[1.06] tracking-[-0.03em] text-zinc-50 md:text-5xl"
-            >
-              Pick the scene closest to your desk.
+    <section id="scenes" ref={scope} className="relative scroll-mt-14" aria-labelledby="scenes-heading">
+      <div className="mx-auto max-w-[1440px] px-4 py-24 sm:px-6 md:py-32 lg:px-10">
+        <header data-reveal className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:items-end">
+          <div>
+            <p className="eyebrow">The scenes</p>
+            <h2 id="scenes-heading" className="display mt-4 max-w-[16ch] text-4xl text-ink-50 md:text-6xl">
+              Five working apps. Pick the one closest to your desk.
             </h2>
-            <p className="mt-4 max-w-xl text-base leading-relaxed text-zinc-400">
-              Each one is a real app, not a recording. Click in, press the
-              buttons, watch the loop run.
-            </p>
           </div>
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-            sandbox · nothing is saved
+          <p className="max-w-md text-base leading-relaxed text-ink-400">
+            Each one is real software on sample data, not a recording. Click in, press the buttons, and watch the
+            loop run. Reload and it starts over.
           </p>
         </header>
 
-        <div className="mt-14 grid gap-6 md:grid-cols-2 md:gap-x-6 md:gap-y-10">
+        <ul className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-6 lg:gap-6">
           {live.map((scene, i) => (
-            <SceneCard key={scene.slug} scene={scene} offset={i % 2 === 1} priority={i < 2} />
+            <li
+              key={scene.slug}
+              data-reveal
+              style={{ "--reveal-delay": `${(i % 3) * 70}ms` } as CSSProperties}
+              className={SPANS[i] ?? "lg:col-span-2"}
+            >
+              <SceneCard scene={scene} wide={i < 2} eager={i < 2} />
+            </li>
           ))}
-        </div>
-
+        </ul>
       </div>
     </section>
   );
 }
 
-function SceneCard({
-  scene,
-  offset,
-  priority,
-}: {
-  scene: Scene;
-  offset: boolean;
-  priority: boolean;
-}) {
-  const accent = scene.swatches[1];
+function SceneCard({ scene, wide, eager }: { scene: Scene; wide: boolean; eager: boolean }) {
+  const card = useRef<HTMLAnchorElement>(null);
+  useTilt(card, wide ? 3.5 : 5);
+  const vars = {
+    "--color-scene-1": scene.theme.accent,
+    "--color-scene-2": scene.theme.accent2,
+    "--color-scene-glow": scene.theme.glow,
+  } as CSSProperties;
 
   return (
-    <Link
+    <a
+      ref={card}
       href={`/${scene.slug}`}
-      data-reveal
-      style={{ "--card-accent": accent } as React.CSSProperties}
-      className={`group block rounded-2xl p-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-scene-1)] ${
-        offset ? "md:mt-8" : ""
-      }`}
+      style={vars}
+      data-spot
+      className="group surface relative flex h-full flex-col overflow-hidden rounded-[22px] p-2 transition-[border-color,box-shadow] duration-300 hover:border-[color-mix(in_oklab,var(--color-scene-1)_45%,transparent)] hover:shadow-[0_40px_80px_-40px_var(--color-scene-glow)]"
     >
-      <ScenePreview scene={scene} priority={priority} sizes="(min-width: 768px) 50vw, 100vw" />
-
-      <div className="px-2 pb-2 pt-5">
-        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
-          <h3 className="text-xl font-medium tracking-[-0.015em] text-zinc-50 md:text-2xl">
-            {scene.name}
-            {scene.codename ? (
-              <span className="ml-2.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                · {scene.codename}
-              </span>
-            ) : null}
-            <span className="ml-3 text-sm font-normal tracking-normal text-zinc-500">
-              {scene.whatItIs}
-            </span>
-          </h3>
-          <span
-            className="rounded-full border px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em]"
-            style={{ borderColor: `${accent}40`, color: accent }}
-          >
-            for {scene.personaLabel}
-          </span>
+      <div
+        className={`relative overflow-hidden rounded-[16px] border border-line bg-ink-925 ${
+          wide ? "aspect-[16/9]" : "aspect-[16/10]"
+        }`}
+      >
+        {/* The accent horizon behind the shot, so the frame is lit in the scene's colour. */}
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(80% 60% at 50% 0%, color-mix(in oklab, var(--color-scene-1) 25%, transparent), transparent 70%)",
+          }}
+        />
+        {/* The capture is the whole 1600x1000 scene view; the card frames
+            its workspace (see framing()), so the picture is the app, not
+            the scene's intro copy. The wrapper zooms on hover, the image
+            inside parallaxes with the tilt (data-depth), so the two
+            transforms never fight. */}
+        <div className="absolute inset-0 origin-top transition-transform duration-700 ease-[var(--ease-out)] group-hover:scale-[1.03]">
+          <img
+            data-depth="8"
+            src={`/scenes/${scene.slug}.webp`}
+            alt={`${scene.name}: ${scene.whatItIs}`}
+            width={1600}
+            height={1000}
+            loading={eager ? "eager" : "lazy"}
+            decoding="async"
+            style={framing(scene.slug, wide, wide ? 16 / 9 : 16 / 10)}
+            className="absolute h-auto max-w-none"
+          />
         </div>
+        <div aria-hidden className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-ink-950/90 to-transparent" />
+        <span className="chip absolute bottom-3 left-3 border-white/15 bg-ink-950/70 backdrop-blur">
+          <span aria-hidden className="live-dot text-emerald-400" />
+          live
+        </span>
+      </div>
 
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-white/5 pt-4">
-          <p className="text-sm leading-relaxed text-zinc-400">{scene.tryLine}</p>
-          <span
-            className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium transition-colors duration-200 group-hover:text-white"
-            style={{ color: accent }}
-          >
-            {scene.openLabel}
-            <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">
+      <div className="flex flex-1 flex-col px-3 pb-3 pt-5 md:px-4">
+        <div className="flex items-center gap-2.5">
+          <SceneGlyph scene={scene} size="sm" />
+          <h3 className={`heading text-ink-50 ${wide ? "text-2xl md:text-[1.75rem]" : "text-xl"}`}>
+            {scene.name}
+          </h3>
+          <span className="text-sm text-ink-500">{scene.codename}</span>
+        </div>
+        <p className={`mt-2.5 leading-relaxed text-ink-400 ${wide ? "max-w-[60ch] text-base" : "text-[0.9375rem]"}`}>
+          {scene.whatItIs}. {scene.tryLine}.
+        </p>
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-5">
+          <span className="chip">For {scene.personaLabel}</span>
+          <span className="inline-flex items-center gap-1.5 text-sm font-medium text-scene-soft transition-colors duration-200 group-hover:text-white">
+            <span className="link-draw">{scene.openLabel}</span>
+            <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1">
               →
             </span>
           </span>
         </div>
       </div>
-    </Link>
+    </a>
   );
 }

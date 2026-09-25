@@ -28,21 +28,29 @@ was removed in PR #14 (2026-05-29). **Nox does not exist as a persona at
 all.** If you are about to write copy, a comment, or a doc that mentions
 persona login, stop.
 
-Prisma, `src/lib/auth.ts`, `src/lib/db.ts` and `/api/auth/[...nextauth]`
-are kept but **inert**: no rendered surface reads the database. There
-are no crons (the weekly reset was retired 2026-07-30 because it
-reseeded rows nothing renders).
+There is no server code at all. The inert Prisma / NextAuth / cron
+scaffolding was removed when the site moved from Next.js to Vite
+(2026-09-25). If a task seems to need a server, it is a new decision,
+not a revival.
 
 ## Stack
 
-- Next.js 16 App Router, React 19, TypeScript strict
-- Tailwind CSS v4
-- Hubot Sans (display) + Mona Sans (body), self-hosted via
-  `@fontsource-variable`, matching the marketing site. Geist Mono stays
-  as `--font-mono`. **Not Geist Sans** (swapped out in PR #22).
-- Prisma 7 + Neon Postgres, single-file schema at `prisma/schema.prisma`
-- Three.js in exactly one component (`components/home/GateField.tsx`)
-- Hosting: Vercel, auto-deploy from `main`
+- Vite 8 + React 19, TypeScript strict. **Not Next.js** (moved
+  2026-09-25): no `next/*` imports, no `"use client"`, plain `<a>` and
+  `<img>`. Every route is prerendered to static HTML at build time
+  (`src/routes.tsx` -> `src/entry-server.tsx` -> `scripts/prerender.mjs`)
+  and hydrated by `src/entry-client.tsx`. Navigation between pages is a
+  full page load (cross-document View Transitions smooth it).
+- Tailwind CSS v4 via `@tailwindcss/vite`
+- GSAP 3 (`src/lib/gsap.ts`, `src/lib/interactions.ts`)
+- Mona Sans (variable width axis) for all UI and display; Newsreader
+  italic for at most one human-voice phrase per page (`.voice`); Geist
+  Mono for machine output only. Hubot Sans is retired, matching
+  gravixar.com's Ember Gate system.
+- Three.js in exactly one component (`components/home/GateField.tsx`),
+  loaded after mount, never in the prerender
+- Hosting: Vercel, static `dist/`, auto-deploy from `main`. `vercel.ts`
+  holds headers, `cleanUrls` and the `/tour` redirect.
 
 ## Local dev
 
@@ -55,10 +63,13 @@ pnpm dev
 Port **3400** (marketing 3300, bs-hub 3000). Never background the dev
 server.
 
-Gate before any PR: `pnpm typecheck` **and** `pnpm build`. `pnpm lint`
-runs `eslint .` (it called the Next-16-removed `next lint` until PR
-#53). `pnpm capture` refreshes `public/scenes/*.png` with real
-headless-Chrome captures. `pnpm verify:learn-beat` asserts all 5 scenes
+Gate before any PR: `pnpm typecheck` **and** `pnpm build` (the build
+includes the prerender, so a component that touches `window` during
+render fails here). `pnpm lint` runs `eslint .`. `pnpm capture:scenes`
+refreshes `public/scenes/` (png + webp + `geometry.json`) with real
+headless-Chrome captures; after it, copy the pngs into
+gravixar-marketing's `public/scenes/` and re-derive its crop boxes from
+`geometry.json`. `pnpm verify:learn-beat` asserts all 5 scenes
 learn on approve, and `pnpm verify:outcomes` asserts all 5 move their
 outcome tiles on the visitor's own clicks and rewind them on reset.
 Both take the base URL as an argument (`... http://localhost:3400`).
@@ -88,26 +99,34 @@ field on `Scene` exists to be rendered.
 ## Repo layout
 
 ```
+index.html                     # the HTML template (<!--app-head--> / <!--app-html-->)
+vite.config.ts, vercel.ts
 src/
-  app/
-    layout.tsx                 # root: fonts, DemoBanner
-    page.tsx                   # the index: Hero / LoopSection / SceneGallery / ProofStrip
-    (scenes)/<slug>/           # one layout.tsx (chrome + scene CSS vars) + one page.tsx
-    modules/[slug]/            # widget renderer
-    api/auth/[...nextauth]/    # inert
-    api/cron/reset-demo/       # inert, no schedule
+  entry-client.tsx             # fonts + CSS, hydrate (prod) or render (dev)
+  entry-server.tsx             # render(route) -> html + head tags
+  routes.tsx                   # the route table: path, title, description, page module
+  App.tsx                      # banner, skip link, analytics, the spotlight listener
+  pages/
+    Home.tsx, NotFound.tsx
+    scenes/<Name>.tsx          # one file per scene, wraps itself in SceneLayout
+    modules/ModulesIndex.tsx, ModuleDetail.tsx
   components/
-    demo/                      # Topbar, DemoBanner, LearnBeat, OutcomePanel, SceneCTA, DeliverableMockup, Avatar
-    home/                      # Hero, GateField, LoopSection, SceneGallery, ProofStrip
+    ui/Button.tsx              # the one button (variants are CSS: .btn-*)
+    demo/                      # SceneLayout (+ SceneGlyph), SceneIntro, Workspace (Pane, ItemCard,
+                               # EmptyState, ActivityLog), LearnBeat, OutcomePanel, SceneCTA,
+                               # Topbar, DemoBanner, SiteFooter, ModulesLayout, DeliverableMockup, Avatar
+    home/                      # Hero, GateField, SceneGallery, LoopSection, ProofStrip
     modules/                   # ReviewStateMachine, DailyCheckin, AuditLogRestore
   lib/
-    scenes.ts                  # scene registry (mirrored contract)
-    modules.ts                 # 12 module manifest
-    playground/*-data.ts       # per-scene reducers + fixtures + outcomeStats()
+    scenes.ts                  # scene registry (mirrored contract) + each scene's theme tokens
+    modules.ts                 # module manifest
+    playground/*-data.ts       # per-scene reducers + fixtures + outcomeStats() + trySteps()
+    interactions.ts            # spotlight, magnetic, tilt, ripple (GSAP)
     useReveal.ts               # the reveal hook, see motion rules
     flowPulse.ts, gsap.ts      # transient cross-column cue
-prisma/schema.prisma           # single file, inert
-scripts/capture.mjs            # pnpm capture
+scripts/
+  prerender.mjs                # build step 3
+  capture.mjs, capture-scenes.mjs, verify-*.mjs
 ```
 
 ## Conventions
@@ -127,6 +146,11 @@ scripts/capture.mjs            # pnpm capture
 
 ### Visual identity
 
+The design system ("Gate" v3, 2026-09-25) is written down in the header
+comment of `src/styles/globals.css`: the ink ramp (Tailwind's `zinc-*`
+is remapped onto it), type roles, surfaces (`.surface`, `.frame`,
+`.item`), buttons (`.btn-*`), chips, and the motion rules.
+
 - Dark only. No light theme, no toggle.
 - `--color-mark` (`#ff1f2d`) is the logo mark and nothing else.
   Everything else reads `--color-scene-1` / `-2` / `-glow`, which each
@@ -136,14 +160,19 @@ scripts/capture.mjs            # pnpm capture
 - Consume tokens through `.text-scene` / `.bg-scene` / `.border-scene` /
   `.ring-scene`, or `var(--color-scene-1)` directly. Never a raw
   Tailwind hue on a token-tinted surface.
-- Contrast floors, measured against the real ground: zinc-400 = 7.9:1,
-  zinc-500 = 4.2:1 (floor for anything informative), **zinc-600 = 2.63:1
-  and is decoration only** (hairlines, separators). Type floor: 10px for
-  meta, 11px for anything a visitor must read to act. The 8px/9px tiers
-  are banned.
-- Buttons: `inline-flex min-h-10 ... active:scale-[0.98] lg:min-h-0`.
+- Contrast floors on ink-950: ink-400 = 7.6:1, ink-500 = 4.6:1 (floor
+  for anything informative), **ink-600 = 2.4:1 and is decoration only**
+  (hairlines, separators). Type floor: 10px for meta, 11px for anything
+  a visitor must read to act. The 8px/9px tiers are banned.
+- Buttons are `components/ui/Button.tsx` (or `.btn .btn-<variant>` on a
+  link): 40px touch height below lg, a press scale, a pointer ripple.
   Tailwind 4's preflight ships `cursor: default` on buttons, so
   `globals.css` restores the pointer.
+- Hover effects are pointer-only and cost nothing when absent:
+  `[data-spot]` gets a light that follows the cursor (one document
+  listener in `useSpotlight`), CTAs use `useMagnetic`, the index scene
+  cards use `useTilt`. Never hide or displace resting content for an
+  effect.
 - Banned: gradient text, glassmorphism as a default surface, side-stripe
   accents, identical icon-plus-heading-plus-text card grids, nested
   cards, big-gradient-number hero metrics.
@@ -203,10 +232,15 @@ exception: Brand Guardian keeps an inline rule column, because its rules
 
 ### Section order
 
-Every scene renders `grid -> LearnBeat -> OutcomePanel -> feed/audit ->
-SceneCTA`. Scene-specific extras attach after the receipts and before
-the CTA. Exceptions on record: Brand Guardian's rules are a column, and
-Agent Console's feed is a column.
+Every scene renders `SceneLayout > SceneIntro > Workspace (Panes) >
+LearnBeat > OutcomePanel > ActivityLog (+ extras) > SceneCTA`, with
+`src/pages/scenes/Lattice.tsx` as the reference. Scene-specific extras
+attach after the receipts and before the CTA. Exception on record:
+Brand Guardian's rules are a column (a Pane), not a below-grid LearnBeat.
+
+`SceneIntro`'s "Try the loop" checklist comes from `trySteps(state)`,
+colocated with the reducer like `outcomeStats`. A step ticks only when
+the visitor's own click did it, never at initial state.
 
 ### Accessibility
 

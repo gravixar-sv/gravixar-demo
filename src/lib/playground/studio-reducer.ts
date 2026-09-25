@@ -12,6 +12,7 @@ import {
 } from "./studio-script";
 import type { AuditEntry } from "./reducer";
 import type { OutcomeStat } from "@/components/demo/OutcomePanel";
+import type { TryStep } from "@/components/demo/SceneIntro";
 import { formatCount } from "./outcomeFormat";
 
 // Gate state for the current output. Writer agents (ECHO) produce a
@@ -108,6 +109,19 @@ export function outcomeStats(state: StudioState): OutcomeStat[] {
       sub: "human decides",
     },
     { value: "0", label: "auto-publishes", sub: "by design" },
+  ];
+}
+
+// The "Try the loop" checklist. Each step reads the visitor's own
+// clicks off the reducer: run counts start at zero, and "You" only ever
+// appears in the feed after an approve or discard (the seed rows are
+// PULSE and ECHO), so nothing is ticked on a fresh load.
+export function trySteps(state: StudioState): TryStep[] {
+  const readOnlyRuns = state.runs.pulse + state.runs.river + state.runs.atlas;
+  return [
+    { label: "Run ECHO, the writer agent", done: state.runs.echo > 0 },
+    { label: "Approve or discard ECHO's draft", done: state.feed.some((e) => e.actor === "You") },
+    { label: "Run a read-only agent: PULSE, RIVER or ATLAS", done: readOnlyRuns > 0 },
   ];
 }
 

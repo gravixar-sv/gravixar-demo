@@ -1,4 +1,3 @@
-"use client";
 
 // useReducer for a scene, with every visitor action wrapped in a View
 // Transition (see viewTransition.ts). The one exception is the

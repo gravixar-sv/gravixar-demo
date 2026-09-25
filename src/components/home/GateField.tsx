@@ -1,4 +1,3 @@
-"use client";
 
 // The approval-gate field: the demo thesis drawn as a particle system.
 // Work streams in from the left in loose, wandering orbits; every

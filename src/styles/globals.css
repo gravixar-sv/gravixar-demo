@@ -1,82 +1,141 @@
 @import "tailwindcss";
 
-@theme {
-  /* Base ground, the layer behind every gradient */
-  --color-bg: #050508;
-  --color-fg: #f5f5f7;
-  --color-muted: #71717a;
+/* ─────────────────────────────────────────────────────────────────────
+   demo.gravixar.com design system ("Gate" v3, 2026-09-25)
 
-  /* Gravixar brand red square, preserved as the platform mark */
+   Ground     ink, a near-black with a faint warm-violet tint. Never #000.
+   Neutrals   the ink ramp below. Tailwind's zinc-* is remapped onto it,
+              so every zinc class in the codebase reads the same family.
+              Contrast on ink-950: ink-400 = 7.6:1, ink-500 = 4.6:1 (the
+              floor for anything informative), ink-600 = 2.4:1 and is
+              decoration only (hairlines, separators).
+   Accent     --color-mark is the logo mark and nothing else. Everything
+              else reads the scene tokens (--color-scene-1 / -2 / -glow),
+              which each scene sets inline on its root.
+   Type       Mona Sans (variable width + weight) for everything; display
+              headings run it semi-expanded. Newsreader italic is the one
+              human-voice phrase, never UI, never under 20px. Geist Mono
+              is machine output only: timestamps, IDs, amounts, statuses.
+              Nothing a visitor must read is under 11px; meta floor 10px.
+   Depth      light and grain, never coloured drop-glows on text.
+   Motion     transform + opacity only. Base visibility never depends on
+              a JS ticker (CSS hides, IntersectionObserver reveals, a
+              rescue timer force-shows). Hover motion is gated to fine
+              pointers; reduced motion keeps colour, drops movement.
+   ───────────────────────────────────────────────────────────────────── */
+
+@theme {
+  --color-ink-950: #09080b;
+  --color-ink-925: #0d0c10;
+  --color-ink-900: #121115;
+  --color-ink-850: #18171c;
+  --color-ink-800: #201e25;
+  --color-ink-700: #2e2c34;
+  --color-ink-600: #47444e;
+  --color-ink-500: #7d7884;
+  --color-ink-400: #a6a1ad;
+  --color-ink-300: #c8c4cd;
+  --color-ink-200: #dfdce3;
+  --color-ink-100: #eeecf0;
+  --color-ink-50: #f8f7fa;
+
+  /* zinc-* resolves to ink, so older class names stay on-system. */
+  --color-zinc-950: #09080b;
+  --color-zinc-900: #121115;
+  --color-zinc-800: #201e25;
+  --color-zinc-700: #2e2c34;
+  --color-zinc-600: #47444e;
+  --color-zinc-500: #7d7884;
+  --color-zinc-400: #a6a1ad;
+  --color-zinc-300: #c8c4cd;
+  --color-zinc-200: #dfdce3;
+  --color-zinc-100: #eeecf0;
+  --color-zinc-50: #f8f7fa;
+
+  --color-bg: #09080b;
+  --color-fg: #f8f7fa;
+  --color-muted: #7d7884;
+  --color-line: rgb(255 255 255 / 0.07);
+  --color-line-strong: rgb(255 255 255 / 0.13);
+
+  /* Gravixar brand red square, preserved as the platform mark only. */
   --color-mark: #ff1f2d;
 
-  /* Scene tokens. Each scene layout overrides these on its root. */
-  --color-scene-1: #ff6b6b;     /* primary accent */
-  --color-scene-2: #f5e6d3;     /* secondary */
-  --color-scene-glow: rgba(255, 107, 107, 0.35);
+  /* Scene tokens. Each scene root overrides these inline. */
+  --color-scene-1: #ff6b5b;
+  --color-scene-2: #f5e6d3;
+  --color-scene-glow: rgb(255 107 91 / 0.35);
 
-  /* Typography. Hubot Sans (display) + Mona Sans (body), GitHub's open
-     variable grotesks, self-hosted via @fontsource-variable and matched
-     to the marketing site. The legacy `--font-display-serif` /
-     `--font-display-mono` names are kept so existing Tailwind classes
-     resolve; serif now points at Hubot, mono stays Geist Mono. */
   --font-sans: "Mona Sans Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Hubot Sans Variable", "Mona Sans Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-display-serif: "Hubot Sans Variable", "Mona Sans Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-display-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Consolas, monospace;
-  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, "SF Mono", Consolas, monospace;
+  --font-display: "Mona Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Newsreader", ui-serif, Georgia, serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, "SF Mono", Consolas, monospace;
+  /* Legacy names some scene code still uses. */
+  --font-display-mono: var(--font-mono);
+  --font-display-serif: var(--font-display);
 
-  /* Motion: strong custom curves, never raw linear / ease-in-out on UI. */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --animate-pop-in: popIn 360ms var(--ease-out) both;
 }
 
 @layer base {
   html {
-    background: #050508;
-    color: #f5f5f7;
+    background: var(--color-ink-950);
+    color: var(--color-ink-50);
     color-scheme: dark;
     font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
   body {
     min-height: 100dvh;
+    background-color: var(--color-ink-950);
+    /* Grain: a fixed, very quiet noise layer so large dark fields have
+       texture instead of banding. One data URI, no request. */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .045 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
   /* Tailwind 4 preflight ships `cursor: default` on buttons; every
-     button in the demo is clickable, so restore the affordance. */
-  button:not(:disabled) {
+     button in the demo does something, so restore the affordance. */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
     cursor: pointer;
   }
-  /* One scene-tinted focus ring for every interactive element. The
-     scene layouts override --color-scene-1, so keyboard focus matches
-     each scene's accent for free. Utility-level focus-visible classes
-     (hero CTAs, scene cards) still win where they're set. */
-  :where(button, a):focus-visible {
-    outline: 2px solid var(--color-scene-1, #ff6b6b);
+  :where(button, a, textarea, input, select, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-scene-1);
     outline-offset: 2px;
   }
-  /* Headings carry the display face. */
   h1,
   h2,
   h3,
   h4 {
     font-family: var(--font-display);
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
   }
   ::selection {
-    background: var(--color-scene-1, #ff1f2d);
-    color: #050508;
+    background: var(--color-scene-1);
+    color: var(--color-ink-950);
   }
-  /* "Explore the scenes" and "How the loop works" are in-page anchors;
-     glide to them instead of jumping. Motion-safe only. */
   @media (prefers-reduced-motion: no-preference) {
     html {
       scroll-behavior: smooth;
     }
   }
-  /* View Transitions (src/lib/viewTransition.ts). The root opts OUT so
-     there is no full-page crossfade: only elements that carry a
-     view-transition-name animate, everything else keeps rendering live
-     (the flowPulse orb, hover states, the agent-output stagger). */
+
+  /* Cross-page navigations crossfade (same-origin MPA transitions). */
+  @view-transition {
+    navigation: auto;
+  }
+  /* In-page View Transitions (src/lib/viewTransition.ts): the root opts
+     out so only named elements (cards, rules, feed rows) move and
+     everything else keeps rendering live. */
   html {
     view-transition-name: none;
   }
@@ -91,339 +150,432 @@
   }
 }
 
-@layer utilities {
-  /* Glass panel, the workhorse surface treatment. Slightly more
-     restrained than the previous values, less consumer-marketing
-     glow, more agency-portfolio chrome. */
-  .glass {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(16px) saturate(120%);
-    -webkit-backdrop-filter: blur(16px) saturate(120%);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+@layer components {
+  /* ── Type ─────────────────────────────────────────────────────── */
+
+  .display {
+    font-family: var(--font-display);
+    font-stretch: 112%;
+    font-weight: 620;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .heading {
+    font-family: var(--font-display);
+    font-stretch: 106%;
+    font-weight: 580;
+    letter-spacing: -0.022em;
+    line-height: 1.08;
+  }
+  /* The one human-voice phrase per page. */
+  .voice {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    font-stretch: normal;
+    letter-spacing: -0.01em;
+  }
+  /* Quiet section label: sans, sentence case, never shouting. */
+  .eyebrow {
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 560;
+    letter-spacing: 0.01em;
+    color: var(--color-ink-400);
+  }
+  /* Machine label: mono, for statuses, counts, IDs and timestamps. */
+  .label-mono {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    line-height: 1rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-ink-500);
+  }
+
+  /* ── Surfaces ─────────────────────────────────────────────────── */
+
+  /* A lit panel: one hairline, a top-edge highlight, a deep soft drop. */
+  .surface {
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.028), rgb(255 255 255 / 0.012));
+    border: 1px solid var(--color-line);
     box-shadow:
-      0 1px 0 0 rgba(255, 255, 255, 0.04) inset,
-      0 24px 48px -16px rgba(0, 0, 0, 0.55);
+      inset 0 1px 0 0 rgb(255 255 255 / 0.05),
+      0 30px 60px -30px rgb(0 0 0 / 0.7);
   }
-  .glass-strong {
-    background: rgba(20, 20, 28, 0.55);
-    backdrop-filter: blur(24px) saturate(140%);
-    -webkit-backdrop-filter: blur(24px) saturate(140%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+  /* The app window every scene's workspace sits in. */
+  .frame {
+    background:
+      linear-gradient(180deg, rgb(255 255 255 / 0.035), rgb(255 255 255 / 0.01) 120px),
+      color-mix(in oklab, var(--color-ink-925) 92%, var(--color-scene-1));
+    border: 1px solid var(--color-line-strong);
     box-shadow:
-      0 1px 0 0 rgba(255, 255, 255, 0.06) inset,
-      0 32px 64px -20px rgba(0, 0, 0, 0.7);
+      inset 0 1px 0 0 rgb(255 255 255 / 0.07),
+      0 0 0 1px rgb(0 0 0 / 0.4),
+      0 50px 100px -40px rgb(0 0 0 / 0.85),
+      0 0 120px -60px var(--color-scene-glow);
+  }
+  /* The one thing inside a pane that is a card: a work item. */
+  .item {
+    position: relative;
+    isolation: isolate;
+    background: color-mix(in oklab, var(--color-ink-850) 88%, transparent);
+    border: 1px solid var(--color-line);
+    box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.04);
+    transition:
+      transform 260ms var(--ease-out),
+      border-color 200ms ease,
+      box-shadow 260ms var(--ease-out),
+      background-color 200ms ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .item:hover {
+      border-color: var(--color-line-strong);
+      box-shadow:
+        inset 0 1px 0 0 rgb(255 255 255 / 0.06),
+        0 18px 36px -18px rgb(0 0 0 / 0.75);
+    }
+    .item[data-lift]:hover {
+      transform: translateY(-2px);
+    }
   }
 
-  /* Editorial dot grid, kept as a subtle agency-portfolio texture */
-  .bg-dot-grid {
-    background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.06) 1px, transparent 0);
-    background-size: 28px 28px;
+  /* Pointer spotlight: any [data-spot] element gets a soft light that
+     follows the cursor (src/lib/interactions.ts sets --mx / --my). */
+  [data-spot] {
+    position: relative;
   }
-
-  /* Lattice scene, was navy → warm-violet → cream (editorial-magazine).
-     Now toned down: desaturated near-black base with a single muted
-     coral wash. Reads agency-portfolio, not literary site. */
-  .bg-lattice {
-    background:
-      radial-gradient(60% 50% at 100% 0%, rgba(255, 107, 107, 0.10) 0%, transparent 60%),
-      radial-gradient(50% 70% at 0% 100%, rgba(245, 230, 211, 0.04) 0%, transparent 60%),
-      linear-gradient(180deg, #0c0e1a 0%, #0e1024 50%, #07080f 100%);
-  }
-
-  /* Studio Mix scene, kept as the operator-aurora signal but with
-     reduced saturation so it stops fighting Lattice for attention. */
-  .bg-studio-mix {
-    background:
-      radial-gradient(60% 60% at 80% 0%, rgba(0, 225, 255, 0.12) 0%, transparent 55%),
-      radial-gradient(50% 70% at 10% 100%, rgba(255, 45, 149, 0.12) 0%, transparent 60%),
-      linear-gradient(180deg, #070a14 0%, #0a0820 60%, #050508 100%);
-  }
-
-  /* Northbeam (DTC/brand governance) scene — muted sage-green + cream
-     wash on a deep green-black base. */
-  .bg-northbeam {
-    background:
-      radial-gradient(60% 55% at 100% 0%, rgba(157, 190, 110, 0.12) 0%, transparent 58%),
-      radial-gradient(50% 70% at 0% 100%, rgba(242, 221, 193, 0.06) 0%, transparent 60%),
-      linear-gradient(180deg, #121a0e 0%, #10160c 55%, #07080f 100%);
-  }
-
-  /* Founder Cockpit scene — warm amber/gold "daily brief" wash on a
-     near-black base. Distinct from Lattice (coral), Studio Mix (cyan),
-     Northbeam (green). */
-  .bg-cockpit {
-    background:
-      radial-gradient(60% 55% at 100% 0%, rgba(251, 191, 36, 0.12) 0%, transparent 58%),
-      radial-gradient(50% 70% at 0% 100%, rgba(180, 83, 9, 0.10) 0%, transparent 60%),
-      linear-gradient(180deg, #14110a 0%, #16120c 55%, #07060f 100%);
-  }
-
-  /* Care Ledger (Billing & Credentialing) scene — clinical teal + sky
-     wash on a deep slate base. Distinct from Studio Mix (electric cyan):
-     calmer, more medical, less neon. */
-  .bg-care-ledger {
-    background:
-      radial-gradient(60% 55% at 100% 0%, rgba(45, 212, 191, 0.12) 0%, transparent 58%),
-      radial-gradient(50% 70% at 0% 100%, rgba(125, 211, 252, 0.08) 0%, transparent 60%),
-      linear-gradient(180deg, #06141a 0%, #07161c 55%, #05080f 100%);
-  }
-
-  /* Gallery landing, mixed palette. Toned to match the new scene
-     gradients, less fluorescent, more gradient agency-poster. */
-  .bg-gallery {
-    background:
-      radial-gradient(70% 60% at 100% 0%, rgba(255, 45, 149, 0.10) 0%, transparent 55%),
-      radial-gradient(50% 80% at 0% 50%, rgba(0, 225, 255, 0.08) 0%, transparent 55%),
-      radial-gradient(40% 50% at 100% 100%, rgba(255, 107, 107, 0.10) 0%, transparent 55%),
-      linear-gradient(180deg, #050508 0%, #0a0814 60%, #050508 100%);
-  }
-
-  /* Static status dot. A fixed, soft halo rather than an idle pulse
-     (the pulsing read as generated); the ring still signals "live". */
-  .pulse-dot {
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05);
-  }
-
-  /* Window chrome, three traffic-light dots, top-left of a panel.
-     Kept available for Studio Mix's operator console where it earns
-     its place; removed from Lattice client-portal panels (per design
-     feedback: too overdesigned for a client-facing surface). */
-  .window-dots::before {
+  [data-spot]::before {
     content: "";
     position: absolute;
-    top: 14px;
-    left: 14px;
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: #ff5f57;
-    box-shadow:
-      16px 0 0 0 #febc2e,
-      32px 0 0 0 #28c840;
-    opacity: 0.7;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0;
+    background: radial-gradient(
+      320px circle at var(--mx, 50%) var(--my, 50%),
+      color-mix(in oklab, var(--color-scene-1) 13%, transparent),
+      transparent 65%
+    );
+    transition: opacity 300ms ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    [data-spot]:hover::before {
+      opacity: 1;
+    }
+  }
+  [data-spot] > * {
+    position: relative;
+    z-index: 1;
   }
 
-  /* Scene-scoped accent utility, uses the CSS vars set on each scene root */
+  /* ── Buttons (src/components/ui/Button.tsx) ───────────────────── */
+
+  .btn {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: inline-flex;
+    min-height: 2.5rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    border-radius: 0.625rem;
+    padding: 0.45rem 0.85rem;
+    font-size: 0.8125rem;
+    line-height: 1.1;
+    font-weight: 560;
+    white-space: nowrap;
+    border: 1px solid transparent;
+    transition:
+      transform 160ms var(--ease-out),
+      background-color 180ms ease,
+      border-color 180ms ease,
+      color 180ms ease,
+      box-shadow 220ms var(--ease-out);
+  }
+  @media (min-width: 1024px) {
+    .btn {
+      min-height: 2.125rem;
+    }
+  }
+  .btn:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  .btn .btn-arrow {
+    transition: transform 220ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn:hover .btn-arrow {
+      transform: translateX(3px);
+    }
+  }
+  .btn-lg {
+    min-height: 3rem;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9375rem;
+    border-radius: 0.75rem;
+  }
+  .btn-sm {
+    min-height: 2.25rem;
+    padding: 0.3rem 0.65rem;
+    font-size: 0.75rem;
+    border-radius: 0.5rem;
+  }
+  @media (min-width: 1024px) {
+    .btn-sm {
+      min-height: 1.875rem;
+    }
+  }
+  /* The decision: scene accent, solid. */
+  .btn-primary {
+    background: var(--color-scene-1);
+    color: var(--color-ink-950);
+    box-shadow:
+      inset 0 1px 0 0 rgb(255 255 255 / 0.35),
+      0 8px 24px -10px var(--color-scene-glow);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover {
+      background: color-mix(in oklab, var(--color-scene-1) 86%, white);
+      box-shadow:
+        inset 0 1px 0 0 rgb(255 255 255 / 0.45),
+        0 12px 30px -10px var(--color-scene-glow);
+    }
+  }
+  /* Scene-accent tint, for the hand-offs inside a workspace. */
+  .btn-accent {
+    background: color-mix(in oklab, var(--color-scene-1) 13%, transparent);
+    border-color: color-mix(in oklab, var(--color-scene-1) 38%, transparent);
+    color: color-mix(in oklab, var(--color-scene-1) 70%, white);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-accent:hover {
+      background: color-mix(in oklab, var(--color-scene-1) 22%, transparent);
+      border-color: color-mix(in oklab, var(--color-scene-1) 60%, transparent);
+      color: white;
+    }
+  }
+  .btn-positive {
+    background: rgb(52 211 153 / 0.12);
+    border-color: rgb(52 211 153 / 0.34);
+    color: #a7f3d0;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-positive:hover {
+      background: rgb(52 211 153 / 0.22);
+      border-color: rgb(52 211 153 / 0.6);
+      color: #ecfdf5;
+    }
+  }
+  .btn-caution {
+    background: rgb(251 191 36 / 0.1);
+    border-color: rgb(251 191 36 / 0.3);
+    color: #fde68a;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-caution:hover {
+      background: rgb(251 191 36 / 0.2);
+      border-color: rgb(251 191 36 / 0.55);
+      color: #fffbeb;
+    }
+  }
+  .btn-danger {
+    background: rgb(251 113 133 / 0.1);
+    border-color: rgb(251 113 133 / 0.3);
+    color: #fecdd3;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-danger:hover {
+      background: rgb(251 113 133 / 0.2);
+      border-color: rgb(251 113 133 / 0.55);
+      color: #fff1f2;
+    }
+  }
+  .btn-quiet {
+    background: rgb(255 255 255 / 0.04);
+    border-color: var(--color-line-strong);
+    color: var(--color-ink-200);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-quiet:hover {
+      background: rgb(255 255 255 / 0.08);
+      border-color: rgb(255 255 255 / 0.24);
+      color: white;
+    }
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--color-ink-400);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-ghost:hover {
+      background: rgb(255 255 255 / 0.05);
+      color: var(--color-ink-100);
+    }
+  }
+  /* Click ripple (src/lib/interactions.ts). */
+  .btn-ripple {
+    position: absolute;
+    z-index: -1;
+    width: 12px;
+    height: 12px;
+    margin: -6px 0 0 -6px;
+    border-radius: 999px;
+    pointer-events: none;
+    background: currentColor;
+    opacity: 0.28;
+  }
+
+  /* ── Pills and chips ──────────────────────────────────────────── */
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-line-strong);
+    background: rgb(255 255 255 / 0.03);
+    padding: 0.15rem 0.6rem;
+    font-size: 0.71875rem;
+    line-height: 1rem;
+    font-weight: 540;
+    color: var(--color-ink-300);
+    white-space: nowrap;
+  }
+  /* Machine values in a chip: versions, IDs, amounts. */
+  .chip-mono {
+    font-family: var(--font-mono);
+    font-weight: 400;
+    font-size: 0.6875rem;
+    letter-spacing: 0.02em;
+  }
+  .chip-accent {
+    border-color: color-mix(in oklab, var(--color-scene-1) 40%, transparent);
+    background: color-mix(in oklab, var(--color-scene-1) 10%, transparent);
+    color: color-mix(in oklab, var(--color-scene-1) 72%, white);
+  }
+  .chip-positive {
+    border-color: rgb(52 211 153 / 0.35);
+    background: rgb(52 211 153 / 0.08);
+    color: #a7f3d0;
+  }
+  .chip-caution {
+    border-color: rgb(251 191 36 / 0.35);
+    background: rgb(251 191 36 / 0.08);
+    color: #fde68a;
+  }
+  .chip-danger {
+    border-color: rgb(251 113 133 / 0.35);
+    background: rgb(251 113 133 / 0.08);
+    color: #fecdd3;
+  }
+
+  /* A soft pulse dot for "live" and "running". */
+  .live-dot {
+    position: relative;
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: currentColor;
+  }
+  .live-dot::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: inherit;
+    border: 1px solid currentColor;
+    opacity: 0;
+    animation: liveRing 2.4s var(--ease-out) infinite;
+  }
+  @keyframes liveRing {
+    0% { opacity: 0.7; transform: scale(0.6); }
+    80%, 100% { opacity: 0; transform: scale(1.8); }
+  }
+
+  /* Hairline link that draws in from the left on hover. */
+  .link-draw {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0% 1px;
+    transition: background-size 280ms var(--ease-out), color 180ms ease;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .link-draw:hover,
+    .group:hover .link-draw {
+      background-size: 100% 1px;
+    }
+  }
+  .link-draw:focus-visible {
+    background-size: 100% 1px;
+  }
+}
+
+@layer utilities {
+  /* Scene-scoped accent utilities, reading the scene root's tokens. */
   .text-scene { color: var(--color-scene-1); }
+  .text-scene-soft { color: color-mix(in oklab, var(--color-scene-1) 72%, white); }
   .bg-scene { background: var(--color-scene-1); }
   .border-scene { border-color: var(--color-scene-1); }
   .ring-scene { box-shadow: 0 0 0 1px var(--color-scene-1); }
 
-  /* Tour-step fade-in. Each tour step mounts fresh and animates in
-     from a small downward offset so the auto-progression reads as one
-     continuous flow rather than abrupt swaps. */
-  @keyframes tourFadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  .tour-step-enter {
-    animation: tourFadeIn 320ms ease-out both;
+  /* The scene ground: the accent rising as a horizon behind the page. */
+  .scene-ground {
+    background:
+      radial-gradient(70% 520px at 50% -140px, color-mix(in oklab, var(--color-scene-1) 22%, transparent), transparent 72%),
+      radial-gradient(40% 420px at 100% 0%, color-mix(in oklab, var(--color-scene-2) 7%, transparent), transparent 70%);
+    background-repeat: no-repeat;
   }
 
-  /* Subtle pulse used on the audit log's "new" rows so the visitor's
-     just-completed actions stand out without being loud. */
-  @keyframes tourFreshPulse {
-    0%, 100% { background-color: rgba(255, 107, 107, 0.04); }
-    50%      { background-color: rgba(255, 107, 107, 0.10); }
-  }
-  .tour-fresh-pulse {
-    animation: tourFreshPulse 2.4s ease-in-out infinite;
+  /* Dot grid texture for closing panels. */
+  .bg-dot-grid {
+    background-image: radial-gradient(circle at 1px 1px, rgb(255 255 255 / 0.07) 1px, transparent 0);
+    background-size: 22px 22px;
   }
 
-  /* ── Playground (multi-column live workspace) ──────────────────── */
+  /* Hide scrollbars on the phone column rail; it scrolls by swipe. */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 
-  /* Fresh audit/feed row: a one-shot highlight that fades to rest. The
-     reducer flips `fresh` off after a beat; this animates the arrival. */
+  /* ── Playground motion (the reducer flips `fresh` off after a beat) ── */
+
   @keyframes pgFreshIn {
-    0%   { background-color: var(--color-scene-glow, rgba(255,107,107,0.18)); transform: translateY(-3px); opacity: 0; }
-    35%  { opacity: 1; transform: translateY(0); }
-    100% { background-color: rgba(255,255,255,0.02); }
+    0%   { background-color: var(--color-scene-glow); transform: translateY(-4px); opacity: 0; }
+    35%  { opacity: 1; transform: none; }
+    100% { background-color: color-mix(in oklab, var(--color-ink-850) 88%, transparent); }
   }
   .pg-fresh {
-    animation: pgFreshIn 2s ease-out both;
+    animation: pgFreshIn 1.8s var(--ease-out) both;
   }
 
-  /* Cross-column cue banner: when an action in one column ripples to
-     another, the cue slides in and gives a single accent pulse so the
-     eye is drawn to the reaction. */
   @keyframes pgCueIn {
-    0%   { opacity: 0; transform: translateY(6px); box-shadow: 0 0 0 0 var(--color-scene-glow, rgba(255,107,107,0.35)); }
-    40%  { opacity: 1; transform: translateY(0); box-shadow: 0 0 0 4px transparent; }
+    0%   { opacity: 0; transform: translateY(6px); box-shadow: 0 0 0 0 var(--color-scene-glow); }
+    40%  { opacity: 1; transform: none; box-shadow: 0 0 0 4px transparent; }
     100% { box-shadow: 0 0 0 0 transparent; }
   }
   .pg-cue {
-    animation: pgCueIn 1.6s ease-out both;
+    animation: pgCueIn 1.6s var(--ease-out) both;
   }
 
-  /* ── Viewport reveals (CSS-first, IO adds .is-in) ──────────────── */
-
-  /* The hidden state only exists so the enter transition has
-     somewhere to come from; if JS never runs the observer, scripting
-     is off, or reduced motion is set, content renders visible. */
-  [data-reveal] {
-    opacity: 0;
-    transform: translateY(28px);
-    transition:
-      opacity 700ms var(--ease-out),
-      transform 700ms var(--ease-out);
-  }
-  [data-reveal].is-in {
-    opacity: 1;
-    transform: none;
-  }
-  @media (scripting: none) {
-    [data-reveal] { opacity: 1; transform: none; }
-  }
-
-  /* ── Index hero: masked line rise + soft elements ──────────────── */
-
-  @keyframes heroLineRise {
-    from { transform: translateY(118%); }
-    to   { transform: none; }
-  }
-  .hero-line   { animation: heroLineRise 950ms var(--ease-out) 150ms both; }
-  .hero-line-2 { animation-delay: 260ms; }
-  .hero-line-3 { animation-delay: 370ms; }
-
-  @keyframes heroSoftIn {
-    from { opacity: 0; transform: translateY(14px); }
-    to   { opacity: 1; transform: none; }
-  }
-  .hero-soft { animation: heroSoftIn 700ms var(--ease-out) 760ms both; }
-
-  /* ── Index hero: the approval-gate hairline ────────────────────── */
-
-  /* The gate the particle field flows through. A quiet vertical line
-     with a slow breathing glow; the canvas does the real talking. */
-  @keyframes gateBreathe {
-    0%, 100% { opacity: 0.5; }
-    50%      { opacity: 0.95; }
-  }
-  .gate-hairline {
-    background: linear-gradient(
-      180deg,
-      transparent 0%,
-      rgba(255, 107, 107, 0.55) 18%,
-      rgba(255, 107, 107, 0.85) 50%,
-      rgba(255, 107, 107, 0.55) 82%,
-      transparent 100%
-    );
-    box-shadow: 0 0 24px 1px rgba(255, 107, 107, 0.25);
-    animation: gateBreathe 5.5s var(--ease-in-out) infinite;
-  }
-
-  /* ── Scene entrance choreography (shared by all 4 scenes) ──────── */
-
-  /* Header, columns, and below-grid strips rise in on mount. Pure CSS
-     so scene bundles stay light; delays are set per slot. */
-  @keyframes sceneRise {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: none; }
-  }
-  .scene-rise { animation: sceneRise 640ms var(--ease-out) both; }
-
-  /* Columns stagger left to right; everything below the grid (learn
-     strip, feed, CTA) rises last as one block. */
-  .scene-columns > * { animation: sceneRise 640ms var(--ease-out) both; }
-  .scene-columns > *:nth-child(1) { animation-delay: 70ms; }
-  .scene-columns > *:nth-child(2) { animation-delay: 140ms; }
-  .scene-columns > *:nth-child(3) { animation-delay: 210ms; }
-  .scene-columns ~ * { animation: sceneRise 640ms var(--ease-out) 280ms both; }
-
-  /* Agent presence: the breathing orb that gives an idle agent column
-     a heartbeat before any run. Scene-accent, quiet, compositor-only. */
-  @keyframes agentBreathe {
-    0%, 100% { transform: scale(1); opacity: 0.45; }
-    50%      { transform: scale(1.18); opacity: 0.9; }
-  }
-  .agent-orb {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--color-scene-1);
-    box-shadow: 0 0 18px 3px var(--color-scene-glow, rgba(255,107,107,0.35));
-    animation: agentBreathe 2.8s var(--ease-in-out) infinite;
-  }
-
-  /* Agent output staging: when a run lands, its lines rise in sequence
-     so the draft reads as being WRITTEN, not pasted. */
-  .pg-stagger > * { animation: sceneRise 460ms var(--ease-out) both; }
-  .pg-stagger > *:nth-child(1) { animation-delay: 40ms; }
-  .pg-stagger > *:nth-child(2) { animation-delay: 140ms; }
-  .pg-stagger > *:nth-child(3) { animation-delay: 240ms; }
-  .pg-stagger > *:nth-child(4) { animation-delay: 340ms; }
-  .pg-stagger > *:nth-child(5) { animation-delay: 440ms; }
-  .pg-stagger > *:nth-child(6) { animation-delay: 540ms; }
-  .pg-stagger > *:nth-child(7) { animation-delay: 640ms; }
-  .pg-stagger > *:nth-child(8) { animation-delay: 740ms; }
-  /* Anything past the 8th shares the last beat, so a long draft never
-     animates a late line in AHEAD of the lines above it. */
-  .pg-stagger > *:nth-child(n+9) { animation-delay: 800ms; }
-
-  /* The attachment thumb lifts above its siblings while popped so the
-     scaled preview isn't clipped by the next card. */
-  .thumb-pop:hover,
-  .thumb-pop:focus-visible,
-  .thumb-pop[data-popped="true"] {
-    z-index: 30;
-  }
-
-  /* The pop itself. Driven from CSS rather than conditional utilities so
-     hover, keyboard focus, and tap all share one rule. Note the zoom is
-     the CONTENT (it's how you read the attachment), so reduced motion
-     drops the animation, not the preview. */
-  .thumb-art {
-    transform-origin: left center;
-  }
-  .thumb-pop:hover .thumb-art,
-  .thumb-pop:focus-visible .thumb-art,
-  .thumb-pop[data-popped="true"] .thumb-art {
-    transform: scale(2.1);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.65);
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .thumb-art {
-      transition: transform 200ms var(--ease-out);
-    }
-  }
-
-  /* Scene conduit: a thin scene-accent thread that draws across the
-     top of the workspace on entry. The index's gate line, echoed. */
-  @keyframes conduitDraw {
-    from { transform: scaleX(0); }
-    to   { transform: scaleX(1); }
-  }
-  .scene-conduit {
-    height: 1px;
-    transform-origin: left center;
-    background: linear-gradient(
-      90deg,
-      var(--color-scene-1) 0%,
-      color-mix(in oklab, var(--color-scene-1) 35%, transparent) 60%,
-      transparent 100%
-    );
-    animation: conduitDraw 900ms var(--ease-out) 120ms both;
-  }
-
-  /* ── Cards that travel (View Transitions) ──────────────────────── */
-
-  /* A card with a view-transition-name is moved by the transition, so
-     its arrival flash must not ALSO fade it in (the new snapshot would
-     start invisible and the hand-off would blink mid-flight). Same
-     background flash as pg-fresh, no opacity or translate. Browsers
-     without View Transitions fall back to the full pg-fresh arrival. */
+  /* A card that travels between columns is moved by the View
+     Transition, so its arrival flash must not also fade it in. */
   @keyframes pgFreshStill {
-    0%   { background-color: var(--color-scene-glow, rgba(255,107,107,0.18)); }
-    100% { background-color: rgba(255,255,255,0.02); }
+    0%   { background-color: var(--color-scene-glow); }
+    100% { background-color: color-mix(in oklab, var(--color-ink-850) 88%, transparent); }
   }
   .pg-fresh-move {
-    animation: pgFreshIn 2s ease-out both;
+    animation: pgFreshIn 1.8s var(--ease-out) both;
   }
   @supports (view-transition-name: none) {
     .pg-fresh-move {
@@ -431,33 +583,26 @@
     }
   }
 
-  /* ── The landing: the column the orb flies INTO ───────────────── */
-
-  /* flowPulse adds .is-receiving to the target column when the orb
-     lands. One accent ring blooms out and fades, so the reaction is
-     pinned to a place on the grid, not just to a row inside it. */
+  /* The column the flowPulse orb lands in blooms one accent ring. */
   @keyframes pgReceive {
-    0%   { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 0 0 var(--color-scene-glow, rgba(255,107,107,0.35)); }
-    30%  { box-shadow: inset 0 0 0 1px var(--color-scene-1), 0 0 0 5px transparent; }
-    100% { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), 0 0 0 0 transparent; }
+    0%   { box-shadow: inset 0 0 0 1px transparent; }
+    30%  { box-shadow: inset 0 0 0 1px var(--color-scene-1), inset 0 0 40px -10px var(--color-scene-glow); }
+    100% { box-shadow: inset 0 0 0 1px transparent; }
   }
   .is-receiving {
     animation: pgReceive 900ms var(--ease-out) both;
   }
 
-  /* ── Start here: the first sensible button in a scene ─────────── */
-
-  /* A quiet scene-accent ring pulses out of the button until the first
-     click anywhere in the workspace (src/lib/useStartHint.ts). It sits
-     under the button's own hover / focus treatment and never blocks a
-     pointer. */
+  /* Start here: a quiet ring pulses out of the first sensible button
+     until the first click anywhere in the workspace. */
   @keyframes hintRing {
-    0%   { opacity: 0.85; transform: scale(1); }
-    70%  { opacity: 0;    transform: scale(1.22); }
-    100% { opacity: 0;    transform: scale(1.22); }
+    0%   { opacity: 0.9; transform: scale(1); }
+    70%  { opacity: 0;   transform: scale(1.2, 1.35); }
+    100% { opacity: 0;   transform: scale(1.2, 1.35); }
   }
   [data-hint="true"] {
     position: relative;
+    overflow: visible;
   }
   [data-hint="true"]::after {
     content: "";
@@ -469,10 +614,6 @@
     animation: hintRing 2.2s var(--ease-out) 900ms infinite;
   }
 
-  /* ── State flips that should be seen: pills, counts, chips ─────── */
-
-  /* Remount a pill with a `key` when its value changes and it pops
-     into place. Never from scale(0): nothing appears from nothing. */
   @keyframes popIn {
     from { opacity: 0.4; transform: scale(0.85); }
     to   { opacity: 1;   transform: none; }
@@ -480,18 +621,80 @@
   .pop-in {
     animation: popIn 360ms var(--ease-out) both;
   }
-  /* Chips that flip together (credential badges) land one after another. */
   .pop-in:nth-child(2) { animation-delay: 60ms; }
   .pop-in:nth-child(3) { animation-delay: 120ms; }
   .pop-in:nth-child(4) { animation-delay: 180ms; }
   .pop-in:nth-child(5) { animation-delay: 240ms; }
 
-  /* ── Index loop console: rows populate per beat ───────────────── */
+  /* Agent presence: the breathing orb of an idle agent. */
+  @keyframes agentBreathe {
+    0%, 100% { transform: scale(1); opacity: 0.45; }
+    50%      { transform: scale(1.18); opacity: 0.9; }
+  }
+  .agent-orb {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-scene-1);
+    box-shadow: 0 0 18px 3px var(--color-scene-glow);
+    animation: agentBreathe 2.8s var(--ease-in-out) infinite;
+  }
 
-  /* The console panel already crossfades per beat; its rows now land
-     one at a time so each beat reads as the console FILLING, not a
-     slide swap. Transition (not keyframes) so a fast scroll that
-     flips beats mid-flight stays interruptible. */
+  /* Agent output lands line by line, so a draft reads as written. */
+  @keyframes sceneRise {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .pg-stagger > * { animation: sceneRise 460ms var(--ease-out) both; }
+  .pg-stagger > *:nth-child(1) { animation-delay: 40ms; }
+  .pg-stagger > *:nth-child(2) { animation-delay: 140ms; }
+  .pg-stagger > *:nth-child(3) { animation-delay: 240ms; }
+  .pg-stagger > *:nth-child(4) { animation-delay: 340ms; }
+  .pg-stagger > *:nth-child(5) { animation-delay: 440ms; }
+  .pg-stagger > *:nth-child(6) { animation-delay: 540ms; }
+  .pg-stagger > *:nth-child(7) { animation-delay: 640ms; }
+  .pg-stagger > *:nth-child(8) { animation-delay: 740ms; }
+  .pg-stagger > *:nth-child(n+9) { animation-delay: 800ms; }
+
+  /* Page entrance: header, frame and receipts rise in on mount. Pure
+     CSS, so it runs on the compositor and survives a frozen ticker. */
+  .scene-rise { animation: sceneRise 700ms var(--ease-out) both; }
+  .scene-rise-2 { animation: sceneRise 700ms var(--ease-out) 90ms both; }
+  .scene-rise-3 { animation: sceneRise 700ms var(--ease-out) 180ms both; }
+  .scene-columns > * { animation: sceneRise 640ms var(--ease-out) both; }
+  .scene-columns > *:nth-child(1) { animation-delay: 160ms; }
+  .scene-columns > *:nth-child(2) { animation-delay: 230ms; }
+  .scene-columns > *:nth-child(3) { animation-delay: 300ms; }
+  .scene-columns > *:nth-child(4) { animation-delay: 370ms; }
+
+  /* The attachment thumb: hover, focus and tap all pop the preview. The
+     zoom IS the content, so reduced motion drops the animation only. */
+  .thumb-pop:hover,
+  .thumb-pop:focus-visible,
+  .thumb-pop[data-popped="true"] {
+    z-index: 30;
+  }
+  /* A card holding a popped thumb rises over its neighbours. */
+  .item:has(.thumb-pop:hover, .thumb-pop:focus-visible, .thumb-pop[data-popped="true"]) {
+    z-index: 20;
+  }
+  .thumb-art {
+    transform-origin: left center;
+  }
+  .thumb-pop:hover .thumb-art,
+  .thumb-pop:focus-visible .thumb-art,
+  .thumb-pop[data-popped="true"] .thumb-art {
+    transform: scale(2.1);
+    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.7);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .thumb-art {
+      transition: transform 220ms var(--ease-out);
+    }
+  }
+
+  /* Index loop console: rows populate per beat. Transitions, so a fast
+     scroll that flips beats mid-flight stays interruptible. */
   .loop-rows > * {
     transition:
       opacity 420ms var(--ease-out),
@@ -509,60 +712,109 @@
   [data-on="true"] .loop-rows > *:nth-child(5) { transition-delay: 300ms; }
   [data-on="true"] .loop-rows > *:nth-child(n+6) { transition-delay: 360ms; }
 
-  /* ── Module widgets: a new audit row is an event ──────────────── */
-
-  /* Widgets have no reducer and no fresh flag; a row that mounts IS a
-     new row, so it animates on mount. Reset empties the list, so
-     nothing re-animates that a visitor has already seen. */
+  /* Module widgets: a row that mounts is a new row. */
   .row-land {
-    animation: pgFreshIn 1.6s ease-out both;
+    animation: pgFreshIn 1.6s var(--ease-out) both;
   }
 
-  /* Honour system reduce-motion. The tour still works, just skips the
-     entrance fade and the pulse animation. */
+  /* ── Viewport reveals (CSS-first, IntersectionObserver adds .is-in) ── */
+
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 800ms var(--ease-out),
+      transform 800ms var(--ease-out);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  [data-reveal].is-in {
+    opacity: 1;
+    transform: none;
+  }
+  @media (scripting: none) {
+    [data-reveal] { opacity: 1; transform: none; }
+  }
+
+  /* ── Index hero ───────────────────────────────────────────────── */
+
+  @keyframes heroLineRise {
+    from { transform: translateY(112%); }
+    to   { transform: none; }
+  }
+  .hero-line   { animation: heroLineRise 1000ms var(--ease-out) 120ms both; }
+  .hero-line-2 { animation-delay: 230ms; }
+  .hero-line-3 { animation-delay: 340ms; }
+
+  @keyframes heroSoftIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: none; }
+  }
+  .hero-soft   { animation: heroSoftIn 800ms var(--ease-out) 700ms both; }
+  .hero-soft-2 { animation-delay: 820ms; }
+  .hero-soft-3 { animation-delay: 940ms; }
+
+  @keyframes gateBreathe {
+    0%, 100% { opacity: 0.5; }
+    50%      { opacity: 0.95; }
+  }
+  .gate-hairline {
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      color-mix(in oklab, var(--color-scene-1) 55%, transparent) 18%,
+      color-mix(in oklab, var(--color-scene-1) 85%, transparent) 50%,
+      color-mix(in oklab, var(--color-scene-1) 55%, transparent) 82%,
+      transparent 100%
+    );
+    animation: gateBreathe 5.5s var(--ease-in-out) infinite;
+  }
+
+  /* A slow marquee for the capability ribbon. */
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .marquee {
+    animation: marquee 48s linear infinite;
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .marquee-wrap:hover .marquee {
+      animation-play-state: paused;
+    }
+  }
+
+  /* ── Reduced motion: keep colour and state, drop movement ─────── */
+
   @media (prefers-reduced-motion: reduce) {
-    .tour-step-enter { animation: none; }
-    .tour-fresh-pulse { animation: none; background-color: rgba(255, 107, 107, 0.06); }
-    .pg-fresh { animation: none; }
-    .pg-cue { animation: none; }
-    .gate-hairline { animation: none; opacity: 0.6; }
+    .pg-fresh,
+    .pg-fresh-move,
+    .pg-cue,
+    .row-land,
+    .is-receiving,
+    .pop-in,
     .scene-rise,
+    .scene-rise-2,
+    .scene-rise-3,
     .scene-columns > *,
-    .scene-columns ~ * {
+    .pg-stagger > *,
+    .hero-line,
+    .hero-line-2,
+    .hero-line-3,
+    .hero-soft,
+    .marquee {
       animation: none;
     }
-    .scene-conduit { animation: none; }
-    [data-reveal] { opacity: 1; transform: none; transition: none; }
-    .hero-line, .hero-line-2, .hero-line-3, .hero-soft { animation: none; }
+    .gate-hairline { animation: none; opacity: 0.6; }
     .agent-orb { animation: none; opacity: 0.7; }
-    .pg-stagger > * { animation: none; }
-    .pg-fresh-move { animation: none; }
-    .is-receiving { animation: none; }
+    .live-dot::after { animation: none; }
     [data-hint="true"]::after { animation: none; opacity: 0.55; }
-    .pop-in { animation: none; }
+    [data-reveal] { opacity: 1; transform: none; transition: none; }
     .loop-rows > * { transition: none; }
     [data-on="false"] .loop-rows > * { opacity: 1; transform: none; }
-    .row-land { animation: none; }
-  }
-
-  /* Agency-style card surface, matches the marketing site's
-     card-surface utility shape so the visual language reads as one
-     family across both sites. */
-  .scene-card {
-    background: linear-gradient(180deg, rgba(24, 24, 32, 0.45) 0%, rgba(8, 8, 12, 0.65) 100%);
-    box-shadow:
-      inset 0 0 0 1px rgba(255, 255, 255, 0.05),
-      0 1px 0 0 rgba(255, 255, 255, 0.02);
-    transition:
-      box-shadow 240ms var(--ease-out),
-      transform 240ms var(--ease-out),
-      background 240ms var(--ease-out);
-  }
-  .scene-card:hover {
-    background: linear-gradient(180deg, rgba(28, 28, 36, 0.55) 0%, rgba(10, 10, 14, 0.7) 100%);
-    box-shadow:
-      inset 0 0 0 1px rgba(255, 255, 255, 0.12),
-      0 8px 32px -8px rgba(0, 0, 0, 0.4);
-    transform: translateY(-2px);
+    .item,
+    .btn,
+    .btn .btn-arrow {
+      transition-property: background-color, border-color, color, box-shadow;
+    }
   }
 }

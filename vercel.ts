@@ -10,25 +10,6 @@
 
 import { type VercelConfig } from "@vercel/config/v1";
 
-const CSP_DIRECTIVES: Record<string, string[]> = {
-  "default-src": ["'self'"],
-  "script-src": ["'self'", "'unsafe-inline'", "https://va.vercel-scripts.com"],
-  "style-src": ["'self'", "'unsafe-inline'"],
-  "font-src": ["'self'", "data:"],
-  "img-src": ["'self'", "data:", "blob:"],
-  "frame-src": ["'self'"],
-  "connect-src": ["'self'", "https://vitals.vercel-insights.com"],
-  "object-src": ["'none'"],
-  "base-uri": ["'self'"],
-  "form-action": ["'self'"],
-  "frame-ancestors": ["'none'"],
-  "upgrade-insecure-requests": [],
-};
-
-const CSP_HEADER = Object.entries(CSP_DIRECTIVES)
-  .map(([k, v]) => (v.length ? `${k} ${v.join(" ")}` : k))
-  .join("; ");
-
 export const config: VercelConfig = {
   framework: "vite",
   buildCommand: "pnpm build",
@@ -54,7 +35,14 @@ export const config: VercelConfig = {
         { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=(), usb=()" },
         { key: "X-DNS-Prefetch-Control", value: "off" },
-        { key: "Content-Security-Policy", value: CSP_HEADER },
+        // Literal, not built from a directive map: Vercel validates these
+        // values without running the code that would compute them (a
+        // computed CSP failed the deploy, "missing required property value").
+        {
+          key: "Content-Security-Policy",
+          value:
+            "default-src 'self'; script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob:; frame-src 'self'; connect-src 'self' https://vitals.vercel-insights.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests",
+        },
         // The demo subdomain is for people, not search engines, so the
         // keyword weight stays on gravixar.com.
         { key: "X-Robots-Tag", value: "noindex, nofollow" },

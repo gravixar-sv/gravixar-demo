@@ -1,167 +1,214 @@
+// Daily check-in. The visitor picks where they are working from today
+// and their "You" chip slides into that column of the team board (a
+// View Transition), with the column counts popping as they change. The
+// five teammates are fixed sample data, so the board feels populated
+// without a database.
 
-// Daily check-in widget. Visitor picks their own status (first row in
-// the team grid), watches the team count update. The other 5 rows are
-// fixed teammates with random-but-deterministic statuses so the team
-// grid feels populated without a DB.
+import { useState, type ReactNode } from "react";
+import { Avatar, type AvatarHue } from "@/components/demo/Avatar";
+import { Button } from "@/components/ui/Button";
+import { cn } from "@/lib/cn";
+import { withViewTransition } from "@/lib/viewTransition";
+import { WidgetFrame, WidgetHeading } from "@/components/modules/WidgetFrame";
 
-import { useState } from "react";
+type Status = "OFFICE" | "WFH" | "FIELD";
 
-type Status = "OFFICE" | "WFH" | "FIELD" | null;
-
-const STATUSES: { value: Exclude<Status, null>; label: string; tone: string }[] = [
-  { value: "OFFICE", label: "in office", tone: "border-emerald-400/40 text-emerald-300 bg-emerald-400/5" },
-  { value: "WFH", label: "wfh", tone: "border-cyan-400/40 text-cyan-300 bg-cyan-400/5" },
-  { value: "FIELD", label: "field", tone: "border-amber-400/40 text-amber-300 bg-amber-400/5" },
+const STATUSES: { value: Status; label: string; hint: string; tone: string; dot: string; icon: ReactNode }[] = [
+  {
+    value: "OFFICE",
+    label: "In the office",
+    hint: "Desk, meeting rooms, the studio",
+    tone: "border-emerald-400/50 bg-emerald-400/[0.08] text-emerald-200",
+    dot: "bg-emerald-400",
+    icon: (
+      <path d="M4 20V6l8-3 8 3v14M9 20v-4h6v4M8 9h.01M12 9h.01M16 9h.01M8 13h.01M12 13h.01M16 13h.01" />
+    ),
+  },
+  {
+    value: "WFH",
+    label: "Working from home",
+    hint: "Online, on Slack, on calls",
+    tone: "border-sky-400/50 bg-sky-400/[0.08] text-sky-200",
+    dot: "bg-sky-400",
+    icon: <path d="M4 11l8-7 8 7v9H4zM10 20v-5h4v5" />,
+  },
+  {
+    value: "FIELD",
+    label: "In the field",
+    hint: "On a shoot, at a client, travelling",
+    tone: "border-amber-400/50 bg-amber-400/[0.08] text-amber-200",
+    dot: "bg-amber-400",
+    icon: <path d="M12 21s-6-5.3-6-10a6 6 0 1112 0c0 4.7-6 10-6 10zM12 13a2 2 0 100-4 2 2 0 000 4z" />,
+  },
 ];
 
-const TEAM = [
-  { name: "Mira Voss", role: "client lead", status: "WFH" as Exclude<Status, null> },
-  { name: "Kai Render", role: "pm", status: "OFFICE" as Exclude<Status, null> },
-  { name: "Nox Bellini", role: "admin", status: "OFFICE" as Exclude<Status, null> },
-  { name: "Sage Holloway", role: "designer", status: "FIELD" as Exclude<Status, null> },
-  { name: "Olin Park", role: "engineer", status: "WFH" as Exclude<Status, null> },
+type Person = { name: string; role: string; initials: string; hue: AvatarHue; status: Status };
+
+const TEAM: Person[] = [
+  { name: "Mira Voss", role: "client lead", initials: "MV", hue: { from: "#FF8A8A", to: "#C2410C", ink: "#2A0E08" }, status: "WFH" },
+  { name: "Kai Render", role: "PM", initials: "KR", hue: { from: "#7DD3FC", to: "#4338CA", ink: "#0A1230" }, status: "OFFICE" },
+  { name: "Rhea Castell", role: "admin", initials: "RC", hue: { from: "#F0ABFC", to: "#7E22CE", ink: "#240833" }, status: "OFFICE" },
+  { name: "Sage Holloway", role: "designer", initials: "SH", hue: { from: "#86EFAC", to: "#047857", ink: "#04221A" }, status: "FIELD" },
+  { name: "Olin Park", role: "engineer", initials: "OP", hue: { from: "#FDE68A", to: "#B45309", ink: "#2A1804" }, status: "WFH" },
 ];
+
+const YOU_HUE: AvatarHue = { from: "#FFB199", to: "#FF6B5E", ink: "#2A0E08" };
 
 export function DailyCheckin() {
-  const [me, setMe] = useState<Status>(null);
-
-  const counts = STATUSES.map((s) => {
-    const teamCount = TEAM.filter((t) => t.status === s.value).length;
-    const total = teamCount + (me === s.value ? 1 : 0);
-    return { ...s, total };
-  });
+  const [me, setMe] = useState<Status | null>(null);
+  const pick = (s: Status | null) => withViewTransition(() => setMe(s));
+  const picked = STATUSES.find((s) => s.value === me);
 
   return (
-    <div className="space-y-8">
-      {/* Picker */}
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-md">
-        <div className="flex items-start justify-between gap-4">
+    <div className="space-y-6">
+      <WidgetFrame
+        crumb="Daily check-in"
+        toolbar={
+          me ? (
+            <Button variant="ghost" size="sm" icon="↻" onClick={() => pick(null)} className="font-mono uppercase tracking-[0.08em]">
+              Reset
+            </Button>
+          ) : null
+        }
+      >
+        <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-              your check-in, today
-            </p>
-            <p className="mt-2 text-base font-medium text-zinc-100">
-              Where are you working from?
-            </p>
-            <p className="mt-1 text-xs text-zinc-500">
-              In production this modal auto-prompts on the first portal
-              pageview each calendar day. Karachi business-day timezone, not
-              UTC, so the prompt fires correctly for PK-based teams.
+            <p className="label-mono">Today&apos;s check-in</p>
+            <p className="heading mt-2 text-xl text-ink-50 md:text-2xl">Where are you working from today?</p>
+            <p className="mt-2 max-w-[60ch] text-xs leading-relaxed text-ink-500">
+              In production this prompt opens on the first portal page view of each calendar day, counted on the
+              team&apos;s own business day (Karachi time for PK-based teams), not UTC.
             </p>
           </div>
         </div>
 
-        <div className="mt-6 grid gap-2 sm:grid-cols-3">
+        <div role="group" aria-label="Where are you working from today?" className="mt-6 grid gap-3 sm:grid-cols-3">
           {STATUSES.map((s) => {
             const active = me === s.value;
             return (
               <button
                 key={s.value}
                 type="button"
-                onClick={() => setMe(active ? null : s.value)}
-                className={`rounded-xl border px-4 py-3 text-left transition-all ${
-                  active
-                    ? s.tone + " ring-1 ring-current"
-                    : "border-white/10 bg-white/[0.02] text-zinc-300 hover:border-white/25"
-                }`}
+                aria-pressed={active}
+                data-spot
+                onClick={() => pick(active ? null : s.value)}
+                className={cn(
+                  "item group flex flex-col items-start gap-3 rounded-2xl p-4 text-left",
+                  active && cn(s.tone, "shadow-[0_18px_40px_-20px_rgb(0_0_0/0.8)]"),
+                )}
               >
-                <p className="font-mono text-[10px] uppercase tracking-[0.18em]">
-                  {s.value.toLowerCase()}
-                </p>
-                <p className="mt-1 text-sm">
-                  {active ? "you're here today" : s.label}
-                </p>
+                <span className="flex w-full items-center justify-between">
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "inline-flex h-10 w-10 items-center justify-center rounded-xl border transition-colors duration-300",
+                      active ? "border-current" : "border-line-strong text-ink-300 group-hover:text-ink-100",
+                    )}
+                  >
+                    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      {s.icon}
+                    </svg>
+                  </span>
+                  <span
+                    aria-hidden
+                    key={active ? "on" : "off"}
+                    className={cn(
+                      "inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px]",
+                      active ? "pop-in bg-current" : "ring-1 ring-white/15",
+                    )}
+                  >
+                    {active ? <span className="text-ink-950">✓</span> : null}
+                  </span>
+                </span>
+                <span>
+                  <span className={cn("block text-[15px] font-semibold", active ? "" : "text-ink-100")}>{s.label}</span>
+                  <span className={cn("mt-0.5 block text-xs", active ? "opacity-80" : "text-ink-500")}>{s.hint}</span>
+                </span>
               </button>
             );
           })}
         </div>
 
-        {me ? (
-          <div className="mt-5 flex items-center justify-between border-t border-white/5 pt-4">
-            <p className="text-xs text-zinc-400">
-              Saved. The team view below picks up your status. Modal won&apos;t
-              re-prompt until tomorrow.
-            </p>
-            <button
-              type="button"
-              onClick={() => setMe(null)}
-              className="inline-flex min-h-10 items-center justify-center rounded-md border border-white/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400 transition-all hover:border-white/30 hover:text-zinc-200 active:scale-[0.98] lg:min-h-0"
-            >
-              <span aria-hidden>↻</span> reset
-            </button>
-          </div>
-        ) : null}
-      </div>
+        <p aria-live="polite" className="mt-5 min-h-5 border-t border-line pt-4 text-xs text-ink-400">
+          {picked ? (
+            <>
+              Saved as <span className="text-ink-100">{picked.label.toLowerCase()}</span>. The team board picks it up,
+              and the prompt will not open again until tomorrow.
+            </>
+          ) : (
+            "Pick one. It is one status per person per day, enforced by a unique constraint."
+          )}
+        </p>
+      </WidgetFrame>
 
-      {/* Team grid */}
-      <div>
-        <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
-          team status, today
-        </h2>
-
-        <div className="mt-4 grid gap-2 sm:grid-cols-3">
-          {counts.map((s) => (
-            <div
-              key={s.value}
-              className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3"
-            >
-              <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                {s.value.toLowerCase()}
-              </p>
-              <p
-                key={s.total}
-                className="pop-in mt-1 origin-left text-2xl font-medium tabular-nums text-zinc-100"
-              >
-                {s.total}
-              </p>
-            </div>
-          ))}
+      {/* The team board */}
+      <section aria-labelledby="checkin-team-heading" className="surface rounded-2xl p-5 md:p-6">
+        <WidgetHeading id="checkin-team-heading" aside="What a manager sees, live">
+          Team today
+        </WidgetHeading>
+        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          {STATUSES.map((s) => {
+            const people = TEAM.filter((t) => t.status === s.value);
+            const total = people.length + (me === s.value ? 1 : 0);
+            return (
+              <div key={s.value} className="rounded-xl border border-line bg-white/[0.015] p-3.5">
+                <div className="flex items-center justify-between">
+                  <p className="flex items-center gap-2 text-[13px] font-medium text-ink-200">
+                    <span aria-hidden className={cn("h-2 w-2 rounded-full", s.dot)} />
+                    {s.label}
+                  </p>
+                  <span key={total} className="pop-in display text-2xl tabular-nums text-ink-50">
+                    {total}
+                  </span>
+                </div>
+                <ul className="mt-3 space-y-1.5">
+                  {me === s.value ? (
+                    <li style={{ viewTransitionName: "checkin-you" }}>
+                      <PersonChip initials="YOU" hue={YOU_HUE} name="You" role="visitor" highlight />
+                    </li>
+                  ) : null}
+                  {people.map((p) => (
+                    <li key={p.name}>
+                      <PersonChip initials={p.initials} hue={p.hue} name={p.name} role={p.role} />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
         </div>
-
-        <ul className="mt-5 divide-y divide-white/5 rounded-2xl border border-white/10 bg-white/[0.03]">
-          {/* "You" row, only renders if a status is picked */}
-          {me ? (
-            <Row name="you" role="visitor" status={me} highlight />
-          ) : null}
-          {TEAM.map((t) => (
-            <Row key={t.name} name={t.name} role={t.role} status={t.status} />
-          ))}
-        </ul>
-      </div>
+      </section>
     </div>
   );
 }
 
-function Row({
+function PersonChip({
+  initials,
+  hue,
   name,
   role,
-  status,
   highlight = false,
 }: {
+  initials: string;
+  hue: AvatarHue;
   name: string;
   role: string;
-  status: Exclude<Status, null>;
   highlight?: boolean;
 }) {
-  const tone = STATUSES.find((s) => s.value === status)!.tone;
   return (
-    <li
-      className={`flex items-center justify-between gap-3 px-5 py-3 ${
-        highlight ? "row-land rounded-t-2xl bg-[var(--color-scene-1)]/[0.04]" : ""
-      }`}
+    <span
+      className={cn(
+        "flex items-center gap-2.5 rounded-lg px-2 py-1.5",
+        highlight
+          ? "bg-[color-mix(in_oklab,var(--color-scene-1)_12%,transparent)] ring-1 ring-[color-mix(in_oklab,var(--color-scene-1)_45%,transparent)]"
+          : "",
+      )}
     >
-      <div>
-        <p className="text-sm text-zinc-100">{name}</p>
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-          {role}
-        </p>
-      </div>
-      <span
-        key={status}
-        className={`${highlight ? "pop-in" : ""} rounded-full border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em] ${tone}`}
-      >
-        {status.toLowerCase()}
+      <Avatar initials={initials === "YOU" ? "Y" : initials} hue={hue} size="xs" ring={false} />
+      <span className="min-w-0">
+        <span className="block truncate text-[13px] text-ink-100">{name}</span>
+        <span className="block text-[11px] text-ink-500">{role}</span>
       </span>
-    </li>
+    </span>
   );
 }

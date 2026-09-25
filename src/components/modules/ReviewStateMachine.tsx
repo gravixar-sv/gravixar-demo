@@ -1,10 +1,19 @@
-
-// Interactive review state machine demo. Visitor moves a single
-// deliverable through transitions. Each transition writes a row to a
-// local audit log so the visitor sees the discipline of "every state
-// change has a side effect" without any DB involvement.
+// Interactive review state machine. The visitor moves one deliverable
+// through its states on a drawn state diagram: the next legal states
+// light up (click the node or the button), an orb flies along the edge,
+// and every transition writes a row to a local audit log, so "every
+// state change has a side effect" is visible without any database.
+//
+// The diagram is HTML nodes over one SVG of edges sharing a 960x300
+// coordinate space; the container keeps that aspect, so nodes and edges
+// scale together. On narrow screens it scrolls sideways rather than
+// shrinking its labels past the type floor.
 
 import { useState } from "react";
+import { Button } from "@/components/ui/Button";
+import { flowPulse } from "@/lib/flowPulse";
+import { cn } from "@/lib/cn";
+import { WidgetFrame, WidgetHeading, timeAgo } from "@/components/modules/WidgetFrame";
 
 type State =
   | "DRAFT"
@@ -16,170 +25,277 @@ type State =
 type Transition = {
   label: string;
   to: State;
-  variant?: "primary" | "ghost";
+  variant: "primary" | "ghost";
   actor: string;
 };
 
 const FLOW: Record<State, Transition[]> = {
-  DRAFT: [
-    { label: "submit for internal review", to: "INTERNAL_APPROVED", variant: "primary", actor: "Sage (designer)" },
-  ],
+  DRAFT: [{ label: "Submit for internal review", to: "INTERNAL_APPROVED", variant: "primary", actor: "Sage (designer)" }],
   INTERNAL_APPROVED: [
-    { label: "submit for client review", to: "SUBMITTED_FOR_CLIENT", variant: "primary", actor: "Kai (PM)" },
-    { label: "send back to draft", to: "DRAFT", variant: "ghost", actor: "Kai (PM)" },
+    { label: "Submit for client review", to: "SUBMITTED_FOR_CLIENT", variant: "primary", actor: "Kai (PM)" },
+    { label: "Send back to draft", to: "DRAFT", variant: "ghost", actor: "Kai (PM)" },
   ],
   SUBMITTED_FOR_CLIENT: [
-    { label: "approve", to: "CLIENT_APPROVED", variant: "primary", actor: "Mira (client)" },
-    { label: "request revision", to: "CLIENT_REVISION_REQUESTED", variant: "ghost", actor: "Mira (client)" },
+    { label: "Approve", to: "CLIENT_APPROVED", variant: "primary", actor: "Mira (client)" },
+    { label: "Request revision", to: "CLIENT_REVISION_REQUESTED", variant: "ghost", actor: "Mira (client)" },
   ],
   CLIENT_APPROVED: [],
-  CLIENT_REVISION_REQUESTED: [
-    { label: "back to draft", to: "DRAFT", variant: "primary", actor: "Sage (designer)" },
-  ],
+  CLIENT_REVISION_REQUESTED: [{ label: "Back to draft", to: "DRAFT", variant: "primary", actor: "Sage (designer)" }],
 };
 
-const STATE_TONE: Record<State, string> = {
-  DRAFT: "border-zinc-700 text-zinc-300",
-  INTERNAL_APPROVED: "border-amber-400/40 text-amber-300",
-  SUBMITTED_FOR_CLIENT: "border-[var(--color-scene-1)]/50 text-[var(--color-scene-1)]",
-  CLIENT_APPROVED: "border-emerald-400/40 text-emerald-300",
-  CLIENT_REVISION_REQUESTED: "border-rose-400/40 text-rose-300",
+const NODES: Record<State, { x: number; y: number; label: string }> = {
+  DRAFT: { x: 110, y: 110, label: "Draft" },
+  INTERNAL_APPROVED: { x: 360, y: 110, label: "Internal approved" },
+  SUBMITTED_FOR_CLIENT: { x: 610, y: 110, label: "With client" },
+  CLIENT_APPROVED: { x: 860, y: 110, label: "Client approved" },
+  CLIENT_REVISION_REQUESTED: { x: 610, y: 240, label: "Revision requested" },
 };
 
-type AuditRow = {
-  id: number;
-  from: State;
-  to: State;
-  actor: string;
-  at: Date;
+// Every legal edge, as an SVG path in the diagram's 960x300 space. Ends
+// stop short of the node pills (sized for a ~850px diagram) so each
+// arrowhead lands on the pill's edge instead of under it.
+const EDGES: { from: State; to: State; d: string }[] = [
+  { from: "DRAFT", to: "INTERNAL_APPROVED", d: "M161 110 H266" },
+  { from: "INTERNAL_APPROVED", to: "SUBMITTED_FOR_CLIENT", d: "M450 110 H544" },
+  { from: "SUBMITTED_FOR_CLIENT", to: "CLIENT_APPROVED", d: "M672 110 H777" },
+  { from: "SUBMITTED_FOR_CLIENT", to: "CLIENT_REVISION_REQUESTED", d: "M610 129 V217" },
+  { from: "CLIENT_REVISION_REQUESTED", to: "DRAFT", d: "M517 240 H140 Q110 240 110 210 V133" },
+  { from: "INTERNAL_APPROVED", to: "DRAFT", d: "M330 93 C 290 22, 150 22, 118 88" },
+];
+const STATE_CHIP: Record<State, string> = {
+  DRAFT: "chip",
+  INTERNAL_APPROVED: "chip chip-caution",
+  SUBMITTED_FOR_CLIENT: "chip chip-accent",
+  CLIENT_APPROVED: "chip chip-positive",
+  CLIENT_REVISION_REQUESTED: "chip chip-danger",
 };
+
+type AuditRow = { id: number; from: State; to: State; actor: string; at: Date };
 
 const TASK_TITLE = "Brand poster, social cut · Lattice spring";
 
 export function ReviewStateMachine() {
   const [state, setState] = useState<State>("DRAFT");
   const [audit, setAudit] = useState<AuditRow[]>([]);
-  const [counter, setCounter] = useState(0);
 
   const transitions = FLOW[state];
+  const next = new Set(transitions.map((t) => t.to));
+  const walked = new Set(audit.map((r) => `${r.from}>${r.to}`));
+  const visited = new Set<State>(["DRAFT", ...audit.map((r) => r.to)]);
 
   function transition(t: Transition) {
-    const id = counter + 1;
-    setCounter(id);
-    setAudit((rows) => [
-      { id, from: state, to: t.to, actor: t.actor, at: new Date() },
-      ...rows,
-    ]);
+    const source = document.querySelector(`[data-flow="rsm-${state}"]`);
+    flowPulse(source, `rsm-${t.to}`);
+    setAudit((rows) => [{ id: (rows[0]?.id ?? 0) + 1, from: state, to: t.to, actor: t.actor, at: new Date() }, ...rows]);
     setState(t.to);
   }
 
   function reset() {
     setState("DRAFT");
     setAudit([]);
-    setCounter(0);
   }
 
   return (
-    <div className="space-y-8">
-      {/* Deliverable card */}
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-md">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-              deliverable
-            </p>
-            <p className="mt-2 text-base font-medium text-zinc-100">
-              {TASK_TITLE}
-            </p>
-          </div>
-          {/* Keyed on the state so each transition pops the pill. */}
-          <span
-            key={state}
-            className={`pop-in shrink-0 rounded-full border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] ${STATE_TONE[state]}`}
-          >
-            {state.replace(/_/g, " ").toLowerCase()}
-          </span>
-        </div>
-
-        {/* Available transitions */}
-        <div className="mt-6 flex flex-wrap gap-2">
-          {transitions.length === 0 ? (
-            <p className="text-sm text-zinc-500">
-              Terminal state. Nothing more to do, the deliverable is shipped.
-              Hit reset to try the loop again.
-            </p>
-          ) : (
-            transitions.map((t) => (
-              <button
-                key={t.label}
-                type="button"
-                onClick={() => transition(t)}
-                className={
-                  t.variant === "primary"
-                    ? "inline-flex min-h-10 items-center justify-center rounded-md border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/15 px-3 py-1.5 text-xs text-[var(--color-scene-1)] transition-all hover:bg-[var(--color-scene-1)]/25 active:scale-[0.98] lg:min-h-0"
-                    : "inline-flex min-h-10 items-center justify-center rounded-md border border-white/10 bg-transparent px-3 py-1.5 text-xs text-zinc-300 transition-all hover:border-white/30 active:scale-[0.98] lg:min-h-0"
-                }
-              >
-                {t.label} <span aria-hidden>→</span>
-              </button>
-            ))
-          )}
-        </div>
-
-        <div className="mt-5 flex items-center justify-between border-t border-white/5 pt-4">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-            visible-to · {actorFor(state)}
-          </p>
-          <button
-            type="button"
+    <div className="space-y-6">
+      <WidgetFrame
+        crumb="Review state machine"
+        toolbar={
+          <Button
+            variant="ghost"
+            size="sm"
+            icon="↻"
             onClick={reset}
             disabled={state === "DRAFT" && audit.length === 0}
-            className="inline-flex min-h-10 items-center justify-center rounded-md border border-white/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400 transition-all hover:border-white/30 hover:text-zinc-200 active:scale-[0.98] disabled:opacity-40 lg:min-h-0"
+            className="font-mono uppercase tracking-[0.08em]"
           >
-            <span aria-hidden>↻</span> reset
-          </button>
+            Reset
+          </Button>
+        }
+      >
+        {/* The diagram */}
+        <div className="no-scrollbar -mx-4 overflow-x-auto px-4 md:mx-0 md:px-0">
+          <div className="relative aspect-[960/300] min-w-[640px]">
+            <svg viewBox="0 0 960 300" className="absolute inset-0 h-full w-full" aria-hidden>
+              <defs>
+                {(["live", "walked", "idle"] as const).map((k) => (
+                  <marker
+                    key={k}
+                    id={`rsm-arrow-${k}`}
+                    viewBox="0 0 10 10"
+                    refX="9"
+                    refY="5"
+                    markerWidth="7"
+                    markerHeight="7"
+                    orient="auto-start-reverse"
+                  >
+                    <path
+                      d="M0 0 L10 5 L0 10 z"
+                      fill={k === "live" ? "var(--color-scene-1)" : k === "walked" ? "var(--color-ink-400)" : "var(--color-ink-700)"}
+                    />
+                  </marker>
+                ))}
+              </defs>
+              {EDGES.map((e) => {
+                const live = e.from === state;
+                const done = walked.has(`${e.from}>${e.to}`);
+                const kind = live ? "live" : done ? "walked" : "idle";
+                return (
+                  <path
+                    key={`${e.from}>${e.to}`}
+                    d={e.d}
+                    fill="none"
+                    strokeWidth={live ? 2 : 1.5}
+                    strokeDasharray={e.to === "DRAFT" && !live ? "5 6" : undefined}
+                    markerEnd={`url(#rsm-arrow-${kind})`}
+                    className={cn("transition-[stroke,opacity] duration-500", live && "rsm-edge-live")}
+                    stroke={
+                      live ? "var(--color-scene-1)" : done ? "var(--color-ink-400)" : "var(--color-ink-700)"
+                    }
+                  />
+                );
+              })}
+            </svg>
+
+            {(Object.keys(NODES) as State[]).map((s) => {
+              const n = NODES[s];
+              const current = s === state;
+              const available = next.has(s);
+              const t = transitions.find((x) => x.to === s);
+              const base =
+                "absolute flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 whitespace-nowrap rounded-full border px-3.5 py-2 text-[12.5px] font-medium transition-[background-color,border-color,color,box-shadow] duration-300";
+              const style = { left: `${(n.x / 960) * 100}%`, top: `${(n.y / 300) * 100}%` };
+              if (available && t) {
+                return (
+                  <button
+                    key={s}
+                    type="button"
+                    data-flow={`rsm-${s}`}
+                    style={style}
+                    onClick={() => transition(t)}
+                    aria-label={`${t.label}: move to ${n.label}`}
+                    className={cn(
+                      base,
+                      "border-dashed border-[color-mix(in_oklab,var(--color-scene-1)_60%,transparent)] bg-ink-900 text-scene-soft hover:border-solid hover:bg-[color-mix(in_oklab,var(--color-scene-1)_14%,var(--color-ink-900))] hover:text-white",
+                    )}
+                  >
+                    <span aria-hidden className="text-[10px]">
+                      →
+                    </span>
+                    {n.label}
+                  </button>
+                );
+              }
+              return (
+                <div
+                  key={s}
+                  data-flow={`rsm-${s}`}
+                  style={style}
+                  aria-current={current ? "step" : undefined}
+                  className={cn(
+                    base,
+                    current
+                      ? "border-[var(--color-scene-1)] bg-[color-mix(in_oklab,var(--color-scene-1)_18%,var(--color-ink-900))] text-ink-50 shadow-[0_0_28px_-6px_var(--color-scene-glow)]"
+                      : visited.has(s)
+                        ? "border-line-strong bg-ink-900 text-ink-300"
+                        : "border-line bg-ink-925 text-ink-500",
+                  )}
+                >
+                  {current ? (
+                    <span aria-hidden className="live-dot text-scene" />
+                  ) : visited.has(s) ? (
+                    <span aria-hidden className="text-[10px] text-ink-400">
+                      ✓
+                    </span>
+                  ) : null}
+                  {n.label}
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </div>
+        <p className="mt-2 text-[11px] text-ink-500 md:hidden">Swipe sideways to see the whole diagram.</p>
+        <p className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 text-[11px] text-ink-500">
+          <span className="inline-flex items-center gap-1.5">
+            <span aria-hidden className="h-0.5 w-4 rounded bg-scene" /> legal next move
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <span aria-hidden className="h-0.5 w-4 rounded bg-ink-400" /> taken this session
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <span aria-hidden className="h-0.5 w-4 rounded bg-ink-700" /> not taken
+          </span>
+        </p>
+
+        {/* The deliverable */}
+        <article data-spot className="item mt-6 rounded-xl p-4">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="label-mono">Deliverable</p>
+              <p className="mt-1.5 text-[15px] font-semibold text-ink-50">{TASK_TITLE}</p>
+            </div>
+            <span key={state} className={cn(STATE_CHIP[state], "chip-mono pop-in")}>
+              {state}
+            </span>
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {transitions.length === 0 ? (
+              <p className="text-sm text-ink-400">
+                Terminal state: the deliverable is shipped and locked. Reset to run the loop again.
+              </p>
+            ) : (
+              transitions.map((t) => (
+                <Button
+                  key={t.label}
+                  variant={t.variant === "primary" ? "accent" : "quiet"}
+                  size="sm"
+                  arrow={t.variant === "primary"}
+                  onClick={() => transition(t)}
+                >
+                  {t.label}
+                </Button>
+              ))
+            )}
+          </div>
+          <p className="mt-4 border-t border-line pt-3 text-xs text-ink-500">
+            Visible to <span className="text-ink-300">{actorFor(state)}</span>
+          </p>
+        </article>
+      </WidgetFrame>
 
       {/* Audit log */}
-      <div>
-        <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
-          audit log, this session
-        </h2>
+      <section aria-labelledby="rsm-audit-heading" className="surface rounded-2xl p-5 md:p-6">
+        <WidgetHeading id="rsm-audit-heading" aside="Retention: CONTRACT tier, 7 years">
+          Audit log, this session
+        </WidgetHeading>
         {audit.length === 0 ? (
-          <p className="mt-3 rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-sm text-zinc-500">
-            No transitions yet. Click a transition above and watch a row land
-            here. In production these rows live forever (CONTRACT-tier
-            retention, 7 years).
+          <p className="mt-5 rounded-xl border border-dashed border-white/[0.1] px-4 py-6 text-center text-xs leading-relaxed text-ink-500">
+            No transitions yet. Move the deliverable and a row lands here. In production these rows live for seven
+            years.
           </p>
         ) : (
-          <ul className="mt-3 divide-y divide-white/5 rounded-2xl border border-white/10 bg-white/[0.03]">
+          <ol aria-live="polite" className="mt-5 space-y-2">
             {audit.map((row) => (
-              <li
-                key={row.id}
-                className="row-land flex items-center justify-between gap-3 px-5 py-3 first:rounded-t-2xl"
-              >
+              <li key={row.id} className="row-land flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line px-4 py-3">
                 <div className="min-w-0">
-                  <p className="text-sm text-zinc-200">
-                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                      transition
-                    </span>{" "}
-                    <span className="text-zinc-100">{row.from}</span>
-                    <span aria-hidden className="text-zinc-600"> → </span>
-                    <span className="text-[var(--color-scene-1)]">{row.to}</span>
+                  <p className="flex flex-wrap items-center gap-2 text-[13px]">
+                    <span className="font-mono text-[11px] text-ink-500">#{row.id}</span>
+                    <span className={cn(STATE_CHIP[row.from], "chip-mono opacity-70")}>{row.from}</span>
+                    <span aria-hidden className="text-ink-500">
+                      →
+                    </span>
+                    <span className="sr-only">to</span>
+                    <span className={cn(STATE_CHIP[row.to], "chip-mono")}>{row.to}</span>
                   </p>
-                  <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                    {row.actor} · {timeAgo(row.at)}
+                  <p className="mt-1.5 text-xs text-ink-500">
+                    <span className="text-ink-300">{row.actor}</span> · <time suppressHydrationWarning>{timeAgo(row.at)}</time>
                   </p>
                 </div>
-                <span className="rounded-sm border border-white/15 bg-zinc-900/60 px-2 py-0.5 font-mono text-[10px] text-zinc-400">
-                  contract 7y
-                </span>
+                <span className="chip chip-mono">contract 7y</span>
               </li>
             ))}
-          </ul>
+          </ol>
         )}
-      </div>
+      </section>
     </div>
   );
 }
@@ -189,19 +305,12 @@ function actorFor(state: State): string {
     case "DRAFT":
       return "Sage (designer)";
     case "INTERNAL_APPROVED":
-      return "Kai (PM) · Sage";
+      return "Kai (PM), Sage";
     case "SUBMITTED_FOR_CLIENT":
-      return "Mira (client) · Kai · Sage";
+      return "Mira (client), Kai, Sage";
     case "CLIENT_APPROVED":
       return "everyone, locked";
     case "CLIENT_REVISION_REQUESTED":
-      return "Sage (designer) · Kai";
+      return "Sage (designer), Kai";
   }
-}
-
-function timeAgo(date: Date): string {
-  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-  if (seconds < 5) return "just now";
-  if (seconds < 60) return `${seconds}s ago`;
-  return `${Math.floor(seconds / 60)}m ago`;
 }

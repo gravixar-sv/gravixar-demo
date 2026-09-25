@@ -42,8 +42,9 @@ export default function ModulePage({ slug }: { slug: string }) {
       </div>
 
       <div className="mt-12 grid gap-10 lg:grid-cols-12">
-        {/* Widget */}
-        <div className="lg:col-span-8">
+        {/* Widget. min-w-0 so a wide sandbox (the state diagram) scrolls
+            inside its own frame instead of widening the grid column. */}
+        <div className="min-w-0 lg:col-span-8">
           {isInteractive && Widget ? (
             <Widget />
           ) : (

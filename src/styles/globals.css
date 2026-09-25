@@ -712,6 +712,15 @@
   [data-on="true"] .loop-rows > *:nth-child(5) { transition-delay: 300ms; }
   [data-on="true"] .loop-rows > *:nth-child(n+6) { transition-delay: 360ms; }
 
+  /* Review state machine: the legal next edges breathe (opacity only). */
+  @keyframes rsmEdge {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.45; }
+  }
+  .rsm-edge-live {
+    animation: rsmEdge 1.8s var(--ease-in-out) infinite;
+  }
+
   /* Module widgets: a row that mounts is a new row. */
   .row-land {
     animation: pgFreshIn 1.6s var(--ease-out) both;
@@ -790,6 +799,7 @@
     .pg-fresh-move,
     .pg-cue,
     .row-land,
+    .rsm-edge-live,
     .is-receiving,
     .pop-in,
     .scene-rise,

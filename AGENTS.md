@@ -116,7 +116,8 @@ src/
                                # EmptyState, ActivityLog), LearnBeat, OutcomePanel, SceneCTA,
                                # Topbar, DemoBanner, SiteFooter, ModulesLayout, DeliverableMockup, Avatar
     home/                      # Hero, GateField, SceneGallery, LoopSection, ProofStrip
-    modules/                   # ReviewStateMachine, DailyCheckin, AuditLogRestore
+    modules/                   # WidgetFrame + the three sandboxes: ReviewStateMachine (state
+                               # diagram), DailyCheckin, AuditLogRestore
   lib/
     scenes.ts                  # scene registry (mirrored contract) + each scene's theme tokens
     modules.ts                 # module manifest

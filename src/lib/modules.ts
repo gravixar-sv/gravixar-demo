@@ -38,7 +38,7 @@ export const MODULES: DemoModule[] = [
     title: "Review State Machine",
     category: "ops",
     summary:
-      "Drag a deliverable through DRAFT → INTERNAL_APPROVED → SUBMITTED_FOR_CLIENT → CLIENT_APPROVED with revision branch back into the loop. Every transition writes an audit row.",
+      "Move a deliverable through DRAFT → INTERNAL_APPROVED → SUBMITTED_FOR_CLIENT → CLIENT_APPROVED with revision branch back into the loop. Every transition writes an audit row.",
     status: "interactive",
     runningIn: ["Broomstick Hub"],
     stack: ["TypeScript", "discriminated unions", "Prisma transactions"],

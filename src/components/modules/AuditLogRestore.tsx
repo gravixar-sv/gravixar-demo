@@ -1,228 +1,211 @@
-
-// Audit log + safe-restore demo. Visitor edits a project's name, sees
-// an UPDATE row land in the audit log, then clicks restore to revert.
-// Demonstrates the "every change is on record, even the corrections"
-// principle without any DB involvement.
+// Audit log + safe restore. The visitor edits a project record, saves,
+// and sees each changed field land as an UPDATE row with its before and
+// after. Restore puts a field back, and the restore is itself a new row
+// ("restore of #N"): every change is on record, even the corrections.
+// Only allowlisted fields are restorable; nothing touches a database.
 
 import { useState } from "react";
+import { Button } from "@/components/ui/Button";
+import { cn } from "@/lib/cn";
+import { withViewTransition } from "@/lib/viewTransition";
+import { WidgetFrame, WidgetHeading, timeAgo } from "@/components/modules/WidgetFrame";
 
 type AuditRow = {
   id: number;
-  field: string;
+  field: Field;
   before: string;
   after: string;
   actor: string;
   at: Date;
-  /** A restore that comes from the audit log itself is also an audit row,
-   *  flagged so the UI can show "restored from #N". */
+  /** A restore that comes from the audit log itself is also a row. */
   restoredFrom?: number;
 };
 
 const ALLOWLIST = ["name", "tagline"] as const;
 type Field = (typeof ALLOWLIST)[number];
 
-const SEED = {
+const SEED: Record<Field, string> = {
   name: "Spring campaign · Lattice",
   tagline: "Outdoor + retargeting set, 6 deliverables",
 };
 
-const ACTOR = "Nox (admin)";
+const LABEL: Record<Field, string> = { name: "Project name", tagline: "Tagline" };
+
+const ACTOR = "Rhea (admin)";
 
 export function AuditLogRestore() {
   const [project, setProject] = useState({ ...SEED });
   const [draft, setDraft] = useState({ ...SEED });
   const [audit, setAudit] = useState<AuditRow[]>([]);
-  const [counter, setCounter] = useState(0);
+  /** Field that just changed by restore, so its input flashes. */
+  const [flash, setFlash] = useState<{ field: Field; n: number } | null>(null);
 
-  const dirty =
-    draft.name !== project.name || draft.tagline !== project.tagline;
+  const dirty = ALLOWLIST.some((f) => draft[f] !== project[f]);
+  const lastId = audit[0]?.id ?? 0;
 
   function save() {
-    const newRows: AuditRow[] = [];
-    let nextCounter = counter;
+    let id = lastId;
+    const rows: AuditRow[] = [];
     for (const field of ALLOWLIST) {
-      if (draft[field] !== project[field]) {
-        nextCounter += 1;
-        newRows.push({
-          id: nextCounter,
-          field,
-          before: project[field],
-          after: draft[field],
-          actor: ACTOR,
-          at: new Date(),
-        });
-      }
+      if (draft[field] === project[field]) continue;
+      id += 1;
+      rows.push({ id, field, before: project[field], after: draft[field], actor: ACTOR, at: new Date() });
     }
-    if (newRows.length === 0) return;
-    setCounter(nextCounter);
-    setAudit((rows) => [...newRows.reverse(), ...rows]);
-    setProject({ ...draft });
+    if (rows.length === 0) return;
+    withViewTransition(() => {
+      setAudit((a) => [...rows.reverse(), ...a]);
+      setProject({ ...draft });
+    });
   }
 
   function restore(row: AuditRow) {
-    setCounter((c) => c + 1);
     const restoreRow: AuditRow = {
-      id: counter + 1,
+      id: lastId + 1,
       field: row.field,
-      before: project[row.field as Field],
+      before: project[row.field],
       after: row.before,
       actor: ACTOR,
       at: new Date(),
       restoredFrom: row.id,
     };
-    setAudit((rows) => [restoreRow, ...rows]);
-    setProject((p) => ({ ...p, [row.field]: row.before }));
-    setDraft((d) => ({ ...d, [row.field]: row.before }));
+    withViewTransition(() => {
+      setAudit((a) => [restoreRow, ...a]);
+      setProject((p) => ({ ...p, [row.field]: row.before }));
+      setDraft((d) => ({ ...d, [row.field]: row.before }));
+      setFlash((f) => ({ field: row.field, n: (f?.n ?? 0) + 1 }));
+    });
   }
 
   function resetAll() {
     setProject({ ...SEED });
     setDraft({ ...SEED });
     setAudit([]);
-    setCounter(0);
+    setFlash(null);
   }
 
   return (
-    <div className="space-y-8">
-      {/* Editable record */}
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-md">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-              project record
-            </p>
-            <p className="mt-2 text-base font-medium text-zinc-100">
-              Edit a field to see the audit row land below.
-            </p>
-          </div>
-          <button
-            type="button"
+    <div className="space-y-6">
+      <WidgetFrame
+        crumb="Project record"
+        toolbar={
+          <Button
+            variant="ghost"
+            size="sm"
+            icon="↻"
             onClick={resetAll}
-            className="inline-flex min-h-10 items-center justify-center rounded-md border border-white/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-400 transition-all hover:border-white/30 hover:text-zinc-200 active:scale-[0.98] lg:min-h-0"
+            disabled={audit.length === 0 && !dirty}
+            className="font-mono uppercase tracking-[0.08em]"
           >
-            <span aria-hidden>↻</span> reset everything
-          </button>
-        </div>
+            Reset
+          </Button>
+        }
+      >
+        <p className="label-mono">Project record</p>
+        <p className="heading mt-2 text-xl text-ink-50 md:text-2xl">Edit a field, save, then restore it.</p>
 
         <div className="mt-6 grid gap-4">
-          <Field
-            label="name"
-            value={draft.name}
-            onChange={(v) => setDraft((d) => ({ ...d, name: v }))}
-          />
-          <Field
-            label="tagline"
-            value={draft.tagline}
-            onChange={(v) => setDraft((d) => ({ ...d, tagline: v }))}
-          />
+          {ALLOWLIST.map((f) => {
+            const edits = audit.filter((r) => r.field === f).length;
+            const changed = draft[f] !== project[f];
+            return (
+              <label key={f} className="block">
+                <span className="flex items-center justify-between gap-3">
+                  <span className="text-[13px] font-medium text-ink-200">{LABEL[f]}</span>
+                  <span className="flex items-center gap-2">
+                    {changed ? <span className="chip chip-caution">unsaved</span> : null}
+                    {edits > 0 ? (
+                      <span key={edits} className="chip chip-mono pop-in">
+                        {edits} {edits === 1 ? "change" : "changes"} on record
+                      </span>
+                    ) : null}
+                  </span>
+                </span>
+                <input
+                  key={flash?.field === f ? `flash-${flash.n}` : "steady"}
+                  type="text"
+                  value={draft[f]}
+                  onChange={(e) => setDraft((d) => ({ ...d, [f]: e.target.value }))}
+                  className={cn(
+                    "mt-2 min-h-11 w-full rounded-xl border border-line-strong bg-ink-950/60 px-3.5 py-2.5 text-sm text-ink-50 outline-none transition-[border-color,box-shadow] duration-200 placeholder:text-ink-500 focus:border-[color-mix(in_oklab,var(--color-scene-1)_60%,transparent)] focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-scene-1)_14%,transparent)]",
+                    flash?.field === f && "pg-fresh",
+                  )}
+                />
+              </label>
+            );
+          })}
         </div>
 
-        <div className="mt-5 flex items-center justify-between border-t border-white/5 pt-4">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-            allowlist · name, tagline · status enums and money would never live
-            here
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
+          <p className="text-xs text-ink-500">
+            Restorable fields: name, tagline. Status enums and money never live on this list.
           </p>
-          <button
-            type="button"
-            onClick={save}
-            disabled={!dirty}
-            className="inline-flex min-h-10 items-center justify-center rounded-md border border-[var(--color-scene-1)]/40 bg-[var(--color-scene-1)]/15 px-4 py-1.5 text-xs text-[var(--color-scene-1)] transition-all hover:bg-[var(--color-scene-1)]/25 active:scale-[0.98] disabled:opacity-40 lg:min-h-0"
-          >
-            save changes
-          </button>
+          <div className="flex gap-2">
+            {dirty ? (
+              <Button variant="ghost" size="sm" onClick={() => setDraft({ ...project })}>
+                Discard
+              </Button>
+            ) : null}
+            <Button variant="primary" size="sm" onClick={save} disabled={!dirty}>
+              Save changes
+            </Button>
+          </div>
         </div>
-      </div>
+      </WidgetFrame>
 
-      {/* Audit log */}
-      <div>
-        <h2 className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-scene-1)]">
-          audit log, this session
-        </h2>
+      <section aria-labelledby="alr-audit-heading" className="surface rounded-2xl p-5 md:p-6">
+        <WidgetHeading id="alr-audit-heading" aside={`${audit.length} ${audit.length === 1 ? "row" : "rows"}, append-only`}>
+          Audit log, this session
+        </WidgetHeading>
         {audit.length === 0 ? (
-          <p className="mt-3 rounded-2xl border border-white/5 bg-white/[0.02] p-5 text-sm text-zinc-500">
-            No edits yet. Change a field above and click save.
+          <p className="mt-5 rounded-xl border border-dashed border-white/[0.1] px-4 py-6 text-center text-xs leading-relaxed text-ink-500">
+            No edits yet. Change a field above and save it.
           </p>
         ) : (
-          <ul className="mt-3 divide-y divide-white/5 rounded-2xl border border-white/10 bg-white/[0.03]">
+          <ol aria-live="polite" className="mt-5 space-y-2">
             {audit.map((row) => {
               const isRestore = row.restoredFrom !== undefined;
-              const isAllowlisted = ALLOWLIST.includes(row.field as Field);
-              const canRestore = isAllowlisted && !isRestore;
               return (
                 <li
                   key={row.id}
-                  className="row-land flex items-center justify-between gap-3 px-5 py-3 first:rounded-t-2xl"
+                  style={{ viewTransitionName: `alr-${row.id}` }}
+                  className="row-land grid gap-3 rounded-xl border border-line px-4 py-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
                 >
                   <div className="min-w-0">
-                    <p className="text-sm text-zinc-200">
-                      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                        update #{row.id} {isRestore ? `· restore of #${row.restoredFrom}` : ""}
+                    <p className="flex flex-wrap items-center gap-2">
+                      <span className="font-mono text-[11px] text-ink-500">#{row.id}</span>
+                      <span className={cn("chip chip-mono", isRestore ? "chip-accent" : "")}>
+                        {isRestore ? `RESTORE of #${row.restoredFrom}` : "UPDATE"}
                       </span>
+                      <span className="text-[13px] text-ink-300">{LABEL[row.field]}</span>
                     </p>
-                    <p className="mt-1 truncate text-sm">
-                      <span className="text-zinc-500">{row.field}: </span>
-                      <span className="text-zinc-400 line-through">
+                    <p className="mt-2 flex flex-wrap items-center gap-2 text-[13px]">
+                      <span className="rounded-md bg-rose-400/[0.08] px-2 py-0.5 text-rose-200/90 line-through decoration-rose-300/60">
                         {row.before}
-                      </span>{" "}
-                      <span aria-hidden className="text-zinc-600">→</span>{" "}
-                      <span className="text-[var(--color-scene-1)]">
-                        {row.after}
                       </span>
+                      <span aria-hidden className="text-ink-500">
+                        →
+                      </span>
+                      <span className="sr-only">became</span>
+                      <span className="rounded-md bg-emerald-400/[0.08] px-2 py-0.5 text-emerald-200">{row.after}</span>
                     </p>
-                    <p className="mt-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-                      {row.actor} · {timeAgo(row.at)}
+                    <p className="mt-1.5 text-xs text-ink-500">
+                      <span className="text-ink-300">{row.actor}</span> ·{" "}
+                      <time suppressHydrationWarning>{timeAgo(row.at)}</time>
                     </p>
                   </div>
-                  {canRestore ? (
-                    <button
-                      type="button"
-                      onClick={() => restore(row)}
-                      className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-md border border-white/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-300 transition-all hover:border-white/30 hover:text-white active:scale-[0.98] lg:min-h-0"
-                    >
-                      <span aria-hidden>↺</span> restore
-                    </button>
+                  {isRestore ? (
+                    <span className="chip chip-mono justify-self-start sm:justify-self-end">restored</span>
                   ) : (
-                    <span className="shrink-0 rounded-sm border border-white/15 bg-zinc-900/60 px-2 py-0.5 font-mono text-[10px] text-zinc-400">
-                      {isRestore ? "restored" : "not restorable"}
-                    </span>
+                    <Button variant="quiet" size="sm" icon="↺" onClick={() => restore(row)} className="justify-self-start sm:justify-self-end">
+                      Restore
+                    </Button>
                   )}
                 </li>
               );
             })}
-          </ul>
+          </ol>
         )}
-      </div>
+      </section>
     </div>
   );
-}
-
-function Field({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  return (
-    <label className="block">
-      <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-        {label}
-      </span>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="mt-1 min-h-11 w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm text-zinc-100 outline-none transition-colors focus:border-[var(--color-scene-1)]/60 focus:ring-2 focus:ring-[var(--color-scene-1)]/35"
-      />
-    </label>
-  );
-}
-
-function timeAgo(date: Date): string {
-  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-  if (seconds < 5) return "just now";
-  if (seconds < 60) return `${seconds}s ago`;
-  return `${Math.floor(seconds / 60)}m ago`;
 }

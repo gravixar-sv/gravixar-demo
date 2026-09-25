@@ -24,7 +24,7 @@ const SLUGS = ["lattice", "studio-mix", "cockpit", "northbeam", "care-ledger"];
 // A scene whose resting state is an idle panel is staged first, so the
 // picture shows work: the first button whose text matches is clicked and
 // the page gets time to settle.
-const STAGE = { "studio-mix": "run" };
+const STAGE = { "studio-mix": "run", northbeam: "generate on-brand" };
 const W = 1600;
 const H = 1000;
 

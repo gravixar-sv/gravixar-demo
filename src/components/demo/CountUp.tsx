@@ -1,4 +1,3 @@
-"use client";
 
 // A number that counts up to its value the first time it scrolls into
 // view. "1,284", "£412k", "94%" and "$612k" all work: the prefix and

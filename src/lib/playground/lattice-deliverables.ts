@@ -9,6 +9,7 @@
 
 import type { AvatarHue } from "@/components/demo/Avatar";
 import type { OutcomeStat } from "@/components/demo/OutcomePanel";
+import type { TryStep } from "@/components/demo/SceneIntro";
 import { formatCount, formatMoney } from "./outcomeFormat";
 
 export type RoleKey = "client" | "pm" | "editor";
@@ -292,6 +293,21 @@ export function outcomeStats(state: LatticeState): OutcomeStat[] {
       label: "leave & WFH requests",
       sub: "gated + audited",
     },
+  ];
+}
+
+// The scene's "try the loop" checklist, derived from state like the
+// outcome tiles: a step ticks only when the visitor's own click did it.
+// Seeded feed rows (lf-1, lf-2) are the story so far, not the visitor.
+const SEED_FEED_IDS = new Set(FEED_SEED.map((f) => f.id));
+
+export function trySteps(state: LatticeState): TryStep[] {
+  const acted = (name: string) =>
+    state.feed.some((e) => !SEED_FEED_IDS.has(e.id) && e.actor === name);
+  return [
+    { label: `Approve or revise the hero as ${PERSONAS.client.firstName}, the client`, done: acted(PERSONAS.client.name) },
+    { label: `Hand a card on as ${PERSONAS.pm.firstName}, the PM`, done: acted(PERSONAS.pm.name) },
+    { label: `Submit the email banner as ${PERSONAS.editor.firstName}, the editor`, done: acted(PERSONAS.editor.name) },
   ];
 }
 

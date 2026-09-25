@@ -1,4 +1,3 @@
-"use client";
 
 // The cascade, made visible. Every scene's signature beat is "act in
 // one column, the next column reacts" — this sends a small scene-accent

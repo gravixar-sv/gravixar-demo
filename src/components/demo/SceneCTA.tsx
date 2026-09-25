@@ -1,8 +1,10 @@
-// Persistent call-to-action shown at the bottom of every scene page.
-// Visitor has just seen what Gravixar builds for their context —
-// this is the bridge to a real conversation.
+// The closing panel of every scene: the bridge from "I pressed the
+// buttons" to a real conversation. The accent rises from the bottom
+// edge like the scene's horizon, and the call button leans toward the
+// pointer.
 
-import type { ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
+import { useMagnetic } from "@/lib/interactions";
 
 export function SceneCTA({
   personaLabel,
@@ -10,84 +12,64 @@ export function SceneCTA({
   headline,
   blurb,
 }: {
-  /** Shown in the eyebrow, e.g. "Brands & DTC". */
+  /** Who this is for, e.g. "Brands & DTC". */
   personaLabel: string;
-  /** Clean word after the default "Want this for your …?" headline.
-   *  Defaults to the lowercased label. */
+  /** Word after the default "Want this for your …?" headline. */
   noun?: string;
   /** Scene-specific headline. Defaults to "Want this for your {noun}?". */
   headline?: ReactNode;
   /** Scene-specific supporting line under the headline. */
   blurb?: string;
 }) {
+  const cta = useRef<HTMLAnchorElement>(null);
+  useMagnetic(cta, 0.22);
   const ctaNoun = noun ?? personaLabel.toLowerCase();
   return (
-    <section className="mt-16 overflow-hidden rounded-2xl" aria-labelledby="scene-cta-heading">
+    <section
+      aria-labelledby="scene-cta-heading"
+      className="frame relative mt-16 overflow-hidden rounded-[26px] px-6 py-12 md:mt-24 md:px-12 md:py-16"
+    >
+      <div aria-hidden className="bg-dot-grid pointer-events-none absolute inset-0 opacity-40 [mask-image:linear-gradient(to_bottom,transparent,black)]" />
       <div
-        className="relative px-7 py-8 md:px-10 md:py-10"
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-[70%]"
         style={{
-          // Scene-tinted wash: same 6%/4% weights as the old coral→cyan
-          // hard-code, but drawn from the scene tokens so the closing CTA
-          // stays on-palette in every scene.
           background:
-            "linear-gradient(135deg, color-mix(in oklab, var(--color-scene-1, #FF6B6B) 6%, transparent) 0%, color-mix(in oklab, var(--color-scene-2, #00E1FF) 4%, transparent) 100%)",
-          boxShadow:
-            "inset 0 0 0 1px rgba(255,255,255,0.08), 0 1px 0 0 rgba(255,255,255,0.02)",
+            "radial-gradient(60% 100% at 50% 100%, color-mix(in oklab, var(--color-scene-1) 26%, transparent), transparent 70%)",
         }}
-      >
-        {/* Subtle dot grid texture */}
-        <div
-          aria-hidden
-          className="bg-dot-grid pointer-events-none absolute inset-0 opacity-[0.12]"
-        />
+      />
+      <div aria-hidden className="absolute inset-x-[15%] bottom-0 h-px bg-[linear-gradient(90deg,transparent,var(--color-scene-1),transparent)]" />
 
-        <div className="relative flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
-          {/* Left — copy */}
-          <div className="max-w-lg">
-            <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--color-scene-1,#FF6B6B)]">
-              {personaLabel} · built by Gravixar
-            </p>
-            <h2
-              id="scene-cta-heading"
-              className="mt-3 text-2xl font-medium leading-tight tracking-[-0.02em] text-zinc-50 md:text-3xl"
-            >
-              {headline ?? (
-                <>
-                  Want this for your{" "}
-                  <span style={{ color: "var(--color-scene-1, #FF6B6B)" }}>
-                    {ctaNoun}?
-                  </span>
-                </>
-              )}
-            </h2>
-            <p className="mt-3 text-sm leading-relaxed text-zinc-400">
-              {blurb ??
-                "I build systems like this from scratch, scoped to your workflow and owned by you. Most engagements run 4 to 8 weeks. One call to scope it, no obligation."}
-            </p>
-          </div>
-
-          {/* Right — CTA */}
-          <div className="flex shrink-0 flex-col items-start gap-3 md:items-end">
-            <a
-              href="https://gravixar.com/contact"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold text-[#0a0a0a] shadow-lg shadow-black/30 transition-all hover:brightness-110 active:scale-[0.98]"
-              style={{
-                background:
-                  "linear-gradient(135deg, var(--color-scene-1, #FF6B6B) 0%, var(--color-scene-2, #FF2D95) 100%)",
-              }}
-            >
-              Book a 30-min call
-              <span aria-hidden>→</span>
-            </a>
-            <a
-              href="https://gravixar.com"
-              rel="noreferrer"
-              className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500 transition-colors hover:text-zinc-300"
-            >
-              gravixar.com
-            </a>
-          </div>
+      <div className="relative grid items-end gap-10 md:grid-cols-[minmax(0,1fr)_auto]">
+        <div className="max-w-2xl">
+          <p className="eyebrow text-scene-soft">{personaLabel}, built by Gravixar</p>
+          <h2 id="scene-cta-heading" className="display mt-4 text-4xl text-ink-50 md:text-[3.25rem]">
+            {headline ?? (
+              <>
+                Want this for your <span className="voice font-normal text-scene-soft">{ctaNoun}?</span>
+              </>
+            )}
+          </h2>
+          <p className="mt-5 max-w-[58ch] text-base leading-relaxed text-ink-400">
+            {blurb ??
+              "I build systems like this from scratch, scoped to your workflow and owned by you. Most engagements run 4 to 8 weeks. One call to scope it, no obligation."}
+          </p>
+        </div>
+        <div className="flex flex-col items-start gap-4 md:items-end">
+          <a
+            ref={cta}
+            href="https://gravixar.com/contact"
+            rel="noreferrer"
+            className="btn btn-primary btn-lg px-7 py-4 text-base"
+          >
+            Book a 30-min call
+            <span aria-hidden className="btn-arrow">
+              →
+            </span>
+          </a>
+          <a href="https://gravixar.com" rel="noreferrer" className="link-draw text-sm text-ink-400 hover:text-ink-100">
+            or read more at gravixar.com
+          </a>
         </div>
       </div>
     </section>

@@ -1,17 +1,11 @@
-// The "this is real" layer, shared by every scene. Two parts:
+// The "this is real" layer, shared by every scene: a band of outcome
+// stats in clearly illustrative sample numbers, and a bridge to the
+// matching case study on gravixar.com.
 //
-//  - OutcomePanel: a row of outcome stats (deliverables approved,
-//    invoices sent, providers credentialed, …) in clearly-illustrative
-//    sample numbers. Always labelled as demo data so a visitor never
-//    reads these as a real company's KPIs.
-//  - A bridge footer: "See the live product →" to the matching
-//    anonymized case study on gravixar.com, plus a "this same loop runs
-//    my own ops" link to book a call.
-//
-// Static + CSS-only, so it respects the CSS-first reveal rule and is
-// reduced-motion / no-WebGL safe, and it wraps on mobile. The big
-// numbers count up the first time they scroll into view (CountUp
-// renders the final value server-side, so nothing depends on it).
+// Tiles are derived from the scene's own reducer (outcomeStats(state)),
+// so a number the visitor's click moves pops rather than counting again.
+// The structure (section[aria-labelledby="outcome-heading"] > dl > div >
+// dt + dd) is what scripts/verify-outcomes.mjs reads; keep it.
 
 import { CountUp } from "@/components/demo/CountUp";
 
@@ -30,75 +24,56 @@ export function OutcomePanel({
   liveProductHref = "https://gravixar.com",
 }: {
   stats: OutcomeStat[];
-  /** Anonymized case-study name, e.g. "the agency OS I run in production". */
+  /** Anonymized case-study name, e.g. "the agency OS I run". */
   liveProductLabel: string;
-  /** Where "see the live product" points (anonymized case study). */
   liveProductHref?: string;
 }) {
   return (
-    <section
-      className="mt-5 scene-card rounded-2xl p-5"
-      aria-labelledby="outcome-heading"
-    >
-      <div className="flex items-baseline justify-between gap-2">
-        <h2
-          id="outcome-heading"
-          className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-500"
-        >
-          outcomes · what this loop ships
-        </h2>
-        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
-          illustrative sample data
-        </p>
+    <section className="surface mt-6 overflow-hidden rounded-2xl" aria-labelledby="outcome-heading">
+      <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 px-5 pt-5 md:px-6 md:pt-6">
+        <div>
+          <h2 id="outcome-heading" className="heading text-lg text-ink-50">
+            Outcomes
+          </h2>
+          <p className="text-xs text-ink-500">What this loop ships at production scale</p>
+        </div>
+        <span className="chip">illustrative sample data</span>
       </div>
 
       {/* A dl group is dt-then-dd; `order` puts the big number on top
           visually without breaking that. */}
-      <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {stats.map((s) => (
+      <dl className="mt-5 grid grid-cols-2 border-t border-line lg:grid-cols-4">
+        {stats.map((s, i) => (
           <div
             key={s.label}
-            className="flex flex-col rounded-xl border border-white/10 bg-black/20 p-3.5"
+            data-spot
+            className={`flex flex-col px-5 py-5 md:px-6 ${i % 2 === 1 ? "border-l border-line" : ""} ${
+              i >= 2 ? "border-t border-line lg:border-t-0" : ""
+            } ${i >= 1 ? "lg:border-l lg:border-line" : ""}`}
           >
-            <dt className="order-2 mt-1 text-xs leading-tight text-zinc-300">
-              {s.label}
-            </dt>
-            <dd className="order-1 text-2xl font-medium tabular-nums tracking-[-0.02em] text-[var(--color-scene-1)]">
+            <dt className="order-2 mt-1.5 text-[13px] leading-snug text-ink-300">{s.label}</dt>
+            <dd className="display order-1 text-[2rem] tabular-nums text-ink-50 md:text-[2.4rem]">
               <CountUp value={s.value} />
             </dd>
-            {s.sub ? (
-              <dd className="order-3 mt-0.5 text-[10px] leading-tight text-zinc-500">
-                {s.sub}
-              </dd>
-            ) : null}
+            {s.sub ? <dd className="order-3 mt-1 text-[11px] leading-tight text-ink-500">{s.sub}</dd> : null}
           </div>
         ))}
       </dl>
 
-      <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-white/5 pt-4">
+      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-t border-line bg-white/[0.012] px-5 py-4 md:px-6">
         <a
           href={liveProductHref}
           rel="noreferrer"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-scene-1)] transition-colors hover:text-white"
+          className="group inline-flex items-center gap-2 text-sm font-medium text-scene-soft transition-colors hover:text-white"
         >
-          See the live product
-          <span aria-hidden>→</span>
-          <span className="font-mono text-[10px] font-normal uppercase tracking-[0.16em] text-zinc-500">
-            {liveProductLabel}
+          <span className="link-draw">See the live product</span>
+          <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5">
+            ↗
           </span>
+          <span className="text-xs font-normal text-ink-500">{liveProductLabel}</span>
         </a>
-        <a
-          href="https://gravixar.com/contact"
-          rel="noreferrer"
-          className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500 transition-colors hover:text-zinc-200"
-        >
-          this same loop runs my own ops →
-        </a>
+        <p className="text-[11px] text-ink-500">Sample numbers for the sandbox, not a real company&apos;s metrics.</p>
       </div>
-
-      <p className="mt-3 text-[10px] leading-relaxed text-zinc-500">
-        Sample numbers for the sandbox, not a real company&apos;s metrics.
-      </p>
     </section>
   );
 }

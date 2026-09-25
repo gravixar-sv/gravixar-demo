@@ -12,6 +12,7 @@ export type AvatarHue = {
 };
 
 const SIZES = {
+  xs: "h-6 w-6 text-[10px]",
   sm: "h-8 w-8 text-[10px]",
   md: "h-10 w-10 text-[11px]",
   lg: "h-12 w-12 text-xs",

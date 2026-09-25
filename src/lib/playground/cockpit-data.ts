@@ -10,6 +10,7 @@
 
 import type { AvatarHue } from "@/components/demo/Avatar";
 import type { OutcomeStat } from "@/components/demo/OutcomePanel";
+import type { TryStep } from "@/components/demo/SceneIntro";
 import { formatCount, formatMoney } from "./outcomeFormat";
 
 export const FOUNDER = {
@@ -270,6 +271,17 @@ export function outcomeStats(state: CockpitState): OutcomeStat[] {
       label: "drafts approved",
       sub: "you held the gate",
     },
+  ];
+}
+
+// The "Try the loop" checklist. Each step reads a flag only the
+// visitor's own click can set (routed, chased, done), so none is true at
+// the initial state and a reset clears all three.
+export function trySteps(state: CockpitState): TryStep[] {
+  return [
+    { label: "Add an inbox email to Today", done: state.signals.some((s) => s.routed) },
+    { label: "Approve a draft and watch it learn", done: state.todos.some((t) => t.done) },
+    { label: "Chase the overdue invoice", done: state.money.some((m) => m.chased) },
   ];
 }
 

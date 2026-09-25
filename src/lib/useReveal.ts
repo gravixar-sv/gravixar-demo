@@ -1,4 +1,3 @@
-"use client";
 
 // Viewport reveal, CSS-first. Elements marked [data-reveal] start
 // hidden via CSS; an IntersectionObserver adds .is-in as they enter

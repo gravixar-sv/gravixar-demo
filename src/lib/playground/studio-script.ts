@@ -96,7 +96,7 @@ export const STUDIO_AGENTS: StudioAgent[] = [
       "Verdict: STRONG · confidence 0.88",
       "Why: led retainer delivery, owned P&L, on-brief writing sample",
       "Watch: notice period 3 months · salary at top of band",
-      "[ advance to interview ]  [ pass ]",
+      "Recommended next step: advance to interview, or pass.",
     ],
   },
   {

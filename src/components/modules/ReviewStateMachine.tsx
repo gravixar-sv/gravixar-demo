@@ -1,4 +1,3 @@
-"use client";
 
 // Interactive review state machine demo. Visitor moves a single
 // deliverable through transitions. Each transition writes a row to a

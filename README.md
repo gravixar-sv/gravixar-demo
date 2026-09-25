@@ -12,10 +12,13 @@ separate visual identity.
 
 ## Stack
 
-- Next.js 16 App Router, React 19, TypeScript strict
-- Tailwind CSS v4
-- Hubot Sans (display) + Mona Sans (body), self-hosted via `@fontsource-variable`
-- Prisma 7 + Neon Postgres, and NextAuth v5, both **inert** (see below)
+- Vite 8 + React 19, TypeScript strict, prerendered to one static HTML
+  file per route (no server, no framework router)
+- Tailwind CSS v4 (`@tailwindcss/vite`)
+- GSAP 3 for pointer interactions, scroll scrubs and the flow orb
+- Mona Sans (variable width), Newsreader italic for the one human-voice
+  phrase, Geist Mono for machine output, all self-hosted via
+  `@fontsource`
 - Three.js, one component only (the index hero's particle field)
 
 ## There is no sign-in
@@ -29,11 +32,21 @@ server. There is no login, no persona switcher, no identity fork, no
 session. Reload the page and the scene starts over. The footer says "no
 sign-in" because that is literally true.
 
-The Prisma schema, the seed, `src/lib/auth.ts`, `src/lib/db.ts` and
-`/api/auth/[...nextauth]` are kept but **inert**: no rendered surface
-reads the database. The `/api/cron/reset-demo` route and `prisma/seed.ts`
-still work if invoked by hand, but no cron calls them (retired 2026-07-30,
-because it was reseeding rows nothing renders).
+The inert Prisma, NextAuth and cron scaffolding left over from the
+persona-login era was removed with the move to Vite (2026-09-25): no
+rendered surface ever read it. There is no server code in the repo.
+
+## How a page is built
+
+`src/routes.tsx` is the route table. `pnpm build` runs the client build,
+an SSR build of `src/entry-server.tsx`, then `scripts/prerender.mjs`,
+which renders every route to `dist/<path>.html` (title, description and
+social tags included) and preloads that page's own chunk. The client
+(`src/entry-client.tsx`) hydrates the page it was served. Vercel serves
+`dist/` statically with `cleanUrls`, so `dist/lattice.html` answers
+`/lattice`; `vercel.ts` carries the security headers and the `/tour`
+redirect. In dev, Vite serves an empty shell for every path and the
+client renders the matching route.
 
 ## Scenes
 
@@ -58,10 +71,12 @@ May 2026). Keep it; the URL is still reachable from old links.
 
 ### Section order
 
-Every scene renders the same rhythm below its column grid:
+Every scene is the same page shape:
 
 ```
-grid -> LearnBeat -> OutcomePanel -> feed/audit -> SceneCTA
+SceneLayout > SceneIntro (h1 + live "Try the loop" checklist)
+  > Workspace (the app window, one Pane per column)
+  > LearnBeat -> OutcomePanel -> ActivityLog (+ extras) -> SceneCTA
 ```
 
 Scene-specific extras attach after the receipts and before the CTA, so
@@ -85,8 +100,11 @@ Open http://localhost:3400.
 | Script | What it does |
 |---|---|
 | `pnpm typecheck` | `tsc --noEmit`. This plus `pnpm build` is the gate. |
-| `pnpm build` | Production build. |
-| `pnpm capture` | Real headless-Chrome page captures with a scroll walk, into `public/scenes/`. Gives the page wall-clock time so viewport reveals and the WebGL field render the way a visitor sees them. |
+| `pnpm build` | Client build, SSR build, prerender into `dist/`. |
+| `pnpm preview` | Serves `dist/` on port 3400. |
+| `pnpm lint` | `eslint .` (typescript-eslint + react-hooks). |
+| `pnpm capture` | Real headless-Chrome captures of a page with a scroll walk, into `shots/`. |
+| `pnpm capture:scenes` | The five gallery captures into `public/scenes/` (`<slug>.png` at 1.5x for gravixar.com and social cards, `<slug>.webp` for this site's cards) plus `geometry.json`, the measured workspace and pane boxes that gravixar.com's crop boxes are set from. |
 | `pnpm verify:learn-beat` | Asserts all 5 scenes grow a rule on approval. |
 | `pnpm verify:outcomes` | Asserts all 5 scenes move their outcome tiles on the visitor's own clicks, hold the tiles they cannot move, and rewind on reset. |
 
@@ -98,7 +116,8 @@ as an argument, e.g. `pnpm verify:outcomes http://localhost:3400`.
 - **No em-dashes** anywhere in copy or in comments you touch. Commas or
   periods.
 - **First person "I", never "we".** This is one person's work.
-- **Dark mode only.** No light theme, no toggle.
+- **Dark mode only.** No light theme, no toggle. The design system and
+  its rules live in the header comment of `src/styles/globals.css`.
 - `--color-mark` (`#ff1f2d`) is the logo mark and nothing else.
   Everything else reads the scene-scoped `--color-scene-1` / `-2` /
   `-glow`, which each scene layout sets inline on its root.

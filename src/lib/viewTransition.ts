@@ -1,4 +1,3 @@
-"use client";
 
 // Wraps a synchronous DOM update in a View Transition so any element
 // carrying a `view-transition-name` animates from its old box to its

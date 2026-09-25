@@ -1,4 +1,3 @@
-"use client";
 
 // "Start here." A first-time visitor lands on a three-column grid and
 // has to read a paragraph to know what to press. The scene marks one

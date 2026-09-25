@@ -1,4 +1,3 @@
-"use client";
 
 // Inline-SVG design mockups for the Lattice review-loop deliverables.
 // CSP-safe (no external image host), zero-cost, and good-looking enough

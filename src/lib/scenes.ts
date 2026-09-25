@@ -36,12 +36,24 @@ export type Scene = {
   openLabel: string;
   /** The visitor's pain this scene addresses (kept for reference / SEO). */
   problemStatement: string;
-  /** Background gradient utility name (defined in globals.css). */
-  bgUtility: string;
-  /** Display font label, informational, the actual font wires in the layout. */
-  displayFont: "fraunces" | "jetbrains" | "inter";
-  /** Pretty palette swatches shown on the gallery card. */
+  /** Palette swatches: ground, accent, secondary. The accent is also
+   *  mirrored in gravixar-marketing's demos.ts. */
   swatches: [string, string, string];
+  /** Scene tokens the layout sets inline on its root. */
+  theme: SceneTheme;
+  /** The fictional product's own name, shown in the workspace app bar. */
+  appName: string;
+  /** One-letter glyph for the product's mark. */
+  glyph: string;
+};
+
+export type SceneTheme = {
+  /** --color-scene-1: the accent, and the colour of a decision. */
+  accent: string;
+  /** --color-scene-2: the secondary wash. */
+  accent2: string;
+  /** --color-scene-glow: the accent at low alpha, for light and flashes. */
+  glow: string;
 };
 
 export const SCENES: Scene[] = [
@@ -61,9 +73,10 @@ export const SCENES: Scene[] = [
     openLabel: "Open the OS",
     problemStatement:
       "Your agency runs on five tools and a dozen spreadsheets.",
-    bgUtility: "bg-lattice",
-    displayFont: "fraunces",
     swatches: ["#0a1230", "#FF6B6B", "#F5E6D3"],
+    theme: { accent: "#FF6B6B", accent2: "#F5E6D3", glow: "rgba(255, 107, 107, 0.35)" },
+    appName: "Lattice Studio",
+    glyph: "L",
   },
   {
     slug: "studio-mix",
@@ -81,9 +94,10 @@ export const SCENES: Scene[] = [
     openLabel: "Open the console",
     problemStatement:
       "Your AI tooling is impressive in demos, invisible in production.",
-    bgUtility: "bg-studio-mix",
-    displayFont: "jetbrains",
     swatches: ["#070a14", "#00E1FF", "#FF2D95"],
+    theme: { accent: "#00E1FF", accent2: "#FF2D95", glow: "rgba(0, 225, 255, 0.32)" },
+    appName: "Studio Mix Console",
+    glyph: "S",
   },
   {
     slug: "cockpit",
@@ -100,9 +114,10 @@ export const SCENES: Scene[] = [
     tryLine: "Inbox triage → today's priorities → cash flow, in one view",
     openLabel: "Open the cockpit",
     problemStatement: "You're CEO, support, and bookkeeper before lunch.",
-    bgUtility: "bg-cockpit",
-    displayFont: "inter",
     swatches: ["#14110a", "#FBBF24", "#FB923C"],
+    theme: { accent: "#FBBF24", accent2: "#FB923C", glow: "rgba(251, 191, 36, 0.32)" },
+    appName: "Driftwood",
+    glyph: "D",
   },
   {
     slug: "northbeam",
@@ -120,9 +135,10 @@ export const SCENES: Scene[] = [
     openLabel: "Open the workspace",
     problemStatement:
       "Everyone makes assets; staying on-brand is the bottleneck.",
-    bgUtility: "bg-northbeam",
-    displayFont: "fraunces",
     swatches: ["#1a2614", "#9DBE6E", "#F2DDC1"],
+    theme: { accent: "#9DBE6E", accent2: "#F2DDC1", glow: "rgba(157, 190, 110, 0.34)" },
+    appName: "Northbeam Brand Agent",
+    glyph: "N",
   },
   {
     slug: "care-ledger",
@@ -140,9 +156,10 @@ export const SCENES: Scene[] = [
     openLabel: "Open the portal",
     problemStatement:
       "Credentialing, claims, and new clinics live in three disconnected tools.",
-    bgUtility: "bg-care-ledger",
-    displayFont: "inter",
     swatches: ["#06141a", "#2DD4BF", "#7DD3FC"],
+    theme: { accent: "#2DD4BF", accent2: "#7DD3FC", glow: "rgba(45, 212, 191, 0.32)" },
+    appName: "Care Ledger",
+    glyph: "C",
   },
 ];
 

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "demo.gravixar.com, five working scenes with sample data. Vite + React + Tailwind + GSAP, prerendered.",
-  "packageManager": "pnpm@9.15.0",
+  "packageManager": "pnpm@9.15.9",
   "pnpm": {
     "overrides": {
       "brace-expansion@<1.1.21": "^1.1.21",
@@ -42,7 +42,7 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "tailwind-merge": "^3.6.0",
-    "three": "^0.184.0"
+    "three": "^0.186.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
@@ -50,8 +50,8 @@
     "@types/node": "^24.13.2",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "@types/three": "^0.184.1",
-    "@vercel/config": "^0.7.0",
+    "@types/three": "^0.186.0",
+    "@vercel/config": "^0.13.0",
     "@vitejs/plugin-react": "^6.1.1",
     "eslint": "^9.39.5",
     "eslint-plugin-react-hooks": "^7.1.1",

@@ -33,9 +33,9 @@ export function Workspace({
     <section aria-label={`${scene.appName} workspace`} className="frame scene-rise-2 mt-8 rounded-[22px] md:mt-10">
       <div className="flex h-12 items-center gap-2.5 rounded-t-[21px] border-b border-line bg-white/[0.015] px-4">
         <SceneGlyph scene={scene} size="sm" />
-        <span className="shrink-0 whitespace-nowrap text-[13px] font-semibold text-ink-100">{scene.appName}</span>
-        <span aria-hidden className="text-ink-600">/</span>
-        <span className="min-w-0 truncate text-[13px] text-ink-400">{board}</span>
+        <span className="shrink-0 whitespace-nowrap text-base font-semibold text-ink-100">{scene.appName}</span>
+        <span aria-hidden className="text-ink-500">/</span>
+        <span className="min-w-0 truncate text-base text-ink-400">{board}</span>
         <div className="ml-auto flex shrink-0 items-center gap-3">
           {toolbar}
           <span className="chip hidden sm:inline-flex">
@@ -90,24 +90,24 @@ export function Pane({
       data-flow={flow}
       aria-labelledby={headingId}
       className={cn(
-        "w-[86%] shrink-0 snap-start p-4 first:rounded-bl-[21px] last:rounded-br-[21px] sm:w-[58%] md:p-5 lg:w-auto",
+        "w-[90%] shrink-0 snap-start p-4 first:rounded-bl-[21px] last:rounded-br-[21px] sm:w-[62%] md:p-5 lg:w-auto",
         className,
       )}
     >
       <header className="flex items-center gap-3">
         {lead}
         <div className="min-w-0 flex-1">
-          <h2 id={headingId} className="flex items-baseline gap-2 truncate text-sm font-semibold text-ink-50">
+          <h2 id={headingId} className="flex items-baseline gap-2 truncate text-base font-semibold text-ink-50">
             {title}
             {tag ? <span className="label-mono text-scene-soft">{tag}</span> : null}
           </h2>
-          {sub ? <p className="mt-0.5 truncate text-xs text-ink-400">{sub}</p> : null}
+          {sub ? <p className="mt-0.5 truncate text-sm text-ink-400">{sub}</p> : null}
         </div>
         {count !== undefined ? (
           <span
             key={count}
             aria-label={`${count} items`}
-            className="pop-in inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-white/[0.06] px-2 font-mono text-[11px] text-ink-200"
+            className="pop-in inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-white/[0.06] px-2 font-mono text-sm text-ink-200"
           >
             {count}
           </span>
@@ -158,7 +158,7 @@ export function ItemCard({
 export function EmptyState({ show = true, children }: { show?: boolean; children: ReactNode }) {
   if (!show) return null;
   return (
-    <p className="rounded-xl border border-dashed border-white/[0.1] px-4 py-7 text-center text-xs leading-relaxed text-ink-500">
+    <p className="rounded-xl border border-dashed border-white/[0.1] px-4 py-7 text-center text-base leading-relaxed text-ink-400">
       {children}
     </p>
   );
@@ -199,7 +199,7 @@ export function ActivityLog({
         <h2 id={headingId} className="heading text-lg text-ink-50">
           {title}
         </h2>
-        <p className="text-xs text-ink-500">{sub}</p>
+        <p className="text-base text-ink-400">{sub}</p>
       </div>
       <ol aria-live="polite" className="mt-5">
         {entries.slice(0, limit).map((e, i, all) => (
@@ -222,12 +222,12 @@ export function ActivityLog({
                 <span className="absolute bottom-[-8px] top-[14px] w-px bg-white/[0.08]" />
               ) : null}
             </span>
-            <p className="text-[13px] leading-relaxed text-ink-300">
+            <p className="text-base leading-relaxed text-ink-300">
               {e.actor ? <span className="font-semibold text-ink-100">{e.actor} </span> : null}
               {e.action}
               {e.detail ? <span className="text-ink-500"> · {e.detail}</span> : null}
             </p>
-            <time suppressHydrationWarning className="mt-0.5 font-mono text-[10.5px] text-ink-500">
+            <time suppressHydrationWarning className="mt-0.5 font-mono text-sm text-ink-500">
               {formatRelative(e.ts)}
             </time>
           </li>

@@ -31,9 +31,7 @@
     "capture:scenes": "node scripts/capture-scenes.mjs"
   },
   "dependencies": {
-    "@fontsource-variable/geist-mono": "^5.3.0",
-    "@fontsource-variable/mona-sans": "^5.3.0",
-    "@fontsource/newsreader": "^5.3.0",
+    "@fontsource-variable/open-sans": "^5.3.0",
     "@gsap/react": "^2.1.2",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",

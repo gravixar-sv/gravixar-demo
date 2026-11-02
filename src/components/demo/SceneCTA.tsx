@@ -46,11 +46,11 @@ export function SceneCTA({
           <h2 id="scene-cta-heading" className="display mt-4 text-4xl text-ink-50 md:text-[3.25rem]">
             {headline ?? (
               <>
-                Want this for your <span className="voice font-normal text-scene-soft">{ctaNoun}?</span>
+                Want this for your <span className="voice text-scene-soft">{ctaNoun}?</span>
               </>
             )}
           </h2>
-          <p className="mt-5 max-w-[58ch] text-base leading-relaxed text-ink-400">
+          <p className="mt-6 max-w-[58ch] text-base leading-relaxed text-ink-300 md:text-lg">
             {blurb ??
               "I build systems like this from scratch, scoped to your workflow and owned by you. Most engagements run 4 to 8 weeks. One call to scope it, no obligation."}
           </p>
@@ -60,14 +60,14 @@ export function SceneCTA({
             ref={cta}
             href="https://gravixar.com/contact"
             rel="noreferrer"
-            className="btn btn-primary btn-lg px-7 py-4 text-base"
+            className="btn btn-primary btn-lg"
           >
             Book a 30-min call
             <span aria-hidden className="btn-arrow">
               →
             </span>
           </a>
-          <a href="https://gravixar.com" rel="noreferrer" className="link-draw text-sm text-ink-400 hover:text-ink-100">
+          <a href="https://gravixar.com" rel="noreferrer" className="link-draw text-base text-ink-300 hover:text-ink-50">
             or read more at gravixar.com
           </a>
         </div>

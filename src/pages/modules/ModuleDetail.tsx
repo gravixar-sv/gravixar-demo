@@ -25,7 +25,7 @@ export default function ModulePage({ slug }: { slug: string }) {
         <a href="/modules" className="link-draw hover:text-ink-100">
           Modules
         </a>
-        <span aria-hidden className="mx-2 text-ink-600">
+        <span aria-hidden className="mx-2 text-ink-500">
           /
         </span>
         <span className="capitalize">{m.category}</span>
@@ -88,7 +88,7 @@ export default function ModulePage({ slug }: { slug: string }) {
             <h2 className="eyebrow">
               Running in
             </h2>
-            <ul className="mt-3 space-y-2 text-sm">
+            <ul className="mt-3 space-y-2 text-base">
               {m.runningIn.map((r) => (
                 <li key={r} className="text-zinc-200">
                   {r}
@@ -121,14 +121,14 @@ export default function ModulePage({ slug }: { slug: string }) {
             </h2>
             <a
               href={`https://gravixar.com/modules/${m.slug}`}
-              className="mt-3 block text-sm text-zinc-300 underline-offset-4 hover:underline"
+              className="mt-3 block text-base text-zinc-200 underline-offset-4 hover:underline"
               rel="noreferrer"
             >
               Full write-up on gravixar.com →
             </a>
             <a
               href="/modules"
-              className="mt-2 block text-sm text-zinc-400 underline-offset-4 hover:underline"
+              className="mt-2 block text-base text-zinc-300 underline-offset-4 hover:underline"
             >
               All modules →
             </a>

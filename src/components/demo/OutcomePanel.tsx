@@ -35,7 +35,7 @@ export function OutcomePanel({
           <h2 id="outcome-heading" className="heading text-lg text-ink-50">
             Outcomes
           </h2>
-          <p className="text-xs text-ink-500">What this loop ships at production scale</p>
+          <p className="text-base text-ink-400">What this loop ships at production scale</p>
         </div>
         <span className="chip">illustrative sample data</span>
       </div>
@@ -51,11 +51,11 @@ export function OutcomePanel({
               i >= 2 ? "border-t border-line lg:border-t-0" : ""
             } ${i >= 1 ? "lg:border-l lg:border-line" : ""}`}
           >
-            <dt className="order-2 mt-1.5 text-[13px] leading-snug text-ink-300">{s.label}</dt>
+            <dt className="order-2 mt-1.5 text-base leading-snug text-ink-300">{s.label}</dt>
             <dd className="display order-1 text-[2rem] tabular-nums text-ink-50 md:text-[2.4rem]">
               <CountUp value={s.value} />
             </dd>
-            {s.sub ? <dd className="order-3 mt-1 text-[11px] leading-tight text-ink-500">{s.sub}</dd> : null}
+            {s.sub ? <dd className="order-3 mt-1 text-sm leading-snug text-ink-400">{s.sub}</dd> : null}
           </div>
         ))}
       </dl>
@@ -64,15 +64,15 @@ export function OutcomePanel({
         <a
           href={liveProductHref}
           rel="noreferrer"
-          className="group inline-flex items-center gap-2 text-sm font-medium text-scene-soft transition-colors hover:text-white"
+          className="group inline-flex min-h-11 items-center gap-2 text-base font-semibold text-scene-soft transition-colors hover:text-white"
         >
           <span className="link-draw">See the live product</span>
           <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5">
             ↗
           </span>
-          <span className="text-xs font-normal text-ink-500">{liveProductLabel}</span>
+          <span className="text-sm font-normal text-ink-500">{liveProductLabel}</span>
         </a>
-        <p className="text-[11px] text-ink-500">Sample numbers for the sandbox, not a real company&apos;s metrics.</p>
+        <p className="text-base text-ink-400">Sample numbers for the sandbox, not a real company&apos;s metrics.</p>
       </div>
     </section>
   );

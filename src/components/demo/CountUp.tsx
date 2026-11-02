@@ -129,7 +129,11 @@ export function CountUp({
 
     return () => {
       io.disconnect();
-      settle();
+      // Only a count that has started owns the text. Before that the
+      // element still holds React's own text node: writing to it here
+      // would detach that node, and a value changed by a click before
+      // the tile was ever scrolled into view would never show.
+      if (started) settle();
     };
   }, [value]);
 

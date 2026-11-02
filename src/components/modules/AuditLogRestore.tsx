@@ -110,7 +110,7 @@ export function AuditLogRestore() {
             return (
               <label key={f} className="block">
                 <span className="flex items-center justify-between gap-3">
-                  <span className="text-[13px] font-medium text-ink-200">{LABEL[f]}</span>
+                  <span className="text-base font-medium text-ink-200">{LABEL[f]}</span>
                   <span className="flex items-center gap-2">
                     {changed ? <span className="chip chip-caution">unsaved</span> : null}
                     {edits > 0 ? (
@@ -126,7 +126,7 @@ export function AuditLogRestore() {
                   value={draft[f]}
                   onChange={(e) => setDraft((d) => ({ ...d, [f]: e.target.value }))}
                   className={cn(
-                    "mt-2 min-h-11 w-full rounded-xl border border-line-strong bg-ink-950/60 px-3.5 py-2.5 text-sm text-ink-50 outline-none transition-[border-color,box-shadow] duration-200 placeholder:text-ink-500 focus:border-[color-mix(in_oklab,var(--color-scene-1)_60%,transparent)] focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-scene-1)_14%,transparent)]",
+                    "mt-2 min-h-11 w-full rounded-xl border border-line-strong bg-ink-950/60 px-3.5 py-2.5 text-base text-ink-50 outline-none transition-[border-color,box-shadow] duration-200 placeholder:text-ink-500 focus:border-[color-mix(in_oklab,var(--color-scene-1)_60%,transparent)] focus:shadow-[0_0_0_4px_color-mix(in_oklab,var(--color-scene-1)_14%,transparent)]",
                     flash?.field === f && "pg-fresh",
                   )}
                 />
@@ -136,7 +136,7 @@ export function AuditLogRestore() {
         </div>
 
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
-          <p className="text-xs text-ink-500">
+          <p className="text-base text-ink-400">
             Restorable fields: name, tagline. Status enums and money never live on this list.
           </p>
           <div className="flex gap-2">
@@ -157,7 +157,7 @@ export function AuditLogRestore() {
           Audit log, this session
         </WidgetHeading>
         {audit.length === 0 ? (
-          <p className="mt-5 rounded-xl border border-dashed border-white/[0.1] px-4 py-6 text-center text-xs leading-relaxed text-ink-500">
+          <p className="mt-5 rounded-xl border border-dashed border-white/[0.1] px-4 py-6 text-center text-base leading-relaxed text-ink-500">
             No edits yet. Change a field above and save it.
           </p>
         ) : (
@@ -172,13 +172,13 @@ export function AuditLogRestore() {
                 >
                   <div className="min-w-0">
                     <p className="flex flex-wrap items-center gap-2">
-                      <span className="font-mono text-[11px] text-ink-500">#{row.id}</span>
+                      <span className="font-mono text-sm text-ink-500">#{row.id}</span>
                       <span className={cn("chip chip-mono", isRestore ? "chip-accent" : "")}>
                         {isRestore ? `RESTORE of #${row.restoredFrom}` : "UPDATE"}
                       </span>
-                      <span className="text-[13px] text-ink-300">{LABEL[row.field]}</span>
+                      <span className="text-base text-ink-300">{LABEL[row.field]}</span>
                     </p>
-                    <p className="mt-2 flex flex-wrap items-center gap-2 text-[13px]">
+                    <p className="mt-2 flex flex-wrap items-center gap-2 text-base">
                       <span className="rounded-md bg-rose-400/[0.08] px-2 py-0.5 text-rose-200/90 line-through decoration-rose-300/60">
                         {row.before}
                       </span>
@@ -188,7 +188,7 @@ export function AuditLogRestore() {
                       <span className="sr-only">became</span>
                       <span className="rounded-md bg-emerald-400/[0.08] px-2 py-0.5 text-emerald-200">{row.after}</span>
                     </p>
-                    <p className="mt-1.5 text-xs text-ink-500">
+                    <p className="mt-1.5 text-sm text-ink-500">
                       <span className="text-ink-300">{row.actor}</span> ·{" "}
                       <time suppressHydrationWarning>{timeAgo(row.at)}</time>
                     </p>

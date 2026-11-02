@@ -45,18 +45,18 @@ export function SceneIntro({
             <span aria-hidden className="live-dot" />
             Live sandbox
           </span>
-          <span className="text-xs text-ink-400">
+          <span className="text-base text-ink-300">
             {scene.whatItIs}, for {scene.personaLabel}
           </span>
           {status}
         </div>
         <h1 className="display mt-5 text-[2.35rem] text-ink-50 sm:text-5xl lg:text-[3.5rem]">{title}</h1>
-        <p className="mt-5 max-w-[60ch] text-base leading-relaxed text-ink-400 md:text-[1.0625rem]">{lede}</p>
+        <p className="mt-6 max-w-[60ch] text-base leading-relaxed text-ink-300 md:text-lg">{lede}</p>
       </header>
 
       <section aria-labelledby={`${slug}-try-heading`} className="surface scene-rise-2 rounded-2xl p-4 md:p-5">
         <div className="flex items-center justify-between gap-3">
-          <h2 id={`${slug}-try-heading`} className="text-sm font-semibold text-ink-50">
+          <h2 id={`${slug}-try-heading`} className="text-base font-semibold text-ink-50">
             {complete ? "Loop complete" : "Try the loop"}
           </h2>
           <div className="flex items-center gap-2">
@@ -66,7 +66,7 @@ export function SceneIntro({
               </span>{" "}
               of {steps.length}
             </span>
-            <Button variant="ghost" size="sm" onClick={onReset} icon="↻" className="font-mono uppercase tracking-[0.08em]">
+            <Button variant="ghost" size="sm" onClick={onReset} icon="↻">
               Reset
             </Button>
           </div>
@@ -83,14 +83,14 @@ export function SceneIntro({
             return (
               <li
                 key={step.label}
-                className={`flex items-start gap-3 rounded-lg px-2 py-1.5 transition-colors duration-300 ${
+                className={`flex items-start gap-3 rounded-lg px-2 py-2 transition-colors duration-300 ${
                   current ? "bg-white/[0.04]" : ""
                 }`}
               >
                 <span
                   aria-hidden
                   key={step.done ? "done" : "todo"}
-                  className={`mt-px inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full font-mono text-[10px] ${
+                  className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-sm font-semibold ${
                     step.done
                       ? "pop-in bg-scene text-ink-950"
                       : current
@@ -101,7 +101,7 @@ export function SceneIntro({
                   {step.done ? "✓" : i + 1}
                 </span>
                 <span
-                  className={`text-sm leading-snug ${
+                  className={`text-base leading-snug ${
                     step.done ? "text-ink-500 line-through decoration-ink-600" : current ? "text-ink-50" : "text-ink-300"
                   }`}
                 >
@@ -113,7 +113,7 @@ export function SceneIntro({
           })}
         </ol>
         {complete ? (
-          <p className="mt-3 border-t border-line pt-3 text-xs leading-relaxed text-ink-400">
+          <p className="mt-3 border-t border-line pt-3 text-base leading-relaxed text-ink-300">
             That is the whole loop: the work moved, a person decided, and the system kept the rule. Reset to run it again.
           </p>
         ) : null}

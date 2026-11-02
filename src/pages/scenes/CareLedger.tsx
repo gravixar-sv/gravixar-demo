@@ -146,7 +146,7 @@ function CareLedgerPortal() {
           status="Approval gate"
         >
           <FinanceStrip state={state} />
-          <p className="flex items-start gap-2 text-[11px] leading-relaxed text-ink-400">
+          <p className="flex items-start gap-2 text-base leading-relaxed text-ink-400">
             <LockGlyph className="mt-[3px] text-scene-soft" />
             <span>Codes and amounts only. No patient records here.</span>
           </p>
@@ -190,7 +190,7 @@ function CareLedgerPortal() {
         learnedLabel="learned from you"
         emptyText="Credential a provider or approve a claim batch and the portal starts a policy book."
         renderMeta={(rule) => (
-          <p className="mt-1 text-[11px] text-ink-500">
+          <p className="mt-1 text-sm text-ink-500">
             {rule.learned ? (
               <span className="font-medium text-scene-soft">Learned from your approval</span>
             ) : (
@@ -217,7 +217,7 @@ function CareLedgerPortal() {
         noun="clinic network"
         headline={
           <>
-            Run credentialing and billing <span className="voice font-normal text-scene-soft">on one rail.</span>
+            Run credentialing and billing <span className="voice text-scene-soft">on one rail.</span>
           </>
         }
         blurb="This is the HIPAA-conscious billing portal I build for clinic networks: provider credentialing, claims and finance behind an approval gate, and a Zoom-first sales pipeline, with PHI kept out of the portal by design. One call to scope it, no obligation."
@@ -274,19 +274,19 @@ function StatStrip({ items }: { items: StatItem[] }) {
     >
       {items.map((s) => (
         <div key={s.label} className="flex min-w-0 flex-col px-3 py-2.5 first:pl-0.5">
-          <dt className="order-2 mt-0.5 truncate text-[11px] text-ink-500">{s.label}</dt>
+          <dt className="order-2 mt-0.5 truncate text-sm text-ink-500">{s.label}</dt>
           <dd className="order-1">
             <span
               key={s.value}
               className={cn(
-                "pop-in inline-block font-mono text-[15px] tabular-nums",
+                "pop-in inline-block font-mono text-base tabular-nums",
                 s.tone === "positive" ? "text-emerald-300" : "text-ink-50",
               )}
             >
               {s.value}
             </span>
           </dd>
-          {s.sub ? <dd className="order-3 mt-0.5 truncate text-[10.5px] text-ink-500">{s.sub}</dd> : null}
+          {s.sub ? <dd className="order-3 mt-0.5 truncate text-sm text-ink-500">{s.sub}</dd> : null}
         </div>
       ))}
     </dl>
@@ -356,8 +356,8 @@ function ProviderCard({ p, dispatch, hint = false }: { p: Provider; dispatch: Di
       <div className="flex items-start gap-3">
         <Avatar initials={initialsOf(p.name)} hue={PROVIDER_HUES[hash(p.name) % PROVIDER_HUES.length]!} size="sm" />
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold leading-snug text-ink-50">{p.name}</p>
-          <p className="mt-0.5 text-[11px] text-ink-400">{p.specialty}</p>
+          <p className="truncate text-base font-semibold leading-snug text-ink-50">{p.name}</p>
+          <p className="mt-0.5 text-sm text-ink-400">{p.specialty}</p>
         </div>
         <span
           key={p.status}
@@ -374,7 +374,7 @@ function ProviderCard({ p, dispatch, hint = false }: { p: Provider; dispatch: Di
             <li
               key={`${c.kind}-${c.status}`}
               className={cn(
-                "flex min-w-0 items-center gap-1.5 rounded-md border px-2 py-1.5 text-[11px]",
+                "flex min-w-0 items-center gap-1.5 rounded-md border px-2 py-1.5 text-sm",
                 ok
                   ? "border-emerald-400/25 bg-emerald-400/[0.05] text-emerald-200"
                   : "border-dashed border-amber-400/35 bg-amber-400/[0.04] text-amber-200",
@@ -386,7 +386,7 @@ function ProviderCard({ p, dispatch, hint = false }: { p: Provider; dispatch: Di
               </span>
               <span className="font-semibold">{c.kind}</span>
               <span className="sr-only">{ok ? "verified" : "pending"}</span>
-              <span className="ml-auto truncate font-mono text-[10.5px] tabular-nums text-ink-400">
+              <span className="ml-auto truncate font-mono text-sm tabular-nums text-ink-400">
                 {maskedId(p.name, c.kind)}
               </span>
             </li>
@@ -394,7 +394,7 @@ function ProviderCard({ p, dispatch, hint = false }: { p: Provider; dispatch: Di
         })}
       </ul>
 
-      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-line pt-3 text-[11px]">
+      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-line pt-3 text-sm">
         <span className="inline-flex items-center gap-1.5 text-ink-400">
           <ZoomGlyph />
           Zoom intake
@@ -419,7 +419,7 @@ function ProviderCard({ p, dispatch, hint = false }: { p: Provider; dispatch: Di
       </div>
 
       {credentialed ? (
-        <p className="mt-3 text-[11px] font-medium text-emerald-300/90">
+        <p className="mt-3 text-sm font-medium text-emerald-300/90">
           <span aria-hidden>✓</span> Credentialed · billing enabled <span aria-hidden>→</span>
         </p>
       ) : intakeDone ? (
@@ -469,14 +469,14 @@ function BillingCard({ item, dispatch }: { item: BillingItem; dispatch: Dispatch
     <ItemCard vt={vtName("cl-bill", item.id)} fresh={item.fresh} tone={approved ? "positive" : "accent"}>
       <p className="label-mono">{item.source === "claims" ? "Claims" : "Billing enablement"}</p>
       <div className="mt-1 flex items-baseline justify-between gap-3">
-        <p className="min-w-0 text-sm font-semibold leading-snug text-ink-50">{item.label}</p>
+        <p className="min-w-0 text-base font-semibold leading-snug text-ink-50">{item.label}</p>
         {item.amountUsd ? (
-          <span className="shrink-0 font-mono text-[13px] tabular-nums text-ink-50">
+          <span className="shrink-0 font-mono text-base tabular-nums text-ink-50">
             {formatAmount("$", item.amountUsd)}
           </span>
         ) : null}
       </div>
-      <p className="mt-1 text-[12px] leading-relaxed text-ink-400">{item.detail}</p>
+      <p className="mt-1 text-base leading-relaxed text-ink-400">{item.detail}</p>
       {/* The gate flips waiting -> approved in place, so the stable
           wrapper announces it. */}
       <div aria-live="polite" className="mt-3 border-t border-line pt-3">
@@ -536,8 +536,8 @@ function DealCard({ deal, dispatch }: { deal: Deal; dispatch: Dispatch }) {
     <ItemCard vt={vtName("cl-deal", deal.id)} fresh={deal.fresh} tone={live ? "positive" : "accent"}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold leading-snug text-ink-50">{deal.clinic}</p>
-          <p className="mt-0.5 text-[11px] text-ink-400">{deal.seats}</p>
+          <p className="truncate text-base font-semibold leading-snug text-ink-50">{deal.clinic}</p>
+          <p className="mt-0.5 text-sm text-ink-400">{deal.seats}</p>
         </div>
         <span key={deal.stage} className={cn("chip shrink-0", STAGE_CHIP[deal.stage], deal.fresh && "pop-in")}>
           {STAGE_LABEL[deal.stage]}
@@ -556,7 +556,7 @@ function DealCard({ deal, dispatch }: { deal: Deal; dispatch: Dispatch }) {
             />
           ))}
         </div>
-        <div aria-hidden className="mt-1.5 grid grid-cols-4 gap-1 text-[10px]">
+        <div aria-hidden className="mt-1.5 grid grid-cols-4 gap-1 text-sm">
           {STAGES.map((s, i) => (
             <span key={s} className={cn("truncate", i === idx ? "font-medium text-ink-100" : "text-ink-500")}>
               {STAGE_SHORT[s]}
@@ -566,7 +566,7 @@ function DealCard({ deal, dispatch }: { deal: Deal; dispatch: Dispatch }) {
       </div>
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3">
-        <span className="inline-flex items-center gap-1.5 text-[11px] text-ink-400">
+        <span className="inline-flex items-center gap-1.5 text-sm text-ink-400">
           <ZoomGlyph />
           Zoom discovery
           <span className={cn("font-medium", deal.zoom === "done" ? "text-emerald-300" : "text-amber-300")}>
@@ -574,7 +574,7 @@ function DealCard({ deal, dispatch }: { deal: Deal; dispatch: Dispatch }) {
           </span>
         </span>
         {live ? (
-          <span className="text-[11px] font-medium text-emerald-300/90">
+          <span className="text-sm font-medium text-emerald-300/90">
             <span aria-hidden>✓</span> Live · billing on this clinic
           </span>
         ) : (
@@ -613,9 +613,9 @@ function ArchitecturePanel() {
         <h2 id="care-ledger-arch-heading" className="heading text-lg text-ink-50">
           Architecture
         </h2>
-        <p className="text-xs text-ink-500">Isolated by design</p>
+        <p className="text-base text-ink-400">Isolated by design</p>
       </div>
-      <p className="mt-3 max-w-[62ch] text-[13.5px] leading-relaxed text-ink-300">
+      <p className="mt-3 max-w-[62ch] text-base leading-relaxed text-ink-300">
         No PHI in the portal. Claims carry CPT/ICD codes and amounts; patient records stay in the clinic&apos;s EHR,
         isolated by design. The portal moves money and credentials, never charts.
       </p>
@@ -634,7 +634,7 @@ function ArchitecturePanel() {
         {SPEC.map((s) => (
           <div key={s.k} className="group grid gap-x-4 gap-y-0.5 py-2.5 sm:grid-cols-[9rem_minmax(0,1fr)]">
             <dt className="label-mono pt-px transition-colors group-hover:text-ink-300">{s.k}</dt>
-            <dd className="text-[13px] leading-relaxed text-ink-300">{s.v}</dd>
+            <dd className="text-base leading-relaxed text-ink-300">{s.v}</dd>
           </div>
         ))}
       </dl>
@@ -653,8 +653,8 @@ function Node({ label, sub, variant }: { label: string; sub: string; variant: "o
         variant === "plain" && "border border-line-strong text-ink-200",
       )}
     >
-      <p className="text-[13px] font-semibold">{label}</p>
-      <p className="mt-0.5 font-mono text-[10.5px] text-ink-500">{sub}</p>
+      <p className="text-base font-semibold">{label}</p>
+      <p className="mt-0.5 font-mono text-sm text-ink-500">{sub}</p>
     </div>
   );
 }
@@ -672,7 +672,7 @@ function Connector({ kind, text }: { kind: "boundary" | "flow"; text: string }) 
         />
         <span
           className={cn(
-            "mx-1 inline-flex h-4 w-4 items-center justify-center rounded-full text-[9px]",
+            "mx-1 inline-flex h-5 w-5 items-center justify-center rounded-full text-sm",
             boundary ? "bg-rose-400/12 text-rose-300" : "text-scene-soft",
           )}
         >
@@ -685,7 +685,7 @@ function Connector({ kind, text }: { kind: "boundary" | "flow"; text: string }) 
           )}
         />
       </span>
-      <span className={cn("text-[10px] font-medium", boundary ? "text-rose-300/90" : "text-ink-500")}>{text}</span>
+      <span className={cn("text-sm font-medium", boundary ? "text-rose-300/90" : "text-ink-500")}>{text}</span>
     </div>
   );
 }

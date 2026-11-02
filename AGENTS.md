@@ -43,10 +43,11 @@ not a revival.
   full page load (cross-document View Transitions smooth it).
 - Tailwind CSS v4 via `@tailwindcss/vite`
 - GSAP 3 (`src/lib/gsap.ts`, `src/lib/interactions.ts`)
-- Mona Sans (variable width axis) for all UI and display; Newsreader
-  italic for at most one human-voice phrase per page (`.voice`); Geist
-  Mono for machine output only. Hubot Sans is retired, matching
-  gravixar.com's Ember Gate system.
+- Open Sans, one family for everything: headings, body, the italic
+  human-voice phrase (`.voice`, at most one per page) and machine values
+  (tabular figures stand in for the old mono). Mona Sans, Newsreader and
+  Geist Mono were retired on 2026-11-02 at the owner's request, so this
+  site no longer matches gravixar.com's font.
 - Three.js in exactly one component (`components/home/GateField.tsx`),
   loaded after mount, never in the prerender
 - Hosting: Vercel, static `dist/`, auto-deploy from `main`. `vercel.ts`
@@ -161,19 +162,28 @@ is remapped onto it), type roles, surfaces (`.surface`, `.frame`,
 - Consume tokens through `.text-scene` / `.bg-scene` / `.border-scene` /
   `.ring-scene`, or `var(--color-scene-1)` directly. Never a raw
   Tailwind hue on a token-tinted surface.
-- Contrast floors on ink-950: ink-400 = 7.6:1, ink-500 = 4.6:1 (floor
-  for anything informative), **ink-600 = 2.4:1 and is decoration only**
-  (hairlines, separators). Type floor: 10px for meta, 11px for anything
-  a visitor must read to act. The 8px/9px tiers are banned.
+- Every text colour meets WCAG AA (4.5:1) on every ink surface up to
+  ink-800. ink-500 (`#908b97`) is the quietest text allowed (5.0:1 on
+  ink-800); **ink-600 and below are decoration only** (hairlines,
+  separators), never text. Do not fade a card holding text below
+  `opacity-90`.
+- Type floors: body copy 16px (`text-base`) at line-height 1.6; labels,
+  tags, chips and meta 14px (`text-sm`); headings line-height 1.2.
+  Nothing smaller, no arbitrary `text-[11px]`-style sizes. Paragraph
+  stacks get clear space between them.
 - Buttons are `components/ui/Button.tsx` (or `.btn .btn-<variant>` on a
-  link): 40px touch height below lg, a press scale, a pointer ripple.
+  link). Every primary button is the hero's size (48px tall, 16px label)
+  whatever size class it carries; other variants are 44px (40px for
+  `btn-sm`) with a visible fill and border. A press scale, a pointer
+  ripple.
   Tailwind 4's preflight ships `cursor: default` on buttons, so
   `globals.css` restores the pointer.
 - Hover effects are pointer-only and cost nothing when absent:
   `[data-spot]` gets a light that follows the cursor (one document
-  listener in `useSpotlight`), CTAs use `useMagnetic`, the index scene
-  cards use `useTilt`. Never hide or displace resting content for an
-  effect.
+  listener in `useSpotlight`), CTAs use `useMagnetic`. The index scene
+  cards are text only (name, one line, who it is for, an Open button)
+  and the whole card is the link. Never hide or displace resting
+  content for an effect.
 - Banned: gradient text, glassmorphism as a default surface, side-stripe
   accents, identical icon-plus-heading-plus-text card grids, nested
   cards, big-gradient-number hero metrics.

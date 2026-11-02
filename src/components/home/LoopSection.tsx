@@ -93,10 +93,10 @@ export function LoopSection() {
       <div className="mx-auto max-w-[1440px] px-4 py-24 sm:px-6 md:py-32 lg:px-10">
         <header data-reveal className="max-w-3xl">
           <p className="eyebrow">The loop</p>
-          <h2 id="loop-heading" className="display mt-4 text-4xl text-ink-50 md:text-6xl">
+          <h2 id="loop-heading" className="display mt-4 text-4xl text-ink-50 md:text-5xl">
             Every scene runs the same loop.
           </h2>
-          <p className="mt-5 max-w-xl text-base leading-relaxed text-ink-400">
+          <p className="mt-6 max-w-xl text-base leading-relaxed text-ink-300 md:text-lg">
             Different buyers, different workflows, one spine. Scroll it once here, then go run it for real in any
             scene.
           </p>
@@ -104,15 +104,15 @@ export function LoopSection() {
 
         <div className="mt-16 grid gap-10 lg:grid-cols-[1fr_1.05fr] lg:gap-20">
           <ol data-beats className="relative">
-            <div aria-hidden className="absolute bottom-10 left-[11px] top-3 hidden w-px bg-white/[0.08] lg:block">
+            <div aria-hidden className="absolute bottom-10 left-[13.5px] top-3 hidden w-px bg-white/[0.08] lg:block">
               <div data-rail-fill className="h-full w-full origin-top scale-y-0 bg-scene" />
             </div>
             {BEATS.map((beat, i) => (
-              <li key={beat.key} data-beat={beat.key} data-reveal className="relative py-8 first:pt-0 lg:py-16 lg:pl-16">
+              <li key={beat.key} data-beat={beat.key} data-reveal className="relative py-8 first:pt-0 lg:py-16 lg:pl-16 lg:first:pt-0">
                 <span
                   aria-hidden
-                  className={`absolute left-0 hidden h-[23px] w-[23px] items-center justify-center rounded-full border font-mono text-[10px] transition-[background-color,border-color,color] duration-300 lg:flex ${
-                    i === 0 ? "-top-1" : "top-[3.72rem]"
+                  className={`absolute left-0 hidden h-7 w-7 items-center justify-center rounded-full border text-sm font-semibold transition-[background-color,border-color,color] duration-300 lg:flex ${
+                    i === 0 ? "-top-1" : "top-[3.75rem]"
                   } ${
                     active === i
                       ? "border-[var(--color-scene-1)] bg-scene text-ink-950"
@@ -133,7 +133,7 @@ export function LoopSection() {
                 >
                   {beat.title}
                 </h3>
-                <p className="mt-4 max-w-md text-base leading-relaxed text-ink-400">{beat.body}</p>
+                <p className="mt-4 max-w-md text-base leading-relaxed text-ink-300 md:text-lg">{beat.body}</p>
                 <p className="mt-5 flex flex-wrap gap-2">
                   {beat.sceneTags.map((tag) => (
                     <span key={tag} className="chip">
@@ -172,8 +172,8 @@ function LoopConsole({ step }: { step: number }) {
     <div className="frame overflow-hidden rounded-[22px]">
       <div className="flex items-center gap-3 border-b border-line bg-white/[0.015] px-5 py-3.5">
         <span aria-hidden className="live-dot text-scene" />
-        <span className="text-[13px] font-semibold text-ink-100">The loop</span>
-        <span className="label-mono ml-auto">beat {String(step + 1).padStart(2, "0")} / 04</span>
+        <span className="text-base font-semibold text-ink-100">The loop</span>
+        <span className="label-mono ml-auto">Beat {String(step + 1).padStart(2, "0")} of 04</span>
       </div>
       <div aria-hidden className="flex gap-1 px-5 pt-4">
         {[0, 1, 2, 3].map((i) => (
@@ -186,7 +186,9 @@ function LoopConsole({ step }: { step: number }) {
         ))}
       </div>
 
-      <div className="relative min-h-[340px] p-5 md:min-h-[370px]">
+      {/* The four panels share one grid cell, so the console is as tall
+          as its tallest panel and the text can never be clipped. */}
+      <div className="grid p-5 md:p-6">
         <ConsoleArrive on={step === 0} />
         <ConsoleDraft on={step === 1} />
         <ConsoleGate on={step === 2} />
@@ -201,7 +203,7 @@ function Panel({ on, children }: { on: boolean; children: React.ReactNode }) {
     <div
       aria-hidden={!on}
       data-on={on ? "true" : "false"}
-      className={`absolute inset-0 p-5 transition-[opacity,transform] duration-500 ${
+      className={`col-start-1 row-start-1 transition-[opacity,transform] duration-500 ${
         on
           ? "translate-y-0 opacity-100"
           : "pointer-events-none translate-y-3 opacity-0"
@@ -229,8 +231,8 @@ function Row({
         ? "border-emerald-400/25 bg-emerald-400/[0.05]"
         : "border-line bg-white/[0.02]";
   return (
-    <div className={`flex items-center justify-between gap-3 rounded-xl border px-3.5 py-2.5 ${toneCls}`}>
-      <span className="truncate text-[13px] text-ink-200">{label}</span>
+    <div className={`flex items-center justify-between gap-4 rounded-xl border px-4 py-3 ${toneCls}`}>
+      <span className="min-w-0 text-base leading-snug text-ink-100">{label}</span>
       <span className="label-mono shrink-0">{meta}</span>
     </div>
   );
@@ -240,16 +242,16 @@ function ConsoleArrive({ on }: { on: boolean }) {
   return (
     <Panel on={on}>
       <p className="label-mono">
-        overnight · unsorted
+        Overnight · unsorted
       </p>
-      <div className="loop-rows mt-3 space-y-2">
+      <div className="loop-rows mt-4 space-y-2.5">
         <Row tone="neutral" label="Re: invoice #0042, payment date?" meta="email" />
         <Row tone="neutral" label="Brief: spring drop launch copy" meta="request" />
         <Row tone="neutral" label="Homepage hero, v2 uploaded" meta="handoff" />
         <Row tone="neutral" label="9 newsletters, 3 receipts" meta="noise" />
         <Row tone="neutral" label="New lead: agency, 12 seats" meta="form" />
       </div>
-      <p className="mt-4 text-xs leading-relaxed text-ink-400">
+      <p className="mt-5 text-base leading-relaxed text-ink-300">
         Nothing triaged yet. This is the pile.
       </p>
     </Panel>
@@ -260,16 +262,16 @@ function ConsoleDraft({ on }: { on: boolean }) {
   return (
     <Panel on={on}>
       <p className="label-mono">
-        agent pass · 06:00
+        Agent pass · 06:00
       </p>
-      <div className="loop-rows mt-3 space-y-2">
+      <div className="loop-rows mt-4 space-y-2.5">
         <Row tone="accent" label="Reply drafted: payment nudge, your tone" meta="draft" />
         <Row tone="accent" label="Launch copy drafted on-brand, 3 variants" meta="draft" />
         <Row tone="neutral" label="Hero v2 routed to PM review" meta="routed" />
         <Row tone="neutral" label="Noise auto-filed, 12 items" meta="filed" />
         <Row tone="accent" label="Lead qualified + summary written" meta="draft" />
       </div>
-      <p className="mt-4 text-xs leading-relaxed text-ink-400">
+      <p className="mt-5 text-base leading-relaxed text-ink-300">
         The 80% is done. None of it has shipped.
       </p>
     </Panel>
@@ -280,20 +282,20 @@ function ConsoleGate({ on }: { on: boolean }) {
   return (
     <Panel on={on}>
       <p className="label-mono">
-        waiting on you · 3 items
+        Waiting on you · 3 items
       </p>
-      <div className="loop-rows mt-3 space-y-2">
+      <div className="loop-rows mt-4 space-y-2.5">
         <Row tone="accent" label="Payment nudge → Greenfield Studio" meta="approve?" />
         <Row tone="accent" label="Launch copy, variant B" meta="approve?" />
         <Row tone="accent" label="Lead reply + calendar link" meta="approve?" />
       </div>
-      <div className="mt-4 flex gap-2">
+      <div className="mt-5 flex flex-wrap gap-2">
         {/* Pictures of the scenes' buttons, not controls: this console is
             a diagram, so they are spans and nothing can be pressed. */}
         <span className="btn btn-positive btn-sm pointer-events-none">Approve</span>
         <span className="btn btn-quiet btn-sm pointer-events-none">Send back</span>
       </div>
-      <p className="mt-4 text-xs leading-relaxed text-ink-400">
+      <p className="mt-5 text-base leading-relaxed text-ink-300">
         Outbound, money, and publishing all stop here. Every decision lands
         in an append-only audit trail.
       </p>
@@ -305,15 +307,15 @@ function ConsoleLearn({ on }: { on: boolean }) {
   return (
     <Panel on={on}>
       <p className="label-mono">
-        rulebook · learned from you
+        Rulebook · learned from you
       </p>
-      <div className="loop-rows mt-3 space-y-2">
+      <div className="loop-rows mt-4 space-y-2.5">
         <Row tone="ok" label="✓ Chase overdue invoices at 12+ days" meta="new" />
         <Row tone="ok" label="✓ Launch copy: variant-B voice wins" meta="new" />
         <Row tone="neutral" label="✓ Writer agents never auto-publish" meta="house" />
         <Row tone="neutral" label="✗ No discount language in spring drop" meta="house" />
       </div>
-      <p className="mt-4 text-xs leading-relaxed text-ink-400">
+      <p className="mt-5 text-base leading-relaxed text-ink-300">
         Two new rules from today&apos;s approvals. Tomorrow&apos;s drafts
         start from them.
       </p>

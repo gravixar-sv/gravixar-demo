@@ -162,7 +162,7 @@ export function ReviewStateMachine() {
               const available = next.has(s);
               const t = transitions.find((x) => x.to === s);
               const base =
-                "absolute flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 whitespace-nowrap rounded-full border px-3.5 py-2 text-[12.5px] font-medium transition-[background-color,border-color,color,box-shadow] duration-300";
+                "absolute flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 whitespace-nowrap rounded-full border px-3.5 py-2 text-sm font-medium transition-[background-color,border-color,color,box-shadow] duration-300";
               const style = { left: `${(n.x / 960) * 100}%`, top: `${(n.y / 300) * 100}%` };
               if (available && t) {
                 return (
@@ -178,7 +178,7 @@ export function ReviewStateMachine() {
                       "border-dashed border-[color-mix(in_oklab,var(--color-scene-1)_60%,transparent)] bg-ink-900 text-scene-soft hover:border-solid hover:bg-[color-mix(in_oklab,var(--color-scene-1)_14%,var(--color-ink-900))] hover:text-white",
                     )}
                   >
-                    <span aria-hidden className="text-[10px]">
+                    <span aria-hidden className="text-sm">
                       →
                     </span>
                     {n.label}
@@ -203,7 +203,7 @@ export function ReviewStateMachine() {
                   {current ? (
                     <span aria-hidden className="live-dot text-scene" />
                   ) : visited.has(s) ? (
-                    <span aria-hidden className="text-[10px] text-ink-400">
+                    <span aria-hidden className="text-sm text-ink-400">
                       ✓
                     </span>
                   ) : null}
@@ -213,8 +213,8 @@ export function ReviewStateMachine() {
             })}
           </div>
         </div>
-        <p className="mt-2 text-[11px] text-ink-500 md:hidden">Swipe sideways to see the whole diagram.</p>
-        <p className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 text-[11px] text-ink-500">
+        <p className="mt-2 text-base text-ink-400 md:hidden">Swipe sideways to see the whole diagram.</p>
+        <p className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-ink-500">
           <span className="inline-flex items-center gap-1.5">
             <span aria-hidden className="h-0.5 w-4 rounded bg-scene" /> legal next move
           </span>
@@ -231,7 +231,7 @@ export function ReviewStateMachine() {
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
               <p className="label-mono">Deliverable</p>
-              <p className="mt-1.5 text-[15px] font-semibold text-ink-50">{TASK_TITLE}</p>
+              <p className="mt-1.5 text-base font-semibold text-ink-50">{TASK_TITLE}</p>
             </div>
             <span key={state} className={cn(STATE_CHIP[state], "chip-mono pop-in")}>
               {state}
@@ -239,7 +239,7 @@ export function ReviewStateMachine() {
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
             {transitions.length === 0 ? (
-              <p className="text-sm text-ink-400">
+              <p className="text-base text-ink-300">
                 Terminal state: the deliverable is shipped and locked. Reset to run the loop again.
               </p>
             ) : (
@@ -256,7 +256,7 @@ export function ReviewStateMachine() {
               ))
             )}
           </div>
-          <p className="mt-4 border-t border-line pt-3 text-xs text-ink-500">
+          <p className="mt-4 border-t border-line pt-3 text-base text-ink-400">
             Visible to <span className="text-ink-300">{actorFor(state)}</span>
           </p>
         </article>
@@ -268,7 +268,7 @@ export function ReviewStateMachine() {
           Audit log, this session
         </WidgetHeading>
         {audit.length === 0 ? (
-          <p className="mt-5 rounded-xl border border-dashed border-white/[0.1] px-4 py-6 text-center text-xs leading-relaxed text-ink-500">
+          <p className="mt-5 rounded-xl border border-dashed border-white/[0.1] px-4 py-6 text-center text-base leading-relaxed text-ink-500">
             No transitions yet. Move the deliverable and a row lands here. In production these rows live for seven
             years.
           </p>
@@ -277,8 +277,8 @@ export function ReviewStateMachine() {
             {audit.map((row) => (
               <li key={row.id} className="row-land flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line px-4 py-3">
                 <div className="min-w-0">
-                  <p className="flex flex-wrap items-center gap-2 text-[13px]">
-                    <span className="font-mono text-[11px] text-ink-500">#{row.id}</span>
+                  <p className="flex flex-wrap items-center gap-2 text-base">
+                    <span className="font-mono text-sm text-ink-500">#{row.id}</span>
                     <span className={cn(STATE_CHIP[row.from], "chip-mono opacity-70")}>{row.from}</span>
                     <span aria-hidden className="text-ink-500">
                       →
@@ -286,7 +286,7 @@ export function ReviewStateMachine() {
                     <span className="sr-only">to</span>
                     <span className={cn(STATE_CHIP[row.to], "chip-mono")}>{row.to}</span>
                   </p>
-                  <p className="mt-1.5 text-xs text-ink-500">
+                  <p className="mt-1.5 text-sm text-ink-500">
                     <span className="text-ink-300">{row.actor}</span> · <time suppressHydrationWarning>{timeAgo(row.at)}</time>
                   </p>
                 </div>

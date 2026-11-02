@@ -8,16 +8,19 @@ import { useReveal } from "@/lib/useReveal";
 import { useMagnetic } from "@/lib/interactions";
 import { INTERACTIVE_COUNT, numberWord } from "@/lib/modules";
 
-// Real production modules, from the fleet's module registry.
+// What the production modules do, in plain words. Each line is one of
+// the fleet's real modules (audit trail, approval gates, passkey + TOTP
+// step-up, provider credentialing, the HIPAA-aware AI guardrail, lead
+// ingestion, the LLM eval harness, the per-project QA scorecard).
 const MODULES = [
-  "append-only audit trail",
-  "human approval gates",
-  "passkey + TOTP step-up",
-  "provider credentialing",
-  "HIPAA-aware AI guardrail",
-  "lead-inbox ingestion",
-  "LLM eval harness",
-  "per-project QA scorecard",
+  "Every action is logged",
+  "Nothing goes out without your approval",
+  "Secure sign-in",
+  "Provider credentials checked",
+  "Healthcare-safe AI",
+  "New leads land in one inbox",
+  "AI answers tested before they ship",
+  "Quality checks on every project",
 ];
 
 export function ProofStrip() {
@@ -35,8 +38,8 @@ export function ProofStrip() {
           {[0, 1].map((copy) => (
             <ul key={copy} aria-hidden={copy === 1} className="flex shrink-0 gap-3">
               {MODULES.map((m) => (
-                <li key={m} className="chip px-3.5 py-1.5 text-[13px]">
-                  <span aria-hidden className="h-1 w-1 rounded-full bg-scene" />
+                <li key={m} className="chip px-4 py-2 text-base text-ink-200">
+                  <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-scene" />
                   {m}
                 </li>
               ))}
@@ -51,16 +54,16 @@ export function ProofStrip() {
             <p data-reveal className="eyebrow">
               Not a concept reel
             </p>
-            <h2 id="proof-heading" data-reveal className="display mt-4 text-4xl text-ink-50 md:text-6xl">
+            <h2 id="proof-heading" data-reveal className="display mt-4 text-4xl text-ink-50 md:text-5xl">
               The same loop runs Gravixar&apos;s own ops.
             </h2>
-            <p data-reveal className="mt-6 max-w-xl text-base leading-relaxed text-ink-400 md:text-lg">
+            <p data-reveal className="mt-6 max-w-xl text-base leading-relaxed text-ink-300 md:text-lg">
               The scenes borrow their spine from production systems: agency portals, finance cockpits, brand agents
               and a HIPAA-conscious medical-billing portal shipped for real clients, plus the platform Gravixar runs
               itself on. Same gates, same audit trail, same rulebook.
             </p>
             <p data-reveal className="mt-8">
-              <a href="/modules" className="group inline-flex items-center gap-2 text-base font-medium text-scene-soft hover:text-white">
+              <a href="/modules" className="group inline-flex min-h-11 items-center gap-2 text-base font-semibold text-scene-soft hover:text-white">
                 <span className="link-draw">
                   Try {numberWord(INTERACTIVE_COUNT).toLowerCase()} of the modules in isolation
                 </span>
@@ -71,7 +74,7 @@ export function ProofStrip() {
             </p>
           </div>
 
-          <div data-reveal className="frame relative flex flex-col justify-end overflow-hidden rounded-[26px] p-8 md:p-10">
+          <div data-reveal className="frame relative flex flex-col justify-center overflow-hidden rounded-[26px] p-8 md:p-10">
             <div
               aria-hidden
               className="pointer-events-none absolute inset-x-0 bottom-0 h-3/4"
@@ -80,21 +83,22 @@ export function ProofStrip() {
                   "radial-gradient(70% 100% at 50% 100%, color-mix(in oklab, var(--color-scene-1) 24%, transparent), transparent 70%)",
               }}
             />
-            <div className="relative">
-              <h3 className="display text-3xl text-ink-50 md:text-[2.6rem]">
-                Want this loop on <span className="voice font-normal text-scene-soft">your ops?</span>
+            {/* Centred: the card is the page's last ask, one column, one button. */}
+            <div className="relative flex flex-col items-center text-center">
+              <h3 className="display text-3xl text-ink-50 md:text-[2.5rem]">
+                Want this loop on <span className="voice text-scene-soft">your ops?</span>
               </h3>
-              <p className="mt-4 max-w-md text-base leading-relaxed text-ink-400">
+              <p className="mt-5 max-w-md text-base leading-relaxed text-ink-300 md:text-lg">
                 One call to scope it. Most builds run 4 to 8 weeks, owned by you, gated by your people.
               </p>
-              <div className="mt-8 flex flex-wrap items-center gap-5">
+              <div className="mt-8 flex flex-col items-center gap-4">
                 <a ref={cta} href="https://gravixar.com/contact" rel="noreferrer" className="btn btn-primary btn-lg">
                   Book a 30-min call
                   <span aria-hidden className="btn-arrow">
                     →
                   </span>
                 </a>
-                <a href="https://gravixar.com" rel="noreferrer" className="link-draw text-sm text-ink-400 hover:text-ink-100">
+                <a href="https://gravixar.com" rel="noreferrer" className="link-draw text-base text-ink-300 hover:text-ink-50">
                   gravixar.com
                 </a>
               </div>

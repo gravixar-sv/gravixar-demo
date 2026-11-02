@@ -12,10 +12,10 @@ export type AvatarHue = {
 };
 
 const SIZES = {
-  xs: "h-6 w-6 text-[10px]",
-  sm: "h-8 w-8 text-[10px]",
-  md: "h-10 w-10 text-[11px]",
-  lg: "h-12 w-12 text-xs",
+  xs: "h-7 w-7 text-sm",
+  sm: "h-8 w-8 text-sm",
+  md: "h-10 w-10 text-sm",
+  lg: "h-12 w-12 text-sm",
 } as const;
 
 export function Avatar({

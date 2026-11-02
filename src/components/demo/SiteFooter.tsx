@@ -5,13 +5,13 @@ export function SiteFooter() {
     <footer className="border-t border-line">
       <div className="mx-auto flex max-w-[1440px] flex-col gap-6 px-4 py-10 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-10">
         <div className="flex items-center gap-3">
-          <img src="/brand/gravixar-wordmark.png" alt="Gravixar" width={130} height={32} className="h-4 w-auto opacity-90" />
-          <span className="text-xs text-ink-500">
+          <img src="/brand/gravixar-wordmark.png" alt="Gravixar" width={130} height={32} className="h-5 w-auto" />
+          <span className="text-base text-ink-400">
             Demo on sample data. Nothing you press here leaves the page.
           </span>
         </div>
         <nav aria-label="Footer">
-          <ul className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-ink-400">
+          <ul className="flex flex-wrap items-center gap-x-6 gap-y-2 text-base text-ink-300">
             <li>
               <a href="/" className="link-draw transition-colors hover:text-ink-50">
                 All scenes

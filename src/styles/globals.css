@@ -1,22 +1,26 @@
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────────────────────────────────
-   demo.gravixar.com design system ("Gate" v3, 2026-09-25)
+   demo.gravixar.com design system ("Gate" v4, 2026-11-02)
 
    Ground     ink, a near-black with a faint warm-violet tint. Never #000.
    Neutrals   the ink ramp below. Tailwind's zinc-* is remapped onto it,
               so every zinc class in the codebase reads the same family.
-              Contrast on ink-950: ink-400 = 7.6:1, ink-500 = 4.6:1 (the
-              floor for anything informative), ink-600 = 2.4:1 and is
-              decoration only (hairlines, separators).
+              Every text colour meets WCAG AA (4.5:1) on every ink surface
+              up to ink-800: ink-500 = 5.0:1 there (6.0:1 on ink-950) and
+              is the quietest text allowed. ink-600 and below are
+              decoration only (hairlines, separators), never text.
    Accent     --color-mark is the logo mark and nothing else. Everything
               else reads the scene tokens (--color-scene-1 / -2 / -glow),
               which each scene sets inline on its root.
-   Type       Mona Sans (variable width + weight) for everything; display
-              headings run it semi-expanded. Newsreader italic is the one
-              human-voice phrase, never UI, never under 20px. Geist Mono
-              is machine output only: timestamps, IDs, amounts, statuses.
-              Nothing a visitor must read is under 11px; meta floor 10px.
+   Type       Open Sans, one family for everything: headings, body, the
+              italic human-voice phrase and machine values (tabular
+              figures stand in for the old mono). Body text is 16px at
+              line-height 1.6; labels, tags, chips and meta are 14px at
+              minimum; headings run line-height 1.2. Nothing is smaller.
+   Buttons    every primary button is the hero's: 48px tall, 16px label.
+              Secondary buttons are 44px (40px for the compact size) with a
+              visible fill and border, so every action reads as one.
    Depth      light and grain, never coloured drop-glows on text.
    Motion     transform + opacity only. Base visibility never depends on
               a JS ticker (CSS hides, IntersectionObserver reveals, a
@@ -32,7 +36,7 @@
   --color-ink-800: #201e25;
   --color-ink-700: #2e2c34;
   --color-ink-600: #47444e;
-  --color-ink-500: #7d7884;
+  --color-ink-500: #908b97;
   --color-ink-400: #a6a1ad;
   --color-ink-300: #c8c4cd;
   --color-ink-200: #dfdce3;
@@ -45,7 +49,7 @@
   --color-zinc-800: #201e25;
   --color-zinc-700: #2e2c34;
   --color-zinc-600: #47444e;
-  --color-zinc-500: #7d7884;
+  --color-zinc-500: #908b97;
   --color-zinc-400: #a6a1ad;
   --color-zinc-300: #c8c4cd;
   --color-zinc-200: #dfdce3;
@@ -54,7 +58,7 @@
 
   --color-bg: #09080b;
   --color-fg: #f8f7fa;
-  --color-muted: #7d7884;
+  --color-muted: #908b97;
   --color-line: rgb(255 255 255 / 0.07);
   --color-line-strong: rgb(255 255 255 / 0.13);
 
@@ -66,13 +70,31 @@
   --color-scene-2: #f5e6d3;
   --color-scene-glow: rgb(255 107 91 / 0.35);
 
-  --font-sans: "Mona Sans Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Mona Sans Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Newsreader", ui-serif, Georgia, serif;
-  --font-mono: "Geist Mono Variable", ui-monospace, "SF Mono", Consolas, monospace;
+  /* One family. The serif and mono names stay as aliases so older
+     class names (.voice, font-mono) resolve to Open Sans too. */
+  --font-sans: "Open Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-sans);
+  --font-serif: var(--font-sans);
+  --font-mono: var(--font-sans);
   /* Legacy names some scene code still uses. */
-  --font-display-mono: var(--font-mono);
-  --font-display-serif: var(--font-display);
+  --font-display-mono: var(--font-sans);
+  --font-display-serif: var(--font-sans);
+
+  /* Size floors: 14px for labels (text-sm), 16px for body (text-base).
+     Body sizes read at 1.6, headings (xl and up) at 1.2. */
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1rem;
+  --text-base--line-height: 1.6;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.6;
+  --text-xl--line-height: 1.3;
+  --text-2xl--line-height: 1.2;
+  --text-3xl--line-height: 1.2;
+  --text-4xl--line-height: 1.2;
+  --text-5xl--line-height: 1.2;
+  --text-6xl--line-height: 1.2;
+  --text-7xl--line-height: 1.2;
 
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
@@ -87,7 +109,8 @@
     color: var(--color-ink-50);
     color-scheme: dark;
     font-family: var(--font-sans);
-    font-feature-settings: "ss01", "cv11";
+    font-size: 1rem;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -114,10 +137,23 @@
   h3,
   h4 {
     font-family: var(--font-display);
+    line-height: 1.2;
     text-wrap: balance;
   }
   p {
     text-wrap: pretty;
+  }
+  /* Machine values (amounts, IDs, times) used to be Geist Mono; with one
+     family, tabular figures keep columns of numbers aligned. */
+  .font-mono,
+  .label-mono,
+  .chip-mono {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Clear space between paragraphs of running copy. Margin utilities
+     still win, since they sit in a later layer. */
+  .copy > p + p {
+    margin-top: 1em;
   }
   ::selection {
     background: var(--color-scene-1);
@@ -155,41 +191,38 @@
 
   .display {
     font-family: var(--font-display);
-    font-stretch: 112%;
-    font-weight: 620;
-    letter-spacing: -0.03em;
-    line-height: 1;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
   }
   .heading {
     font-family: var(--font-display);
-    font-stretch: 106%;
-    font-weight: 580;
-    letter-spacing: -0.022em;
-    line-height: 1.08;
+    font-weight: 650;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
   }
-  /* The one human-voice phrase per page. */
+  /* The one human-voice phrase per page: the same family and weight as
+     the heading it sits in, in italic and the scene's colour. */
   .voice {
-    font-family: var(--font-serif);
+    font-family: var(--font-sans);
     font-style: italic;
-    font-weight: 400;
-    font-stretch: normal;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
   }
   /* Quiet section label: sans, sentence case, never shouting. */
   .eyebrow {
-    font-size: 0.75rem;
-    line-height: 1rem;
-    font-weight: 560;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    font-weight: 600;
     letter-spacing: 0.01em;
     color: var(--color-ink-400);
   }
-  /* Machine label: mono, for statuses, counts, IDs and timestamps. */
+  /* Machine label: statuses, counts, IDs and timestamps. Sentence case
+     at the 14px label floor; tabular figures (see base). */
   .label-mono {
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    line-height: 1rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    font-weight: 600;
+    letter-spacing: 0.01em;
     color: var(--color-ink-500);
   }
 
@@ -277,15 +310,15 @@
     isolation: isolate;
     overflow: hidden;
     display: inline-flex;
-    min-height: 2.5rem;
+    min-height: 2.75rem;
     align-items: center;
     justify-content: center;
-    gap: 0.4rem;
-    border-radius: 0.625rem;
-    padding: 0.45rem 0.85rem;
-    font-size: 0.8125rem;
-    line-height: 1.1;
-    font-weight: 560;
+    gap: 0.5rem;
+    border-radius: 0.75rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.9375rem;
+    line-height: 1.2;
+    font-weight: 600;
     white-space: nowrap;
     border: 1px solid transparent;
     transition:
@@ -295,16 +328,11 @@
       color 180ms ease,
       box-shadow 220ms var(--ease-out);
   }
-  @media (min-width: 1024px) {
-    .btn {
-      min-height: 2.125rem;
-    }
-  }
   .btn:active:not(:disabled) {
     transform: scale(0.97);
   }
   .btn:disabled {
-    opacity: 0.45;
+    opacity: 0.6;
     cursor: not-allowed;
   }
   .btn .btn-arrow {
@@ -318,30 +346,39 @@
   .btn-lg {
     min-height: 3rem;
     padding: 0.75rem 1.25rem;
-    font-size: 0.9375rem;
-    border-radius: 0.75rem;
+    font-size: 1rem;
   }
+  /* Compact, for actions inside a work item. Still a 40px target. */
   .btn-sm {
-    min-height: 2.25rem;
-    padding: 0.3rem 0.65rem;
-    font-size: 0.75rem;
-    border-radius: 0.5rem;
+    min-height: 2.5rem;
+    padding: 0.4375rem 0.875rem;
+    font-size: 0.875rem;
+    border-radius: 0.625rem;
   }
-  @media (min-width: 1024px) {
-    .btn-sm {
-      min-height: 1.875rem;
-    }
-  }
-  /* The decision: scene accent, solid. */
+  /* The decision: scene accent, solid. Every primary button is the
+     hero's size whatever size class it carries, so the decision on a
+     screen is always the biggest, clearest thing on it. */
   .btn-primary {
+    min-height: 3rem;
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+    border-radius: 0.75rem;
     background: var(--color-scene-1);
     color: var(--color-ink-950);
     box-shadow:
       inset 0 1px 0 0 rgb(255 255 255 / 0.35),
       0 8px 24px -10px var(--color-scene-glow);
   }
+  /* Not available yet: a plain grey key with readable text, rather than
+     a see-through coral one whose label drops below AA. */
+  .btn-primary:disabled {
+    opacity: 1;
+    background: var(--color-ink-800);
+    color: var(--color-ink-400);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+  }
   @media (hover: hover) and (pointer: fine) {
-    .btn-primary:hover {
+    .btn-primary:hover:not(:disabled) {
       background: color-mix(in oklab, var(--color-scene-1) 86%, white);
       box-shadow:
         inset 0 1px 0 0 rgb(255 255 255 / 0.45),
@@ -350,9 +387,9 @@
   }
   /* Scene-accent tint, for the hand-offs inside a workspace. */
   .btn-accent {
-    background: color-mix(in oklab, var(--color-scene-1) 13%, transparent);
-    border-color: color-mix(in oklab, var(--color-scene-1) 38%, transparent);
-    color: color-mix(in oklab, var(--color-scene-1) 70%, white);
+    background: color-mix(in oklab, var(--color-scene-1) 18%, transparent);
+    border-color: color-mix(in oklab, var(--color-scene-1) 55%, transparent);
+    color: color-mix(in oklab, var(--color-scene-1) 55%, white);
   }
   @media (hover: hover) and (pointer: fine) {
     .btn-accent:hover {
@@ -362,8 +399,8 @@
     }
   }
   .btn-positive {
-    background: rgb(52 211 153 / 0.12);
-    border-color: rgb(52 211 153 / 0.34);
+    background: rgb(52 211 153 / 0.16);
+    border-color: rgb(52 211 153 / 0.5);
     color: #a7f3d0;
   }
   @media (hover: hover) and (pointer: fine) {
@@ -374,8 +411,8 @@
     }
   }
   .btn-caution {
-    background: rgb(251 191 36 / 0.1);
-    border-color: rgb(251 191 36 / 0.3);
+    background: rgb(251 191 36 / 0.14);
+    border-color: rgb(251 191 36 / 0.45);
     color: #fde68a;
   }
   @media (hover: hover) and (pointer: fine) {
@@ -386,8 +423,8 @@
     }
   }
   .btn-danger {
-    background: rgb(251 113 133 / 0.1);
-    border-color: rgb(251 113 133 / 0.3);
+    background: rgb(251 113 133 / 0.14);
+    border-color: rgb(251 113 133 / 0.45);
     color: #fecdd3;
   }
   @media (hover: hover) and (pointer: fine) {
@@ -398,9 +435,9 @@
     }
   }
   .btn-quiet {
-    background: rgb(255 255 255 / 0.04);
-    border-color: var(--color-line-strong);
-    color: var(--color-ink-200);
+    background: rgb(255 255 255 / 0.07);
+    border-color: rgb(255 255 255 / 0.2);
+    color: var(--color-ink-100);
   }
   @media (hover: hover) and (pointer: fine) {
     .btn-quiet:hover {
@@ -409,14 +446,28 @@
       color: white;
     }
   }
+  /* The least weight a button can have: still outlined, so it is
+     never mistaken for plain text. */
   .btn-ghost {
     background: transparent;
-    color: var(--color-ink-400);
+    border-color: rgb(255 255 255 / 0.16);
+    color: var(--color-ink-200);
   }
   @media (hover: hover) and (pointer: fine) {
     .btn-ghost:hover {
-      background: rgb(255 255 255 / 0.05);
-      color: var(--color-ink-100);
+      background: rgb(255 255 255 / 0.06);
+      border-color: rgb(255 255 255 / 0.26);
+      color: var(--color-ink-50);
+    }
+  }
+  /* A whole-card link (the index scene cards) carries a picture of its
+     button; hovering anywhere on the card lights that button. */
+  @media (hover: hover) and (pointer: fine) {
+    .card-link:hover .btn-primary {
+      background: color-mix(in oklab, var(--color-scene-1) 86%, white);
+    }
+    .card-link:hover .btn .btn-arrow {
+      transform: translateX(3px);
     }
   }
   /* Click ripple (src/lib/interactions.ts). */
@@ -437,23 +488,21 @@
   .chip {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.4rem;
     border-radius: 999px;
     border: 1px solid var(--color-line-strong);
     background: rgb(255 255 255 / 0.03);
-    padding: 0.15rem 0.6rem;
-    font-size: 0.71875rem;
-    line-height: 1rem;
-    font-weight: 540;
+    padding: 0.1875rem 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 500;
     color: var(--color-ink-300);
     white-space: nowrap;
   }
   /* Machine values in a chip: versions, IDs, amounts. */
   .chip-mono {
-    font-family: var(--font-mono);
-    font-weight: 400;
-    font-size: 0.6875rem;
-    letter-spacing: 0.02em;
+    font-weight: 500;
+    letter-spacing: 0.01em;
   }
   .chip-accent {
     border-color: color-mix(in oklab, var(--color-scene-1) 40%, transparent);

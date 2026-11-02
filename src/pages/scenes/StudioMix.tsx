@@ -174,7 +174,7 @@ function StudioConsole() {
           ) : (
             <div className="flex min-h-[260px] flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-white/[0.1] px-6 text-center">
               <span aria-hidden className="agent-orb" />
-              <p className="text-xs leading-relaxed text-ink-500">
+              <p className="text-base leading-relaxed text-ink-500">
                 Agents standing by.
                 <br />
                 Run one and its output streams in here.
@@ -208,7 +208,7 @@ function StudioConsole() {
         learnedLabel="learned from you"
         emptyText="Run ECHO, then approve or discard the draft, and the studio starts a policy book."
         renderMeta={(rule) => (
-          <p className="mt-1 text-[11px] text-ink-500">
+          <p className="mt-1 text-sm text-ink-500">
             {rule.learned ? (
               <span className="font-medium text-scene-soft">Learned from your call</span>
             ) : (
@@ -224,7 +224,7 @@ function StudioConsole() {
         noun="ops team"
         headline={
           <>
-            Put your agents <span className="voice font-normal text-scene-soft">behind a human.</span>
+            Put your agents <span className="voice text-scene-soft">behind a human.</span>
           </>
         }
         blurb="I wire supervised agent consoles like this into a team's ops: read-only agents run on their own, anything that writes or publishes waits for approval. One call to scope what to automate first."
@@ -268,7 +268,7 @@ function AgentMark({ agent, size = "md" }: { agent: StudioAgent; size?: "sm" | "
       aria-hidden
       className={cn(
         "inline-flex shrink-0 items-center justify-center border font-mono font-semibold",
-        size === "sm" ? "h-8 w-8 rounded-lg text-[12px]" : "h-10 w-10 rounded-xl text-[13px]",
+        size === "sm" ? "h-8 w-8 rounded-lg text-sm" : "h-10 w-10 rounded-xl text-base",
       )}
       style={{
         color: agent.color,
@@ -305,7 +305,7 @@ function AgentCard({
         <AgentMark agent={agent} size="sm" />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <p className="text-sm font-semibold tracking-[0.06em] text-ink-50">{agent.name}</p>
+            <p className="text-base font-semibold text-ink-50">{agent.name}</p>
             {current ? (
               <>
                 <span aria-hidden className="live-dot text-scene" />
@@ -318,10 +318,10 @@ function AgentCard({
               <span className="chip">Read-only</span>
             )}
           </div>
-          <p className="mt-1 flex flex-wrap items-center gap-2 text-xs text-ink-400">
+          <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-ink-400">
             {agent.role}
             {runs > 0 ? (
-              <span key={runs} className="pop-in inline-flex items-center gap-1 font-mono text-[11px] text-emerald-300/90">
+              <span key={runs} className="pop-in inline-flex items-center gap-1 font-mono text-sm text-emerald-300/90">
                 <span aria-hidden>✓</span> ran ×{runs}
               </span>
             ) : null}
@@ -331,7 +331,7 @@ function AgentCard({
           {runs > 0 ? "Run again" : "Run"}
         </Button>
       </div>
-      <p className="mt-2.5 text-[12.5px] leading-relaxed text-ink-400">{agent.blurb}</p>
+      <p className="mt-2.5 text-base leading-relaxed text-ink-400">{agent.blurb}</p>
     </ItemCard>
   );
 }
@@ -382,14 +382,14 @@ function OutputCard({ agent, state, dispatch }: { agent: StudioAgent; state: Stu
       className="pg-fresh-move border-[color-mix(in_oklab,var(--color-scene-1)_32%,transparent)] p-4"
     >
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-[13px] font-semibold tracking-[0.06em] text-ink-50">{agent.name}</span>
-        <span className="text-xs text-ink-400">{agent.role}</span>
+        <span className="text-base font-semibold tracking-[0.06em] text-ink-50">{agent.name}</span>
+        <span className="text-sm text-ink-400">{agent.role}</span>
         <span className="ml-auto flex items-center gap-1.5">
           {runId ? <span className="chip chip-mono">run·{runId}</span> : null}
         </span>
       </div>
 
-      <div className="mt-3 rounded-xl border border-line bg-ink-950/70 p-4 font-mono text-[12.5px] leading-relaxed">
+      <div className="mt-3 rounded-xl border border-line bg-ink-950/70 p-4 font-mono text-base leading-relaxed">
         <p className="label-mono mb-2.5 flex items-center gap-2">
           <span aria-hidden className="text-scene-soft">›</span>
           {agent.key} · stdout
@@ -434,7 +434,7 @@ function OutputCard({ agent, state, dispatch }: { agent: StudioAgent; state: Stu
             <span className="chip chip-positive">
               <span aria-hidden>✓</span> Ran autonomously
             </span>
-            <span className="text-[11px] text-ink-500">Read-only, nothing to approve</span>
+            <span className="text-sm text-ink-500">Read-only, nothing to approve</span>
           </p>
         )}
       </div>
@@ -474,17 +474,17 @@ function AuditTimeline({ feed }: { feed: AuditEntry[] }) {
               </span>
               <div className="min-w-0">
                 <div className="flex items-baseline justify-between gap-2">
-                  <p className="text-[13px] leading-snug text-ink-300">
+                  <p className="text-base leading-snug text-ink-300">
                     <span className={cn("font-semibold", agent ? "tracking-[0.04em] text-ink-100" : "text-scene-soft")}>
                       {e.actor}
                     </span>{" "}
                     {e.action}
                   </p>
-                  <time suppressHydrationWarning className="shrink-0 font-mono text-[10.5px] text-ink-500">
+                  <time suppressHydrationWarning className="shrink-0 font-mono text-sm text-ink-500">
                     {formatRelative(e.ts)}
                   </time>
                 </div>
-                {e.detail ? <p className="mt-0.5 break-words text-xs leading-snug text-ink-500">{e.detail}</p> : null}
+                {e.detail ? <p className="mt-0.5 break-words text-sm leading-snug text-ink-500">{e.detail}</p> : null}
               </div>
             </li>
           );

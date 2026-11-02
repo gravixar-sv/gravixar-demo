@@ -101,7 +101,7 @@ function LatticeReviewLoop() {
         board="Spring rebrand · review board"
         onClickCapture={endHint}
         toolbar={
-          <span aria-hidden className="hidden -space-x-1.5 md:flex">
+          <span aria-hidden className="hidden gap-1 md:flex">
             {Object.values(PERSONAS).map((p) => (
               <span key={p.key} className="rounded-full ring-2 ring-ink-925">
                 <Avatar initials={p.initials} hue={p.hue} size="xs" ring={false} />
@@ -175,7 +175,7 @@ function LatticeReviewLoop() {
         learnedLabel={`learned from ${PERSONAS.client.firstName}`}
         emptyText={`Have ${PERSONAS.client.firstName} approve or revise a deliverable and the studio starts a house rulebook.`}
         renderMeta={(rule) => (
-          <p className="mt-1 flex flex-wrap items-center gap-x-2 text-[11px] text-ink-500">
+          <p className="mt-1 flex flex-wrap items-center gap-x-2 text-sm text-ink-500">
             <span>For {rule.audience === "editor" ? PERSONAS.editor.firstName : PERSONAS.pm.firstName}</span>
             {rule.learned ? (
               <span className="font-medium text-scene-soft">Learned from {PERSONAS.client.firstName}</span>
@@ -202,7 +202,7 @@ function LatticeReviewLoop() {
         noun="agency"
         headline={
           <>
-            Run your agency <span className="voice font-normal text-scene-soft">on this.</span>
+            Run your agency <span className="voice text-scene-soft">on this.</span>
           </>
         }
         blurb="This is the operating system I build for agencies: scoped projects, the review loop, invoicing and payment requests, partner commissions, leave and WFH, all gated and audited. Most builds run 4 to 8 weeks. One call to scope it, no obligation."
@@ -218,10 +218,10 @@ function CardHead({ d, stage }: { d: Deliverable; stage: string }) {
     <div className="flex items-start gap-3">
       <MockupThumb kind={d.kind} />
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold leading-snug text-ink-50">{d.title}</p>
+        <p className="text-base font-semibold leading-snug text-ink-50">{d.title}</p>
         <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
           <span className="chip chip-mono">v{d.version}</span>
-          <span className="text-[11px] text-ink-500">{stage}</span>
+          <span className="text-sm text-ink-500">{stage}</span>
         </div>
       </div>
     </div>
@@ -243,7 +243,7 @@ function ClientCard({ d, dispatch, hint = false }: { d: Deliverable; dispatch: D
             rows={2}
             aria-label="Revision note"
             placeholder="What should change?"
-            className="w-full resize-none rounded-lg border border-line-strong bg-ink-950/60 px-3 py-2 text-[13px] text-ink-100 placeholder:text-ink-500 focus:border-[color-mix(in_oklab,var(--color-scene-1)_60%,transparent)] focus:outline-none"
+            className="w-full resize-none rounded-lg border border-line-strong bg-ink-950/60 px-3 py-2 text-base text-ink-100 placeholder:text-ink-500 focus:border-[color-mix(in_oklab,var(--color-scene-1)_60%,transparent)] focus:outline-none"
           />
           <div className="mt-2 flex gap-2">
             <Button
@@ -309,8 +309,8 @@ function PMRevisionCard({ d, dispatch }: { d: Deliverable; dispatch: Dispatch })
   return (
     <ItemCard vt={vtName("lat", d.id)} fresh={d.fresh} tone="caution">
       <CardHead d={d} stage="Client asked for changes" />
-      <blockquote className="mt-3 rounded-lg border border-amber-400/20 bg-amber-400/[0.06] px-3 py-2 text-[12.5px] leading-relaxed text-amber-100/90">
-        <span className="mr-1.5 text-[11px] font-semibold text-amber-300/90">{PERSONAS.client.firstName}:</span>
+      <blockquote className="mt-3 rounded-lg border border-amber-400/20 bg-amber-400/[0.06] px-3 py-2 text-base leading-relaxed text-amber-100/90">
+        <span className="mr-1.5 text-sm font-semibold text-amber-300/90">{PERSONAS.client.firstName}:</span>
         {d.revisionNote}
       </blockquote>
       <Button
@@ -354,8 +354,8 @@ function DoneCard({ d }: { d: Deliverable }) {
     <ItemCard vt={vtName("lat", d.id)} fresh={d.fresh} tone="positive" className="flex items-center gap-3 py-3">
       <MockupThumb kind={d.kind} />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-ink-200">{d.title}</p>
-        <p className="mt-1 text-[11px] font-medium text-emerald-300/90">
+        <p className="truncate text-base font-medium text-ink-200">{d.title}</p>
+        <p className="mt-1 text-sm font-medium text-emerald-300/90">
           <span aria-hidden>✓</span> Shipped · v{d.version}
         </p>
       </div>
@@ -384,7 +384,7 @@ function CapabilityStrip() {
         <h2 id="os-heading" className="heading text-lg text-ink-50">
           The rest of the OS
         </h2>
-        <p className="text-xs text-ink-500">Running alongside this loop</p>
+        <p className="text-base text-ink-400">Running alongside this loop</p>
       </div>
       <ul className="mt-4 divide-y divide-line">
         {OS_MODULES.map((m) => (
@@ -392,9 +392,9 @@ function CapabilityStrip() {
             key={m.name}
             className="group grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4 gap-y-0.5 py-3 sm:grid-cols-[minmax(0,13rem)_minmax(0,1fr)_auto]"
           >
-            <p className="col-start-1 row-start-1 text-[13.5px] font-medium text-ink-100 transition-colors group-hover:text-white">{m.name}</p>
-            <p className="col-span-2 col-start-1 row-start-2 text-[12.5px] text-ink-500 sm:col-span-1 sm:col-start-2 sm:row-start-1">{m.desc}</p>
-            <span className="col-start-2 row-start-1 font-mono text-[11px] text-scene-soft sm:col-start-3">{m.stat}</span>
+            <p className="col-start-1 row-start-1 text-base font-medium text-ink-100 transition-colors group-hover:text-white">{m.name}</p>
+            <p className="col-span-2 col-start-1 row-start-2 text-base text-ink-400 sm:col-span-1 sm:col-start-2 sm:row-start-1">{m.desc}</p>
+            <span className="col-start-2 row-start-1 font-mono text-sm text-scene-soft sm:col-start-3">{m.stat}</span>
           </li>
         ))}
       </ul>

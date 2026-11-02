@@ -29,7 +29,7 @@ export function SceneLayout({ slug, children }: { slug: string; children: ReactN
 
 /** The scene's product mark: a lit square with its glyph. */
 export function SceneGlyph({ scene, size = "md" }: { scene: Scene; size?: "sm" | "md" }) {
-  const box = size === "sm" ? "h-5 w-5 rounded-[6px] text-[10px]" : "h-7 w-7 rounded-lg text-xs";
+  const box = size === "sm" ? "h-5 w-5 rounded-[6px] text-sm" : "h-7 w-7 rounded-lg text-sm";
   return (
     <span
       aria-hidden
@@ -47,26 +47,26 @@ export function SceneGlyph({ scene, size = "md" }: { scene: Scene; size?: "sm" |
 function SceneBar({ scene }: { scene: Scene }) {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-ink-950/75 backdrop-blur-xl backdrop-saturate-150">
-      <div className="mx-auto flex h-14 max-w-[1440px] items-center gap-3 px-4 sm:px-6 lg:px-10">
+      <div className="mx-auto flex h-16 max-w-[1440px] items-center gap-3 px-4 sm:px-6 lg:px-10">
         <a
           href="/"
-          className="group inline-flex min-h-10 items-center gap-2 rounded-lg pr-2 text-sm text-ink-400 transition-colors hover:text-ink-50 lg:min-h-0"
+          aria-label="All scenes"
+          className="group inline-flex min-h-11 shrink-0 items-center gap-2 rounded-lg pr-2 text-sm text-ink-300 transition-colors hover:text-ink-50"
         >
           <span
             aria-hidden
-            className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-line-strong transition-[transform,border-color] duration-200 group-hover:-translate-x-0.5 group-hover:border-white/25"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/20 transition-[transform,border-color] duration-200 group-hover:-translate-x-0.5 group-hover:border-white/25"
           >
             ←
           </span>
-          <span className="hidden sm:inline">All scenes</span>
+          <span className="hidden whitespace-nowrap sm:inline xl:hidden 2xl:inline">All scenes</span>
         </a>
         <span aria-hidden className="h-5 w-px bg-line-strong" />
         <div className="flex min-w-0 items-center gap-2.5">
           <SceneGlyph scene={scene} />
-          <p className="min-w-0 truncate text-sm">
-            <span className="font-semibold text-ink-50">{scene.name}</span>
-            <span className="ml-2 hidden text-ink-500 md:inline">{scene.codename}</span>
-          </p>
+          {/* One name, the product's. The sample brand's name lives in the
+              workspace header below, where it is the app's own. */}
+          <p className="min-w-0 truncate text-base font-semibold text-ink-50">{scene.name}</p>
         </div>
 
         <nav aria-label="Other scenes" className="mx-auto hidden xl:block">
@@ -78,7 +78,7 @@ function SceneBar({ scene }: { scene: Scene }) {
                   <a
                     href={`/${s.slug}`}
                     aria-current={current ? "page" : undefined}
-                    className={`group flex items-center gap-2 rounded-full px-3 py-1.5 text-xs transition-colors duration-200 ${
+                    className={`group flex min-h-9 items-center gap-2 whitespace-nowrap rounded-full px-3 text-sm transition-colors duration-200 ${
                       current
                         ? "bg-white/[0.08] text-ink-50"
                         : "text-ink-400 hover:bg-white/[0.04] hover:text-ink-100"
@@ -97,15 +97,15 @@ function SceneBar({ scene }: { scene: Scene }) {
           </ul>
         </nav>
 
-        <div className="ml-auto flex items-center gap-2 xl:ml-0">
+        <div className="ml-auto flex shrink-0 items-center gap-2 xl:ml-0">
           <a
             href="https://gravixar.com"
             rel="noreferrer"
-            className="hidden px-2 text-xs text-ink-500 transition-colors hover:text-ink-100 md:inline"
+            className="hidden whitespace-nowrap px-2 text-sm text-ink-400 transition-colors hover:text-ink-100 md:inline xl:hidden 2xl:inline"
           >
             gravixar.com
           </a>
-          <ButtonLink href="https://gravixar.com/contact" external variant="primary" size="sm" arrow>
+          <ButtonLink href="https://gravixar.com/contact" external variant="primary" arrow>
             Book a call
           </ButtonLink>
         </div>

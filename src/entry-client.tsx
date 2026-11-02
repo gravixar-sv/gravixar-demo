@@ -1,6 +1,7 @@
-import "@fontsource-variable/mona-sans/wdth.css";
-import "@fontsource-variable/geist-mono";
-import "@fontsource/newsreader/latin-400-italic.css";
+// One family: Open Sans, upright and italic (the italic carries the
+// one human-voice phrase per page).
+import "@fontsource-variable/open-sans";
+import "@fontsource-variable/open-sans/wght-italic.css";
 import "@/styles/globals.css";
 
 import { StrictMode } from "react";

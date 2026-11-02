@@ -21,11 +21,11 @@ export function WidgetFrame({
     <section aria-label={`${crumb} sandbox`} className="frame scene-rise-2 rounded-[22px]">
       <div className="flex h-12 items-center gap-2.5 rounded-t-[21px] border-b border-line bg-white/[0.015] px-4">
         <SceneGlyph scene={lattice} size="sm" />
-        <span className="shrink-0 whitespace-nowrap text-[13px] font-semibold text-ink-100">{lattice.appName}</span>
-        <span aria-hidden className="text-ink-600">
+        <span className="shrink-0 whitespace-nowrap text-base font-semibold text-ink-100">{lattice.appName}</span>
+        <span aria-hidden className="text-ink-500">
           /
         </span>
-        <span className="min-w-0 truncate text-[13px] text-ink-400">{crumb}</span>
+        <span className="min-w-0 truncate text-base text-ink-400">{crumb}</span>
         <div className="ml-auto flex shrink-0 items-center gap-2">
           {toolbar}
           <span className="chip hidden sm:inline-flex">
@@ -46,7 +46,7 @@ export function WidgetHeading({ id, children, aside }: { id: string; children: R
       <h2 id={id} className="heading text-lg text-ink-50">
         {children}
       </h2>
-      {aside ? <div className="text-xs text-ink-500">{aside}</div> : null}
+      {aside ? <div className="text-sm text-ink-500">{aside}</div> : null}
     </div>
   );
 }

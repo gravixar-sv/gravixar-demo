@@ -75,7 +75,7 @@ export function DailyCheckin() {
           <div>
             <p className="label-mono">Today&apos;s check-in</p>
             <p className="heading mt-2 text-xl text-ink-50 md:text-2xl">Where are you working from today?</p>
-            <p className="mt-2 max-w-[60ch] text-xs leading-relaxed text-ink-500">
+            <p className="mt-2 max-w-[60ch] text-base leading-relaxed text-ink-500">
               In production this prompt opens on the first portal page view of each calendar day, counted on the
               team&apos;s own business day (Karachi time for PK-based teams), not UTC.
             </p>
@@ -113,7 +113,7 @@ export function DailyCheckin() {
                     aria-hidden
                     key={active ? "on" : "off"}
                     className={cn(
-                      "inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px]",
+                      "inline-flex h-6 w-6 items-center justify-center rounded-full text-sm",
                       active ? "pop-in bg-current" : "ring-1 ring-white/15",
                     )}
                   >
@@ -121,15 +121,15 @@ export function DailyCheckin() {
                   </span>
                 </span>
                 <span>
-                  <span className={cn("block text-[15px] font-semibold", active ? "" : "text-ink-100")}>{s.label}</span>
-                  <span className={cn("mt-0.5 block text-xs", active ? "opacity-80" : "text-ink-500")}>{s.hint}</span>
+                  <span className={cn("block text-base font-semibold", active ? "" : "text-ink-100")}>{s.label}</span>
+                  <span className={cn("mt-0.5 block text-sm", active ? "opacity-80" : "text-ink-500")}>{s.hint}</span>
                 </span>
               </button>
             );
           })}
         </div>
 
-        <p aria-live="polite" className="mt-5 min-h-5 border-t border-line pt-4 text-xs text-ink-400">
+        <p aria-live="polite" className="mt-5 min-h-5 border-t border-line pt-4 text-base text-ink-300">
           {picked ? (
             <>
               Saved as <span className="text-ink-100">{picked.label.toLowerCase()}</span>. The team board picks it up,
@@ -153,7 +153,7 @@ export function DailyCheckin() {
             return (
               <div key={s.value} className="rounded-xl border border-line bg-white/[0.015] p-3.5">
                 <div className="flex items-center justify-between">
-                  <p className="flex items-center gap-2 text-[13px] font-medium text-ink-200">
+                  <p className="flex items-center gap-2 text-base font-medium text-ink-200">
                     <span aria-hidden className={cn("h-2 w-2 rounded-full", s.dot)} />
                     {s.label}
                   </p>
@@ -206,8 +206,8 @@ function PersonChip({
     >
       <Avatar initials={initials === "YOU" ? "Y" : initials} hue={hue} size="xs" ring={false} />
       <span className="min-w-0">
-        <span className="block truncate text-[13px] text-ink-100">{name}</span>
-        <span className="block text-[11px] text-ink-500">{role}</span>
+        <span className="block truncate text-base text-ink-100">{name}</span>
+        <span className="block text-sm text-ink-500">{role}</span>
       </span>
     </span>
   );

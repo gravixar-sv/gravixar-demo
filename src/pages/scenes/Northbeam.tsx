@@ -211,7 +211,7 @@ function NorthbeamBrandAgent() {
         noun="brand agent"
         headline={
           <>
-            Give your brand an agent that <span className="voice font-normal text-scene-soft">holds the line.</span>
+            Give your brand an agent that <span className="voice text-scene-soft">holds the line.</span>
           </>
         }
         blurb="I build brand agents like this for DTC teams: on-brand drafts, a guardrail that blocks drift, and a memory that learns your rules from every approval. One call to scope it, no obligation."
@@ -291,15 +291,15 @@ function RequestCard({
         active &&
           !done &&
           "border-[color-mix(in_oklab,var(--color-scene-1)_45%,transparent)] bg-[color-mix(in_oklab,var(--color-scene-1)_6%,var(--color-ink-850))]",
-        req.status === "dropped" && "opacity-70",
+        req.status === "dropped" && "opacity-90",
       )}
     >
       <div className="flex items-start gap-3">
         <MockupThumb kind={req.kind} brand="northbeam" />
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold leading-snug text-ink-50">{req.title}</p>
-          <p className="mt-1 text-[12px] leading-snug text-ink-300">&ldquo;{req.brief}&rdquo;</p>
-          <p className="mt-1 text-[11px] text-ink-500">{req.by}</p>
+          <p className="text-base font-semibold leading-snug text-ink-50">{req.title}</p>
+          <p className="mt-1 text-base leading-snug text-ink-300">&ldquo;{req.brief}&rdquo;</p>
+          <p className="mt-1 text-sm text-ink-500">{req.by}</p>
         </div>
       </div>
 
@@ -373,12 +373,12 @@ function AgentDesk({ state, dispatch }: { state: NorthbeamState; dispatch: Dispa
           <span className="agent-orb" />
         </span>
         <div>
-          <p className="text-[15px] font-semibold text-ink-100">The agent is standing by.</p>
-          <p className="mt-1.5 text-[13px] leading-relaxed text-ink-400">
+          <p className="text-base font-semibold text-ink-100">The agent is standing by.</p>
+          <p className="mt-1.5 text-base leading-relaxed text-ink-400">
             Pick a request on the left and it drafts on-brand here.
           </p>
         </div>
-        <p className="max-w-[34ch] text-[12px] leading-relaxed text-ink-500">
+        <p className="max-w-[34ch] text-base leading-relaxed text-ink-500">
           Each draft lands with a preview, its copy, the brand checks it passed, and your call to approve or send it
           back.
         </p>
@@ -396,8 +396,8 @@ function AgentDesk({ state, dispatch }: { state: NorthbeamState; dispatch: Dispa
     <div style={{ viewTransitionName: "nb-draft" }}>
       <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
         <div className="min-w-0">
-          <p className="text-[15px] font-semibold leading-snug text-ink-50">{draft.title}</p>
-          {req ? <p className="mt-0.5 text-[11px] text-ink-500">Brief from {req.by}</p> : null}
+          <p className="text-base font-semibold leading-snug text-ink-50">{draft.title}</p>
+          {req ? <p className="mt-0.5 text-sm text-ink-500">Brief from {req.by}</p> : null}
         </div>
         <DraftChip key={`${take}-${gate}`} gate={gate} />
       </div>
@@ -416,7 +416,7 @@ function AgentDesk({ state, dispatch }: { state: NorthbeamState; dispatch: Dispa
               {fieldsOf(draft.lines).map((f) => (
                 <div key={f.label} className="grid grid-cols-[5.5rem_minmax(0,1fr)] items-baseline gap-3 py-2.5 sm:grid-cols-[6.75rem_minmax(0,1fr)]">
                   <span className="label-mono">{f.label}</span>
-                  <span className="text-[13.5px] leading-relaxed text-ink-100">{f.value}</span>
+                  <span className="text-base leading-relaxed text-ink-100">{f.value}</span>
                 </div>
               ))}
             </div>
@@ -426,7 +426,7 @@ function AgentDesk({ state, dispatch }: { state: NorthbeamState; dispatch: Dispa
               <p className="label-mono">On-brand checks</p>
               <ul key={take} className="pg-stagger mt-2.5 flex flex-wrap gap-2">
                 {draft.applied.map((a) => (
-                  <li key={a} className="chip chip-positive whitespace-normal py-1 text-left leading-snug">
+                  <li key={a} className="chip chip-positive whitespace-normal py-1.5 text-left text-base leading-snug">
                     <span aria-hidden>✓</span>
                     {a}
                   </li>
@@ -447,7 +447,7 @@ function AgentDesk({ state, dispatch }: { state: NorthbeamState; dispatch: Dispa
       >
         {gate === "pending" ? (
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-[12.5px] text-ink-300">
+            <p className="text-sm text-ink-300">
               <span className="font-semibold text-amber-200">Waiting on you.</span> This would publish.
             </p>
             <div className="flex flex-wrap gap-2">
@@ -461,7 +461,7 @@ function AgentDesk({ state, dispatch }: { state: NorthbeamState; dispatch: Dispa
           </div>
         ) : gate === "blocked" ? (
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="text-[12.5px] text-ink-300">
+            <p className="text-sm text-ink-300">
               <span className="font-semibold text-rose-200">Won&apos;t ship as-is.</span> Your call.
             </p>
             <div className="flex flex-wrap gap-2">
@@ -474,7 +474,7 @@ function AgentDesk({ state, dispatch }: { state: NorthbeamState; dispatch: Dispa
             </div>
           </div>
         ) : gate === "approved" ? (
-          <p className="flex flex-wrap items-center gap-2 text-[12.5px] text-ink-300">
+          <p className="flex flex-wrap items-center gap-2 text-sm text-ink-300">
             <span className="chip chip-positive pop-in">
               <span aria-hidden>✓</span> Approved + published
             </span>
@@ -483,7 +483,7 @@ function AgentDesk({ state, dispatch }: { state: NorthbeamState; dispatch: Dispa
             </span>
           </p>
         ) : gate === "changed" ? (
-          <p className="flex flex-wrap items-center gap-2 text-[12.5px] text-ink-300">
+          <p className="flex flex-wrap items-center gap-2 text-sm text-ink-300">
             <span className="chip chip-caution pop-in">
               <span aria-hidden>↩</span> Sent back
             </span>
@@ -707,7 +707,7 @@ function Pin({ n, className }: { n: number; className: string }) {
     <span
       aria-hidden
       className={cn(
-        "absolute inline-flex h-5 w-5 items-center justify-center rounded-full bg-rose-400 font-mono text-[11px] font-semibold text-ink-950 ring-4 ring-rose-400/25",
+        "absolute inline-flex h-6 w-6 items-center justify-center rounded-full bg-rose-400 font-mono text-sm font-semibold text-ink-950 ring-4 ring-rose-400/25",
         className,
       )}
     >
@@ -721,13 +721,13 @@ function Pin({ n, className }: { n: number; className: string }) {
 function GuardrailStop({ draft, take }: { draft: Draft; take: string }) {
   return (
     <div className="mt-5 rounded-xl border border-rose-400/20 bg-rose-400/[0.04] p-4">
-      <p className="flex items-center gap-2 text-[12.5px] font-semibold text-rose-200">
+      <p className="flex items-center gap-2 text-sm font-semibold text-rose-200">
         <ShieldGlyph className="h-4 w-4" />
         Stopped at the guardrail
       </p>
       <div key={take} className="pg-stagger mt-2.5 space-y-1.5">
         {draft.lines.map((line) => (
-          <p key={line} className="text-[13.5px] leading-relaxed text-ink-200">
+          <p key={line} className="text-base leading-relaxed text-ink-200">
             {line}
           </p>
         ))}
@@ -737,10 +737,10 @@ function GuardrailStop({ draft, take }: { draft: Draft; take: string }) {
           <p className="label-mono mt-4 text-rose-200/80">Breaks these locked rules</p>
           <ol className="mt-2 space-y-1.5">
             {draft.violations.map((v, i) => (
-              <li key={v} className="flex items-center gap-2.5 text-[12.5px] text-rose-100/90">
+              <li key={v} className="flex items-center gap-2.5 text-sm text-rose-100/90">
                 <span
                   aria-hidden
-                  className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-rose-400/40 font-mono text-[10.5px] text-rose-200"
+                  className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-rose-400/40 font-mono text-sm text-rose-200"
                 >
                   {i + 1}
                 </span>
@@ -759,21 +759,21 @@ function GuardrailStop({ draft, take }: { draft: Draft; take: string }) {
 function RuleMeta({ rule, gate }: { rule: BrandRule; gate: Gate }) {
   if (rule.learned) {
     return (
-      <p className="mt-1 text-[11px] font-medium text-scene-soft">
+      <p className="mt-1 text-sm font-medium text-scene-soft">
         {rule.kind === "do" ? "Learned from your approval" : "Learned when you sent one back"}
       </p>
     );
   }
   if (rule.kind === "dont") {
     return gate === "blocked" ? (
-      <p key="firing" className="pop-in mt-1 text-[11px] font-medium text-rose-300">
+      <p key="firing" className="pop-in mt-1 text-sm font-medium text-rose-300">
         Locked · holding the flash banner
       </p>
     ) : (
-      <p className="mt-1 text-[11px] text-ink-500">Locked · the guardrail enforces it</p>
+      <p className="mt-1 text-sm text-ink-500">Locked · the guardrail enforces it</p>
     );
   }
-  return <p className="mt-1 text-[11px] text-ink-500">House rule</p>;
+  return <p className="mt-1 text-sm text-ink-500">House rule</p>;
 }
 
 // ─── Brand kit ──────────────────────────────────────────────────────
@@ -794,11 +794,11 @@ function BrandKit() {
         <h2 id="northbeam-kit-heading" className="heading text-lg text-ink-50">
           Brand kit
         </h2>
-        <p className="text-xs text-ink-500">What the agent drafts against</p>
+        <p className="text-base text-ink-400">What the agent drafts against</p>
       </div>
       <ul className="mt-4 divide-y divide-line">
         <li className="group grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)] items-center gap-x-4 py-3">
-          <p className="text-[13.5px] font-medium text-ink-100 transition-colors group-hover:text-white">Palette</p>
+          <p className="text-base font-medium text-ink-100 transition-colors group-hover:text-white">Palette</p>
           <div className="flex flex-wrap items-center gap-3">
             {[
               { hex: NB.ground, name: "Forest" },
@@ -807,16 +807,16 @@ function BrandKit() {
             ].map((s) => (
               <span key={s.hex} className="inline-flex items-center gap-2">
                 <span aria-hidden className="h-5 w-5 rounded-md ring-1 ring-white/15" style={{ background: s.hex }} />
-                <span className="text-[12.5px] text-ink-400">{s.name}</span>
-                <span className="font-mono text-[10.5px] text-ink-500">{s.hex}</span>
+                <span className="text-sm text-ink-400">{s.name}</span>
+                <span className="font-mono text-sm text-ink-500">{s.hex}</span>
               </span>
             ))}
           </div>
         </li>
         {KIT.map((k) => (
           <li key={k.name} className="group grid grid-cols-[minmax(0,7rem)_minmax(0,1fr)] items-baseline gap-x-4 py-3">
-            <p className="text-[13.5px] font-medium text-ink-100 transition-colors group-hover:text-white">{k.name}</p>
-            <p className="text-[12.5px] text-ink-400">{k.desc}</p>
+            <p className="text-base font-medium text-ink-100 transition-colors group-hover:text-white">{k.name}</p>
+            <p className="text-base text-ink-400">{k.desc}</p>
           </li>
         ))}
       </ul>

@@ -67,10 +67,10 @@ export function LearnBeat<R extends LearnedRule>({
             <h2 id={headingId} className="heading text-lg text-ink-50">
               {heading}
             </h2>
-            <p className="text-xs text-ink-500">{sub}</p>
+            <p className="text-base text-ink-400">{sub}</p>
           </div>
         </div>
-        <p className="font-mono text-[11px] text-ink-500">
+        <p className="font-mono text-sm text-ink-500">
           {rules.length} {rules.length === 1 ? "rule" : "rules"}
           {learnedCount > 0 ? (
             <>
@@ -84,7 +84,7 @@ export function LearnBeat<R extends LearnedRule>({
         </p>
       </div>
       {rules.length === 0 ? (
-        <p className="mt-5 rounded-xl border border-dashed border-white/[0.1] px-4 py-6 text-center text-xs text-ink-500">
+        <p className="mt-5 rounded-xl border border-dashed border-white/[0.1] px-4 py-6 text-center text-base text-ink-400">
           {emptyText}
         </p>
       ) : (
@@ -123,7 +123,7 @@ export function RuleRow({
         <span
           aria-hidden
           className={cn(
-            "mt-px inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-[11px] font-semibold",
+            "mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-sm font-semibold",
             isDo ? "bg-emerald-400/12 text-emerald-300" : "bg-rose-400/12 text-rose-300",
           )}
         >
@@ -131,9 +131,9 @@ export function RuleRow({
         </span>
         <span className="sr-only">{isDo ? "Do:" : "Don't:"}</span>
         <div className="min-w-0 flex-1">
-          <p className="text-[13px] leading-relaxed text-ink-200">{rule.text}</p>
+          <p className="text-base leading-relaxed text-ink-200">{rule.text}</p>
           {meta ??
-            (rule.learned ? <p className="mt-1 text-[11px] font-medium text-scene-soft">{learnedNote}</p> : null)}
+            (rule.learned ? <p className="mt-1 text-sm font-medium text-scene-soft">{learnedNote}</p> : null)}
         </div>
       </div>
     </li>

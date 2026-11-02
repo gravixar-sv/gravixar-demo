@@ -116,7 +116,7 @@ function FounderCockpit() {
         onClickCapture={endHint}
         toolbar={
           <span className="hidden items-center gap-2 md:inline-flex">
-            <span className="text-xs text-ink-400">
+            <span className="text-sm text-ink-400">
               <span key={openTodos.length} className="pop-in inline-block font-mono text-ink-100">
                 {openTodos.length}
               </span>{" "}
@@ -144,9 +144,9 @@ function FounderCockpit() {
         emptyText="Approve a draft above and the cockpit starts learning your shape."
         renderMeta={(rule) =>
           rule.learned ? (
-            <p className="mt-1 text-[11px] font-medium text-scene-soft">Learned from your approval</p>
+            <p className="mt-1 text-sm font-medium text-scene-soft">Learned from your approval</p>
           ) : (
-            <p className="mt-1 text-[11px] text-ink-500">Starting default</p>
+            <p className="mt-1 text-sm text-ink-500">Starting default</p>
           )
         }
       />
@@ -168,7 +168,7 @@ function FounderCockpit() {
         noun="business"
         headline={
           <>
-            Run the business <span className="voice font-normal text-scene-soft">from one screen.</span>
+            Run the business <span className="voice text-scene-soft">from one screen.</span>
           </>
         }
         blurb="This is the cockpit I build for solo founders and small teams: inbox triage, today's priorities, and the money in one view, with you approving every send. One call to scope it, no obligation."
@@ -248,15 +248,15 @@ function InboxPane({
         const u = URGENCY[s.urgency];
         const quiet = s.autoFiled || s.routed;
         return (
-          <ItemCard key={s.id} vt={vtName("cp-signal", s.id)} fresh={s.fresh} className={cn(quiet && "opacity-75")}>
+          <ItemCard key={s.id} vt={vtName("cp-signal", s.id)} fresh={s.fresh} className={cn(quiet && "opacity-90")}>
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-ink-50">{s.from}</p>
-                <p className="mt-0.5 text-[13px] leading-snug text-ink-300">{s.subject}</p>
+                <p className="truncate text-base font-semibold text-ink-50">{s.from}</p>
+                <p className="mt-0.5 text-base leading-snug text-ink-300">{s.subject}</p>
               </div>
               <span className={cn("chip shrink-0", u.cls)}>{u.label}</span>
             </div>
-            <p className="mt-3 flex gap-2 border-t border-line pt-3 text-[12px] leading-relaxed text-ink-400">
+            <p className="mt-3 flex gap-2 border-t border-line pt-3 text-base leading-relaxed text-ink-400">
               <span aria-hidden className="text-scene">
                 ✦
               </span>
@@ -319,17 +319,17 @@ function TodayPane({ open, sent, dispatch }: { open: Todo[]; sent: Todo[]; dispa
       {open.map((t) => (
         <ItemCard key={t.id} vt={vtName("cp-todo", t.id)} fresh={t.fresh}>
           <div className="flex items-start justify-between gap-3">
-            <p className="text-sm font-semibold leading-snug text-ink-50">{t.label}</p>
+            <p className="text-base font-semibold leading-snug text-ink-50">{t.label}</p>
             {t.amountGbp !== undefined ? (
               <span className="chip chip-mono shrink-0 tabular-nums">£{t.amountGbp.toLocaleString("en-GB")}</span>
             ) : null}
           </div>
-          <p className="mt-1.5 text-[11px] text-ink-500">
+          <p className="mt-1.5 text-sm text-ink-500">
             {t.source === "money" ? "From Money · payment reminder" : "From the inbox · reply drafted"}
           </p>
           <div className="mt-3 rounded-lg bg-white/[0.03] px-3 py-2.5">
             <p className="label-mono">Draft</p>
-            <p className="mt-1 text-[12.5px] leading-relaxed text-ink-300">“{t.draft}”</p>
+            <p className="mt-1 text-base leading-relaxed text-ink-300">“{t.draft}”</p>
           </div>
           <div className="mt-3.5 flex flex-wrap gap-2">
             <Button
@@ -360,13 +360,13 @@ function TodayPane({ open, sent, dispatch }: { open: Todo[]; sent: Todo[]; dispa
         >
           <span
             aria-hidden
-            className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-400/12 text-[12px] text-emerald-300"
+            className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-400/12 text-sm text-emerald-300"
           >
             ✓
           </span>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-ink-200">{t.label}</p>
-            <p ref={focusRef(t.id)} tabIndex={-1} className="mt-0.5 text-[11px] font-medium text-emerald-300/90">
+            <p className="truncate text-base font-medium text-ink-200">{t.label}</p>
+            <p ref={focusRef(t.id)} tabIndex={-1} className="mt-0.5 text-sm font-medium text-emerald-300/90">
               Approved + sent{t.learnedRule ? <span className="text-ink-500"> · taught the cockpit a rule</span> : null}
             </p>
           </div>
@@ -403,12 +403,12 @@ function MoneyPane({ money, dispatch, count }: { money: MoneyItem[]; dispatch: D
         {summary.map((m) => (
           <div key={m.id} className="flex items-baseline justify-between gap-4 px-3.5 py-3">
             <dt className="min-w-0">
-              <span className="block text-[13px] font-medium text-ink-100">{m.label}</span>
-              <span className="mt-0.5 block text-[11px] text-ink-500">{m.sub}</span>
+              <span className="block text-base font-medium text-ink-100">{m.label}</span>
+              <span className="mt-0.5 block text-sm text-ink-500">{m.sub}</span>
             </dt>
             <dd
               className={cn(
-                "shrink-0 font-mono text-[15px] tabular-nums",
+                "shrink-0 font-mono text-base tabular-nums",
                 m.direction === "in" ? "text-emerald-300" : "text-rose-300",
               )}
             >
@@ -423,8 +423,8 @@ function MoneyPane({ money, dispatch, count }: { money: MoneyItem[]; dispatch: D
           <ItemCard key={m.id} vt={vtName("cp-money", m.id)} fresh={m.fresh} tone="danger">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-ink-50">{m.label}</p>
-                <p className="mt-0.5 text-[12px] text-ink-400">{m.sub}</p>
+                <p className="truncate text-base font-semibold text-ink-50">{m.label}</p>
+                <p className="mt-0.5 text-base text-ink-400">{m.sub}</p>
               </div>
               <span className="chip chip-danger shrink-0">Overdue</span>
             </div>
@@ -453,10 +453,10 @@ function MoneyPane({ money, dispatch, count }: { money: MoneyItem[]; dispatch: D
         ) : (
           <ItemCard key={m.id} vt={vtName("cp-money", m.id)} fresh={m.fresh} tone="caution">
             <div className="flex items-start justify-between gap-3">
-              <p className="min-w-0 text-sm font-semibold leading-snug text-ink-50">{m.label}</p>
+              <p className="min-w-0 text-base font-semibold leading-snug text-ink-50">{m.label}</p>
               <span className="chip chip-caution shrink-0 capitalize">{m.amount}</span>
             </div>
-            <p className="mt-1 text-[12px] leading-relaxed text-ink-400">{m.sub}</p>
+            <p className="mt-1 text-base leading-relaxed text-ink-400">{m.sub}</p>
           </ItemCard>
         ),
       )}
@@ -491,7 +491,7 @@ function OvernightRun({ state }: { state: CockpitState }) {
         <h2 id="cockpit-overnight-heading" className="heading text-lg text-ink-50">
           The overnight run
         </h2>
-        <p className="text-xs text-ink-500">What ran before you woke up</p>
+        <p className="text-base text-ink-400">What ran before you woke up</p>
       </div>
       <ul className="mt-4 divide-y divide-line">
         {rows.map((r) => (
@@ -499,13 +499,13 @@ function OvernightRun({ state }: { state: CockpitState }) {
             key={r.name}
             className="group grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4 gap-y-0.5 py-3 sm:grid-cols-[minmax(0,9rem)_minmax(0,1fr)_auto]"
           >
-            <p className="col-start-1 row-start-1 text-[13.5px] font-medium text-ink-100 transition-colors group-hover:text-white">
+            <p className="col-start-1 row-start-1 text-base font-medium text-ink-100 transition-colors group-hover:text-white">
               {r.name}
             </p>
-            <p className="col-span-2 col-start-1 row-start-2 text-[12.5px] text-ink-500 sm:col-span-1 sm:col-start-2 sm:row-start-1">
+            <p className="col-span-2 col-start-1 row-start-2 text-base text-ink-400 sm:col-span-1 sm:col-start-2 sm:row-start-1">
               {r.desc}
             </p>
-            <span key={r.stat} className="pop-in col-start-2 row-start-1 font-mono text-[11px] text-scene-soft sm:col-start-3">
+            <span key={r.stat} className="pop-in col-start-2 row-start-1 font-mono text-sm text-scene-soft sm:col-start-3">
               {r.stat}
             </span>
           </li>

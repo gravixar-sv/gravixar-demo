@@ -27,14 +27,14 @@ export default function ModulesIndex() {
       <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:items-end">
         <div className="scene-rise">
           <p className="eyebrow">Modules, the patterns I reuse across builds</p>
-          <h1 className="display mt-5 text-5xl text-ink-50 md:text-7xl">
+          <h1 className="display mt-5 text-5xl text-ink-50 md:text-6xl">
             Pick a module.
-            <span className="voice mt-2 block font-normal text-scene-soft">
+            <span className="voice mt-2 block text-scene-soft">
               {numberWord(INTERACTIVE_COUNT)} of them you can press.
             </span>
           </h1>
         </div>
-        <div className="scene-rise-2 space-y-4 text-base leading-relaxed text-ink-400">
+        <div className="scene-rise-2 space-y-4 text-base leading-relaxed text-ink-300">
           <p className="text-ink-300">
             The patterns I reuse across builds, running in production at Broomstick Hub, Beeline Medical, and the
             platform Gravixar runs itself on. Each engagement adds to the library, so the next build is faster.
@@ -85,8 +85,8 @@ function ModuleRow({ m }: { m: (typeof MODULES)[number] }) {
     >
       <h3 className="heading text-xl text-ink-100 transition-colors group-hover:text-white">{m.title}</h3>
       <div>
-        <p className="max-w-[70ch] text-sm leading-relaxed text-ink-400">{m.summary}</p>
-        <p className="mt-2 text-xs text-ink-500">Runs in {m.runningIn.join(", ")}</p>
+        <p className="max-w-[70ch] text-base leading-relaxed text-ink-400">{m.summary}</p>
+        <p className="mt-2 text-base text-ink-400">Runs in {m.runningIn.join(", ")}</p>
       </div>
       <span className="flex items-center gap-3 md:justify-end">
         <span className={`chip ${interactive ? "chip-positive" : ""}`}>
@@ -98,7 +98,7 @@ function ModuleRow({ m }: { m: (typeof MODULES)[number] }) {
             "in production"
           )}
         </span>
-        <span className="inline-flex items-center gap-1 text-sm text-ink-300 group-hover:text-white">
+        <span className="inline-flex items-center gap-1 text-base font-semibold text-scene-soft group-hover:text-white">
           {interactive ? "Try it" : "Read"}
           <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">
             →

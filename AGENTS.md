@@ -46,8 +46,9 @@ not a revival.
 - Open Sans, one family for everything: headings, body, the italic
   human-voice phrase (`.voice`, at most one per page) and machine values
   (tabular figures stand in for the old mono). Mona Sans, Newsreader and
-  Geist Mono were retired on 2026-11-02 at the owner's request, so this
-  site no longer matches gravixar.com's font.
+  Geist Mono were retired on 2026-11-02 at the owner's request, and
+  gravixar.com switched to Open Sans the same day, so the two sites
+  match again.
 - Three.js in exactly one component (`components/home/GateField.tsx`),
   loaded after mount, never in the prerender
 - Hosting: Vercel, static `dist/`, auto-deploy from `main`. `vercel.ts`
